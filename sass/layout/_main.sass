@@ -1,10 +1,10 @@
 .main
     position: relative
-    height: 80vh
-    width: max-content
+    // position: absolute
+    width: 90vw
     display: grid
-    grid-template: auto / repeat(3, auto)
-    grid-column-gap: 10vw
+    grid-template: repeat(3, auto) / auto
+    row-gap: 15vh
     box-sizing: content-box
     padding: 5vh 5vw
     transition: transform .7s ease ,translate .7s ease
@@ -13,5 +13,6 @@
 
 .container
     position: relative
-    width: 90vw
+    height: 80vh
     perspective: 100rem
+    scroll-margin-top: 15vh

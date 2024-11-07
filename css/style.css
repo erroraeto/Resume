@@ -506,6 +506,7 @@ span {
 html {
   color-scheme: dark;
   font-size: 62.5%;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -550,7 +551,7 @@ a:link, a:visited {
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("./square_721_bold_extended_bt.woff") format("woff");
+  src: url("/square_721_bold_extended_bt.woff") format("woff");
 }
 .btn {
   position: relative;
@@ -936,16 +937,24 @@ a:link, a:visited {
   justify-items: center;
   border-bottom: 1px solid #d1ffff;
 }
-
-.main {
+.navigation a:link, .navigation a:visited {
+  color: #d1ffff;
+}
+.navigation .logo {
   position: relative;
-  height: 80vh;
+  height: 3.6rem;
   width: -webkit-max-content;
   width: -moz-max-content;
   width: max-content;
+  cursor: pointer;
+}
+
+.main {
+  position: relative;
+  width: 90vw;
   display: grid;
-  grid-template: auto/repeat(3, auto);
-  grid-column-gap: 10vw;
+  grid-template: repeat(3, auto)/auto;
+  row-gap: 15vh;
   -webkit-box-sizing: content-box;
           box-sizing: content-box;
   padding: 5vh 5vw;
@@ -963,12 +972,14 @@ a:link, a:visited {
 
 .container {
   position: relative;
-  width: 90vw;
+  height: 80vh;
   -webkit-perspective: 100rem;
           perspective: 100rem;
+  scroll-margin-top: 15vh;
 }
 
 .container_about {
+  position: relative;
   display: grid;
   grid-template: auto/40% 60%;
   -webkit-box-pack: center;
@@ -1017,7 +1028,7 @@ a:link, a:visited {
   }
 }
 .container_skills {
-  position: absolute;
+  position: relative;
   height: -webkit-max-content;
   height: -moz-max-content;
   height: max-content;
@@ -1210,24 +1221,28 @@ a:link, a:visited {
 }
 
 .footer {
+  display: inline-block;
   position: sticky;
-  width: 100vw;
   height: 16rem;
   bottom: 0;
+  right: 0;
   z-index: 20;
   -webkit-transition: -webkit-transform 0.5s ease;
   transition: -webkit-transform 0.5s ease;
   transition: transform 0.5s ease;
   transition: transform 0.5s ease, -webkit-transform 0.5s ease;
-  -webkit-clip-path: polygon(60% -10%, 100% -10%, 100% 100%, 60% 100%);
-          clip-path: polygon(60% -10%, 100% -10%, 100% 100%, 60% 100%);
+  overflow: hidden;
 }
 .footer_bar {
-  position: absolute;
+  position: relative;
   bottom: 0;
   right: 0;
   height: 100%;
   width: 36.8rem;
+  -webkit-transition: -webkit-transform 0.5s ease;
+  transition: -webkit-transform 0.5s ease;
+  transition: transform 0.5s ease;
+  transition: transform 0.5s ease, -webkit-transform 0.5s ease;
 }
 .footer_bar .contact_target {
   position: absolute;

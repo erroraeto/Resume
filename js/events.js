@@ -38,53 +38,59 @@ async function textTyping(doc, txt, speed) {
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 };
-//Горизонтальный скролл
-let main = document.querySelector('.main');
-let skills = document.querySelector('.container_skills');
-let about = document.querySelector('.container_about');
-let home = document.querySelector('.container_home');
-let abilities = document.querySelector('.container_abilities');
-let pos = 1;
-
+//Скролл по id
 document.addEventListener('click', async function (e) {
-    if (!e.target.closest('.btn')) return;
-    let but = e.target.closest('.btn');
-    let childPos = e.target.parentNode.children;
+    if (!e.target.id == "btn") return;
+    e.target.hash.scrollIntoView();
+})
 
-    if (childPos[0] == but && 0 != pos) {
-        pos = 0;
-        main.style.transform = 'translateZ(-20rem)';
-        await sleep(500);
-        main.style.translate = '';
-        await sleep(700);
-        main.style.transform = '';
-        // skills.style.display = "none";
-        // for (el of about.children) el.style.display = "";
-        // home.style.opacity = "0";
-        // await sleep(500);
-        // home.style.display = "none";
-    } else if (childPos[1] == but && 1 != pos) {
-        pos = 1;
-        main.style.transform = 'translateZ(-20rem)';
-        await sleep(500);
-        main.style.translate = -100 + 'vw';
-        await sleep(700);
-        main.style.transform = '';
-        // skills.style.display = "none";
-        // home.style.display = "";
-        // for (el of about.children) el.style.display = "none";
-    } else if (childPos[2] == but && 2 != pos) {
-        pos = 2;
-        main.style.transform = 'translateZ(-20rem)';
-        await sleep(500);
-        main.style.translate = -200 + 'vw';
-        await sleep(700);
-        main.style.transform = '';
-        // skills.style.display = "block";
-        // home.style.display = "none";
-        // for (el of about.children) el.style.display = "none";
-    }
-});
+//Горизонтальный скролл
+// let main = document.querySelector('.main');
+// let skills = document.querySelector('.container_skills');
+// let about = document.querySelector('.container_about');
+// let home = document.querySelector('.container_home');
+// let abilities = document.querySelector('.container_abilities');
+// let pos = 1;
+
+// document.addEventListener('click', async function (e) {
+//     if (!e.target.closest('.btn')) return;
+//     let but = e.target.closest('.btn');
+//     let childPos = e.target.parentNode.children;
+
+//     if (childPos[0] == but && 0 != pos) {
+//         pos = 0;
+//         main.style.transform = 'translateZ(-20rem)';
+//         await sleep(500);
+//         main.style.translate = '';
+//         await sleep(700);
+//         main.style.transform = '';
+//         // skills.style.display = "none";
+//         // for (el of about.children) el.style.display = "";
+//         // home.style.opacity = "0";
+//         // await sleep(500);
+//         // home.style.display = "none";
+//     } else if (childPos[1] == but && 1 != pos) {
+//         pos = 1;
+//         main.style.transform = 'translateZ(-20rem)';
+//         await sleep(500);
+//         main.style.translate = -100 + 'vw';
+//         await sleep(700);
+//         main.style.transform = '';
+//         // skills.style.display = "none";
+//         // home.style.display = "";
+//         // for (el of about.children) el.style.display = "none";
+//     } else if (childPos[2] == but && 2 != pos) {
+//         pos = 2;
+//         main.style.transform = 'translateZ(-20rem)';
+//         await sleep(500);
+//         main.style.translate = -200 + 'vw';
+//         await sleep(700);
+//         main.style.transform = '';
+//         // skills.style.display = "block";
+//         // home.style.display = "none";
+//         // for (el of about.children) el.style.display = "none";
+//     }
+// });
 
 // async function aboutOpen() {
 
@@ -290,7 +296,8 @@ document.onmousedown = () => drag.setAttribute('r', `2.5`);
 document.onmouseup = () => drag.setAttribute('r', `4`);
 
 //Открытие/закрытие контактов
-let footer = document.querySelector('.footer');
+// let footer = document.querySelector('.footer');
+let footer = document.querySelector('.footer_bar');
 let contacts = document.querySelector('.contacts');
 let opened = false;
 

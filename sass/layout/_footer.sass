@@ -1,17 +1,23 @@
 .footer
+    display: inline-block
     position: sticky
-    width: 100vw
+    // position: fixed
+    // width: 100vw
     height: 16rem
     bottom: 0
+    right: 0
     z-index: 20
     transition: transform .5s ease
-    clip-path: polygon(60% -10%, 100% -10%, 100% 100%, 60% 100%)
+    // clip-path: polygon(60% -10%, 100% -10%, 100% 100%, 60% 100%)
+    overflow: hidden
     &_bar
-        position: absolute
+        position: relative
+        // position: absolute
         bottom: 0
         right: 0
         height: 100%
         width: 36.8rem
+        transition: transform .5s ease
         .contact_target
             position: absolute
             z-index: 1
