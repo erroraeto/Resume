@@ -41,6 +41,9 @@ function sleep(ms) {
 //Горизонтальный скролл
 let main = document.querySelector('.main');
 let skills = document.querySelector('.container_skills');
+let about = document.querySelector('.container_about');
+let home = document.querySelector('.container_home');
+let abilities = document.querySelector('.container_abilities');
 let pos = 1;
 
 document.addEventListener('click', async function (e) {
@@ -49,31 +52,43 @@ document.addEventListener('click', async function (e) {
     let childPos = e.target.parentNode.children;
 
     if (childPos[0] == but && 0 != pos) {
+        pos = 0;
         main.style.transform = 'translateZ(-20rem)';
         await sleep(500);
         main.style.translate = '';
         await sleep(700);
         main.style.transform = '';
-        pos = 0;
-        skills.style.display = "none";
+        // skills.style.display = "none";
+        // for (el of about.children) el.style.display = "";
+        // home.style.opacity = "0";
+        // await sleep(500);
+        // home.style.display = "none";
     } else if (childPos[1] == but && 1 != pos) {
+        pos = 1;
         main.style.transform = 'translateZ(-20rem)';
         await sleep(500);
         main.style.translate = -100 + 'vw';
         await sleep(700);
         main.style.transform = '';
-        pos = 1;
-        skills.style.display = "none";
+        // skills.style.display = "none";
+        // home.style.display = "";
+        // for (el of about.children) el.style.display = "none";
     } else if (childPos[2] == but && 2 != pos) {
+        pos = 2;
         main.style.transform = 'translateZ(-20rem)';
         await sleep(500);
         main.style.translate = -200 + 'vw';
         await sleep(700);
         main.style.transform = '';
-        pos = 2;
-        skills.style.display = "block";
+        // skills.style.display = "block";
+        // home.style.display = "none";
+        // for (el of about.children) el.style.display = "none";
     }
 });
+
+// async function aboutOpen() {
+
+// }
 
 //Выбор скилла
 let parametr = document.querySelector(".parametr");

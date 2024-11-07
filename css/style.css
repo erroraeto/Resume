@@ -205,6 +205,34 @@ span {
     opacity: 1;
   }
 }
+@-webkit-keyframes visiible {
+  0% {
+    -webkit-transform: translateZ(-4rem);
+            transform: translateZ(-4rem);
+    -webkit-filter: blur(2px);
+            filter: blur(2px);
+  }
+  100% {
+    -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+    -webkit-filter: blur(0);
+            filter: blur(0);
+  }
+}
+@keyframes visiible {
+  0% {
+    -webkit-transform: translateZ(-4rem);
+            transform: translateZ(-4rem);
+    -webkit-filter: blur(2px);
+            filter: blur(2px);
+  }
+  100% {
+    -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+    -webkit-filter: blur(0);
+            filter: blur(0);
+  }
+}
 @-webkit-keyframes openFigure {
   0% {
     fill: rgba(209, 255, 255, 0.8);
@@ -522,7 +550,7 @@ a:link, a:visited {
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(../../../assets/fonts/Square/Square721BT-BoldExtended.woff) format("woff");
+  src: url("/square_721_bold_extended_bt.woff") format("woff");
 }
 .btn {
   position: relative;
@@ -670,6 +698,8 @@ a:link, a:visited {
   position: relative;
   -webkit-perspective: 100rem;
           perspective: 100rem;
+  -webkit-animation: inclusion 1s ease 0.3s both;
+          animation: inclusion 1s ease 0.3s both;
 }
 .slider > * {
   position: absolute;
@@ -947,11 +977,15 @@ a:link, a:visited {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
+  -webkit-perspective: 100rem;
+          perspective: 100rem;
 }
 
 .container_home {
   position: relative;
   height: 80vh;
+  -webkit-transition: opacity 1s ease;
+  transition: opacity 1s ease;
 }
 .container_home .planet {
   position: absolute;
@@ -962,6 +996,13 @@ a:link, a:visited {
   top: 50%;
   -webkit-transform: translate(-50%, -50%);
           transform: translate(-50%, -50%);
+}
+.container_home .planet text {
+  font-family: "Square";
+  font-size: 1rem;
+  text-align: center;
+  text-anchor: middle;
+  text-shadow: none;
 }
 
 @-webkit-keyframes shift {
@@ -976,7 +1017,6 @@ a:link, a:visited {
   }
 }
 .container_skills {
-  display: none;
   position: absolute;
   height: -webkit-max-content;
   height: -moz-max-content;
