@@ -1,0 +1,27 @@
+.radio__list
+    display: flex
+    flex-direction: column
+    row-gap: 1rem
+    border: none
+    padding: 1rem 0 0 3rem
+    legend
+        display: none
+
+.radio__item
+    display: flex
+    align-items: center
+    column-gap: 1rem
+    *
+        cursor: pointer
+    input[type="radio"]
+        position: relative
+        height: 1rem
+        aspect-ratio: 1/1
+        border: 2px solid var(--color-white)
+        appearance: none
+        border-radius: 100rem
+        outline: none
+        padding: 1px
+        transition: background .3s ease
+        &:checked
+                background: var(--color-white)
