@@ -22,6 +22,58 @@
                 <feComposite in="BackgroundImage" in2="goo" operator="atop"></feComposite>
             </filter>
         </defs>
+        <defs>
+            <filter id='neumorphism-inner'>
+                <feOffset in="SourceGraphic" result="offOutBlack" dx='-1' dy='-1'/>
+                <feGaussianBlur in="offOutBlack" stdDeviation='1' result='blurBlack'/>
+                <feFlood flood-color='black' flood-opacity='.5' result='colorBlack'/>
+                <feComposite operator='in' in='colorBlack' in2='blurBlack' result='shadowBlack'/>
+
+                <feOffset in="SourceGraphic" result="offOutWhite" dx='1' dy='1'/>
+                <feGaussianBlur in="offOutWhite" stdDeviation='1' result='blurWhite'/>
+                <feFlood flood-color='white' flood-opacity='.5' result='colorWhite'/>
+                <feComposite operator='in' in='colorWhite' in2='blurWhite' result='shadowWhite'/>
+
+                <feGaussianBlur in="SourceGraphic" stdDeviation=".5" result="blur"></feGaussianBlur>
+                
+                <feComposite operator='over' in='shadowBlack' in2='shadowWhite' result='shadow'/>
+                <feComposite operator='over' in='shadow' in2='blur'/>
+                <feMerge result="final">
+                    <feMergeNode mode="normal" in="shadow"></feMergeNode>
+                    <feMergeNode mode="normal" in="blur"></feMergeNode>
+                </feMerge>
+                <feComposite operator='over' in='final' in2='BackgroundImage'/>
+            </filter>
+
+            <filter id='neumorphism-outer'>
+                <feOffset in="SourceGraphic" result="offOutBlack" dx='-1' dy='-1'/>
+                <feGaussianBlur in="offOutBlack" stdDeviation='1' result='blurBlack'/>
+                <feComposite operator='out' in='SourceGraphic' in2='blurBlack' result='inverseBlack'/>
+                <feFlood flood-color='black' flood-opacity='.7' result='colorBlack'/>
+                <feComposite operator='in' in='colorBlack' in2='inverseBlack' result='shadowBlack'/>
+
+                <feOffset in="SourceGraphic" result="offOutWhite" dx='1' dy='1'/>
+                <feGaussianBlur in="offOutWhite" stdDeviation='1' result='blurWhite'/>
+                <feComposite operator='out' in='SourceGraphic' in2='blurWhite' result='inverseWhite'/>
+                <feFlood flood-color='white' flood-opacity='.7' result='colorWhite'/>
+                <feComposite operator='in' in='colorWhite' in2='inverseWhite' result='shadowWhite'/>
+
+                <feGaussianBlur in="SourceGraphic" stdDeviation=".1" result="blur"/>
+
+                <feComposite operator='over' in='shadowBlack' in2='shadowWhite' result='shadow'/>
+                <feComposite operator='over' in='shadow' in2='blur'/>
+            </filter>
+
+            <filter id="inkBleed">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="0" result="blur">
+                    <animate attributeName="stdDeviation" values="20;0" dur="3s" />
+                </feGaussianBlur>
+                <feComponentTransfer in="blur" result="threshold">
+                    <feFuncA type="linear" slope="10" intercept="-4"/>
+                </feComponentTransfer>
+                <feComposite in="SourceGraphic" in2="threshold" operator="in"/>
+            </filter>
+        </defs>
     </svg>
     <nav class="nav">
         <div class="subtitle">
@@ -49,50 +101,76 @@
                 <span class="txt_align_right">DATE</span><span>:</span><span class="txt_align_left">10.07.2025</span>
             </h3>
         </section>
-        <section class="about">
-            <div class="description">
-                <h2 class="description__title txt_uppercase">About</h2>
-                <svg class="line line_hr" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="-5" y1="50" x2="104" y2="50" stroke-width="100"/>
-                </svg>
-                <p class="description__paragraph"><span>I am a passionate front-end developer advancing in the implementation of 3D and intuitive websites.</span>
-                    <span>My experience also includes modeling:</span>
-                </p>
-                <fieldset class="radio__list">
-                    <legend>Select phase:</legend>
-                    <div class="radio__item">
-                        <input id="c&d" type="radio" name="drone" value="c&d"/>
-                        <label for="c&d">Concepts & design</label>
-                    </div>
-                    <div class="radio__item">
-                        <input id="retopology" type="radio" name="drone" value="retopology"/>
-                        <label for="retopology">Retopology</label>
-                    </div>
-                    <div class="radio__item">
-                        <input id="unwrap" type="radio" name="drone" value="unwrap"/>
-                        <label for="unwrap">Unwrap</label>
-                    </div>
-                    <div class="radio__item">
-                        <input id="sculpting" type="radio" name="drone" value="sculpting"/>
-                        <label for="sculpting">Sculpting</label>
-                    </div>
-                    <div class="radio__item">
-                        <input id="bm" type="radio" name="drone" value="bm"/>
-                        <label for="bm">Baking maps</label>
-                    </div>
-                    <div class="radio__item">
-                        <input id="texturing" type="radio" name="drone" value="texturing"/>
-                        <label for="texturing">Texturing</label>
-                    </div>
-                    <div class="radio__item">
-                        <input id="r&s" type="radio" name="drone" value="r&s"/>
-                        <label for="r&s">Rigging & skinning</label>
-                    </div>
-                </fieldset>
-            </div>
-        </section>
-        <section></section>
-        <section></section>
+        <!-- Section About -->
+        <div class="about__description description">
+            <h2 class="description__title txt_uppercase" data-title="01">About</h2>
+            <svg class="line line_hr" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <line x1="-5" y1="50" x2="104" y2="50" stroke-width="100"/>
+            </svg>
+            <p class="description__paragraph"><span>I am a passionate front-end developer advancing in the implementation of 3D and intuitive websites.</span>
+                <span>My experience also includes modeling:</span>
+            </p>
+            <fieldset class="radio__list">
+                <legend>Select phase:</legend>
+                <div class="radio__item">
+                    <input id="c&d" type="radio" name="drone" value="c&d"/>
+                    <label for="c&d">Concepts & design</label>
+                </div>
+                <div class="radio__item">
+                    <input id="retopology" type="radio" name="drone" value="retopology"/>
+                    <label for="retopology">Retopology</label>
+                </div>
+                <div class="radio__item">
+                    <input id="unwrap" type="radio" name="drone" value="unwrap"/>
+                    <label for="unwrap">Unwrap</label>
+                </div>
+                <div class="radio__item">
+                    <input id="sculpting" type="radio" name="drone" value="sculpting"/>
+                    <label for="sculpting">Sculpting</label>
+                </div>
+                <div class="radio__item">
+                    <input id="bm" type="radio" name="drone" value="bm"/>
+                    <label for="bm">Baking maps</label>
+                </div>
+                <div class="radio__item">
+                    <input id="texturing" type="radio" name="drone" value="texturing"/>
+                    <label for="texturing">Texturing</label>
+                </div>
+                <div class="radio__item">
+                    <input id="r&s" type="radio" name="drone" value="r&s"/>
+                    <label for="r&s">Rigging & skinning</label>
+                </div>
+            </fieldset>
+        </div>
+        <!-- Section Experience -->
+        <div class="experience__description description">
+            <h2 class="description__title txt_uppercase" data-title="02">Experience</h2>
+            <svg class="line line_hr" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <line x1="-5" y1="50" x2="104" y2="50" stroke-width="100"/>
+            </svg>
+            <p class="description__paragraph">Descriptions of any skills related to a person's personality, such as communication skills, teamwork, problem solving, etc.</p>
+        </div>
+        <!-- Section Tool -->
+        <div class="tool__description description">
+            <h2 class="description__title txt_uppercase" data-title="03">Tool</h2>
+            <svg class="line line_hr" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <line x1="-5" y1="50" x2="104" y2="50" stroke-width="100"/>
+            </svg>
+            <p class="description__paragraph">My last year activity on languages and progression frontend developer.</p>
+        </div>
+        <div class="visit-card">
+            <svg class="visit-card__line line" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <line x1="50" y1="0" x2="50" y2="100" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+                <line x1="0" y1="48" x2="100" y2="48" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+            </svg>
+            <h3 class="visit-card__seal txt_kanji">電</h3>
+            <h2 class="visit-card__name">DANILA</h2>
+            <h2 class="visit-card__surname">DIPPEL`</h2>
+            <h3 class="visit-card__vocation-left-side">FRONTEND</h3>
+            <h3 class="visit-card__vocation-right-side">DEVELOPER</h3>
+            <a class="visit-card__link visit-card__link-mail" href="mailto:erroraeto@gmail.com">erroraeto@gmail.com</a>
+            <a class="visit-card__link visit-card__link-telegram" href="https://t.me/danildippel">@danildippel</a>
+        </div>
     </main>
 </body>
 </html>

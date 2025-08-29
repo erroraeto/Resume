@@ -17,6 +17,7 @@ h2
 
 h3,
 p,
+a,
 .radio__item
     font-family: "Averia Libre", system-ui
     font-size: 2rem
@@ -39,7 +40,7 @@ a:link, a:visited
 .subtitle *
     color: var(--color-gray)
 
-// Cover section
+// Cover
 .cover__title
     padding-left: 1.6rem
     letter-spacing: .2em
@@ -47,6 +48,16 @@ a:link, a:visited
 .cover__subtitle
     font-size: 1.8rem
 
-// About section
+// Description
+.description__title
+    &::after
+        font-family: "Averia Libre", system-ui
+        letter-spacing: normal
+        font-size: 2rem
+
 .description__paragraph
     line-height: 1.2em
+    text-indent: 2rem
+
+.visit-card
+    // line-height: .8em
