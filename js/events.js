@@ -1,0 +1,1 @@
+let example=document.querySelector("canvas"),ctx=example.getContext("2d"),pic=new Image;example.height=300,example.height=450,pic.src="./img/1.png",pic.onload=function(){ctx.drawImage(pic,0,0),ctx.drawImage(pic,0,130,300,150),ctx.drawImage(pic,25,42,85,55,0,300,170,110)};
