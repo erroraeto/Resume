@@ -1,4 +1,4 @@
-import*as THREE from"https://cdn.jsdelivr.net/npm/three@0.179.1/+esm";let gl=document.querySelector("#gl"),textures=(gl.height=gl.clientHeight,gl.width=gl.clientWidth,["../img/1.png","../img/2.png","../img/3.png","../img/4.png","../img/5.png","../img/6.png","../img/7.png","../img/8.png"].map(e=>(new THREE.TextureLoader).load(e))),camera=new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,.01,10),scene=(camera.position.z=1.4,new THREE.Scene),geometry=new THREE.PlaneGeometry(1.5,1,10,10),material=new THREE.ShaderMaterial({uniforms:{uTexture:{value:textures[0]},positionVlak3:{value:-3.5},transparent:!0},vertexShader:`
+import*as THREE from"https://cdn.jsdelivr.net/npm/three@0.179.1/+esm";let gl=document.querySelector("#gl"),textures=(gl.height=gl.clientHeight,gl.width=gl.clientWidth,["../img/1.png","../img/2.png","../img/3.png","../img/4.png","../img/5.png","../img/6.png","../img/7.png","../img/8.png"].map(e=>(new THREE.TextureLoader).load(e))),alphaTexture=textureLoader.load("../img/5.png"),camera=new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,.01,10),scene=(camera.position.z=1.4,new THREE.Scene),geometry=new THREE.PlaneGeometry(1.5,1,20,20),material=new THREE.ShaderMaterial({uniforms:{uTexture:{value:textures[0]},intensity:{value:.86},spread:{value:97.554},alphaMap:alphaTexture,transparent:!0,color:{value:new THREE.Color("red")},color1:{value:new THREE.Color("red")},color2:{value:new THREE.Color("white")}},vertexShader:`
         varying vec2 vUv;
         void main(){
         vUv = uv;
@@ -12,47 +12,74 @@ import*as THREE from"https://cdn.jsdelivr.net/npm/three@0.179.1/+esm";let gl=doc
             
         gl_Position = projectionMatrix * modelViewMatrix * vec4( newposition, 1.0 );
         }`,fragmentShader:`
+        // precision highp float;
+        // precision highp int;
+        
         // uniform sampler2D uTexture;
+        // uniform vec3 color;
+        // uniform float intensity;
+        // uniform float spread;
+
         // varying vec2 vUv;
+        
+        // void main() {
+        //     float vignette = vUv.y * vUv.x * (1.-vUv.x) * (1.-vUv.y) * spread;
+        //     vec3 multiplier = 1.0 - ( vignette * color * intensity ); 
+        //     gl_FragColor =  vec4( clamp( color * multiplier, 0.0, 1.0 ), 1.0 );
+        // }
+
+
+
+
+
+
+        // #define PI 3.1415926
+        // #define TWO_PI PI*2.
 
         uniform sampler2D uTexture;
-        uniform float uTime;
-        uniform float uProgress;
-        uniform vec2 uRes;
-        uniform vec2 uImageRes;
-
+        uniform vec3 color1;
+        uniform vec3 color2;
+    
         varying vec2 vUv;
+        
+        // void main() {
+        
+        // vec2 uv = vUv * 2. - 1.;
+        
+        // float a = atan(uv.x,uv.y)+PI;
+        // float r = TWO_PI/4.;
+        // float d = cos(floor(.5+a/r)*r-a)*length(uv);
+        
+        // gl_FragColor = vec4(mix(color1, color2, d), 1.0);
+        // }
 
-        #include ../includes/perlin3dNoise.glsl
-        #include ../includes/coverUV.glsl
 
-        void main()
-        {
-            // New UV to prevent image stretching on fullscreen mode
-            vec2 newUv = CoverUV(vUv, uRes, uImageRes);
+        void main() {
 
-            // Displace the UV
-            vec2 displacedUv = vUv + cnoise(vec3(vUv * 5.0, uTime * 0.1));
+            vec3 c;
+            vec4 Ca = texture2D(uTexture, vUv);
+            vec4 Cb = vec4(vUv.x, vUv.x, vUv.x, 0.0);
+            // vec4 Cb = texture2D(tSec, vUv);
 
-            // Perlin noise
-            float strength = cnoise(vec3(displacedUv * 5.0, uTime * 0.2 ));
 
-            // Radial gradient
-            float radialGradient = distance(vUv, vec2(0.5)) * 12.5 - 7.0 * uProgress;
-            strength += radialGradient;
+            // c = Ca.rgb * Ca.a + Cb.rgb * Cb.a * (1.0 - Ca.a);  // blending equation
+            // gl_FragColor= vec4(c, 1.0);
+            // gl_FragColor = vec4(mix(color1, color2, colorMix), alpha);
 
-            // Clamp the value from 0 to 1 & invert it
-            strength = clamp(strength, 0.0, 1.0);
-            strength = 1.0 - strength;
+            float strength = vUv.x * 0.5;
+            float grad = vec4(vec3(strength), 0.0);
 
-            // Apply texture
-            vec3 textureColor = texture2D(uTexture, newUv).rgb;
+            diffuseColor.a *= texture2D( alphaMap, vAlphaMapUv ).g;
 
-            // Opacity animation
-            float opacityProgress = smoothstep(0.0, 0.7, uProgress);
 
-            // FINAL COLOR
-            gl_FragColor = vec4(textureColor, strength * opacityProgress);
+            // // y < 0 = transparent, > 1 = opaque
+            // float alpha = smoothstep(0.0, 1.0, vUv.y);
+            // // y < 1 = color1, > 2 = color2
+            // float colorMix = smoothstep(1.0, 2.0, vUv.y);
+            // gl_FragColor = vec4(mix(color1, color2, colorMix), alpha);
         }
 
-    `});for(let r=0;r<8;r++){let e=material.clone(),t=(e.uniforms.uTexture.value=textures[r%8],new THREE.Mesh(geometry,e));t.position.x=1.7*r,scene.add(t)}let renderer=new THREE.WebGLRenderer({canvas:gl,antialias:!0,alpha:!0}),start=(renderer.setSize(gl.clientWidth,gl.clientHeight),null),isDown=!1,startX;function step(e){var t;start=start||e,"number"==typeof e&&(t=e-start,scene.position.x=0,renderer.render(scene,camera),t<2e3)&&requestAnimationFrame(step),"wheel"==e.type&&(scene.position.x+=.005*-e.deltaX,renderer.render(scene,camera),console.log("Delta X:",e.deltaX)),"mousemove"==e.type&&(t=e.pageX-startX,scene.position.x+=5e-5*t,renderer.render(scene,camera))}gl.addEventListener("wheel",step),gl.addEventListener("mousedown",e=>{isDown=!0,startX=e.pageX}),gl.addEventListener("mousemove",e=>{isDown&&step(e)}),window.addEventListener("mouseup",e=>{isDown=!1,startX=0}),requestAnimationFrame(step);
+
+
+        // diffuseColor.a *= texture2D( alphaMap, vAlphaMapUv ).g;
+    `});for(let t=0;t<8;t++){let e=material.clone(),r=(e.uniforms.uTexture.value=textures[t%8],new THREE.Mesh(geometry,e));r.position.x=1.7*t,scene.add(r)}let renderer=new THREE.WebGLRenderer({canvas:gl,antialias:!0,alpha:!0}),start=(renderer.setSize(gl.clientWidth,gl.clientHeight),null),isDown=!1,startX;function step(e){var r;start=start||e,"number"==typeof e&&(r=e-start,scene.position.x=0,renderer.render(scene,camera),r<2e3)&&requestAnimationFrame(step),"wheel"==e.type&&(scene.position.x+=.005*-e.deltaX,renderer.render(scene,camera),console.log("Delta X:",e.deltaX)),"mousemove"==e.type&&(r=e.pageX-startX,scene.position.x+=5e-5*r,renderer.render(scene,camera))}gl.addEventListener("wheel",step),gl.addEventListener("mousedown",e=>{isDown=!0,startX=e.pageX}),gl.addEventListener("mousemove",e=>{isDown&&step(e)}),window.addEventListener("mouseup",e=>{isDown=!1,startX=0}),requestAnimationFrame(step);
