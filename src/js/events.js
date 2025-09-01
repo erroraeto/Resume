@@ -1,5 +1,4 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.179.1/+esm";
-// https://www.shadertoy.com/view/t3XGzM
 // init
 let gl = document.querySelector('#gl');
 gl.height = gl.clientHeight;
@@ -15,21 +14,46 @@ let textures = [
 `../img/7.png`,
 `../img/8.png`,].
 map(url => new THREE.TextureLoader().load(url));
+const alphaMapTexture = new THREE.TextureLoader().load('../img/AlphaMap.png');
 
 const camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10);
 
 camera.position.z = 1.4;
 
 const scene = new THREE.Scene();
+// --------------------------------------------------------------------------------------------------------------------------------------------------
+const vMouse = new THREE.Vector2();
+const vMouseDamp = new THREE.Vector2();
+const vResolution = new THREE.Vector2();
 
-const geometry = new THREE.PlaneGeometry(1.5, 1, 10, 10);
+const onPointerMove = (e) => { vMouse.set(e.pageX, e.pageY) }
+document.addEventListener('mousemove', onPointerMove);
+document.addEventListener('pointermove', onPointerMove);
+document.body.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
+
+// --------------------------------------------------------------------------------------------------------------------------------------------------
+
+const geometry = new THREE.PlaneGeometry(1.5, 1, 20, 20);
 const material = new THREE.ShaderMaterial({
     uniforms: {
         uTexture: { value: textures[0] },
-        positionVlak3: {value: -3.5},
-        transparent: true,
-    },
+        opacity: { value: 1.0 },
+        blend: { value: 0.8 },
 
+        tMap: { value: textures[0] },
+        uPlaneSize: { value: [0, 0] },
+        uImageSize: { value: [0, 0] },
+        uViewportSize: { value: [window.innerWidth, window.innerHeight] },
+        uTime: { value: 100 * Math.random() },
+        uBlurStrength: { value: 0.1 },
+
+        u_mouse: { value: vMouseDamp },
+        u_resolution: { value: vResolution },
+        u_pixelRatio: { value: 2 }
+    },
+    depthTest: false,
+    depthWrite: false,
+    transparent: true,
     vertexShader: `
         varying vec2 vUv;
         void main(){
@@ -38,10 +62,10 @@ const material = new THREE.ShaderMaterial({
         float distanceFromCenter = abs(
             (modelMatrix * vec4(position, 1.0)).x
         );
-            
+
         // most important
         newposition.y *= 1.0 + 0.05*pow(distanceFromCenter,2.);
-            
+
         gl_Position = projectionMatrix * modelViewMatrix * vec4( newposition, 1.0 );
         }`,
     // fragmentShader: `
@@ -51,64 +75,218 @@ const material = new THREE.ShaderMaterial({
     //         gl_FragColor = texture2D(uTexture,vUv);
     //     }
     // `
-    fragmentShader: `
-        // uniform sampler2D uTexture;
-        // varying vec2 vUv;
-
-        uniform sampler2D uTexture;
-        uniform float uTime;
-        uniform float uProgress;
-        uniform vec2 uRes;
-        uniform vec2 uImageRes;
-
-        varying vec2 vUv;
-
-        #include ../includes/perlin3dNoise.glsl
-        #include ../includes/coverUV.glsl
-
-        void main()
-        {
-            // New UV to prevent image stretching on fullscreen mode
-            vec2 newUv = CoverUV(vUv, uRes, uImageRes);
-
-            // Displace the UV
-            vec2 displacedUv = vUv + cnoise(vec3(vUv * 5.0, uTime * 0.1));
-
-            // Perlin noise
-            float strength = cnoise(vec3(displacedUv * 5.0, uTime * 0.2 ));
-
-            // Radial gradient
-            float radialGradient = distance(vUv, vec2(0.5)) * 12.5 - 7.0 * uProgress;
-            strength += radialGradient;
-
-            // Clamp the value from 0 to 1 & invert it
-            strength = clamp(strength, 0.0, 1.0);
-            strength = 1.0 - strength;
-
-            // Apply texture
-            vec3 textureColor = texture2D(uTexture, newUv).rgb;
-
-            // Opacity animation
-            float opacityProgress = smoothstep(0.0, 0.7, uProgress);
-
-            // FINAL COLOR
-            gl_FragColor = vec4(textureColor, strength * opacityProgress);
-        }
-
-    `
-
-
     // fragmentShader: `
     //     uniform sampler2D uTexture;
-    //     varying vec3 vWorldDirection;
-    //     void main() {
-    //         vec3 direction = normalize( vWorldDirection );
-    //         vec2 sampleUV = equirectUv( direction );
-    //         gl_FragColor = texture2D( uTexture, sampleUV );
-    //     }
-    // `
-});
+    //     uniform float opacity;
+    //     uniform float blend;
 
+    //     varying vec2 vUv;
+
+    //     float getFadeInWeight(vec2 uv) {
+    //         float edge = 0.4 * abs(sin(0.5));
+    //         return smoothstep(0., edge, uv.x) * smoothstep(0., edge, 1.-uv.x) * smoothstep(0., edge, uv.y) * smoothstep(0., edge, 1.-uv.y);
+    //     }
+
+    //     void main() {
+    //         vec4 texelColor = texture2D(uTexture, vUv);
+    //         float alpha = getFadeInWeight(vUv);
+    //         // gl_FragColor = vec4(texelColor.rgb, texelColor.a * alpha);
+            
+            
+    //         vec4 res = vec4(texelColor.rgb, texelColor.a * alpha);
+    //         // vec3 finalColor = mix(alpha, uTexture, 1.0);
+    //         // gl_FragColor = vec4(finalColor, 1.0);
+
+    //         gl_FragColor = mix(texelColor, res, blend);
+    //     }
+    // `,
+    // fragmentShader: `
+    //     precision highp float;
+
+    //     uniform vec2 uImageSize;
+    //     uniform vec2 uPlaneSize;
+    //     uniform vec2 uViewportSize;
+    //     uniform float uBlurStrength;
+    //     uniform float uTime;
+    //     uniform sampler2D tMap;
+
+    //     varying vec2 vUv;
+
+    //     /*
+    //     by @arthurstammet
+    //     https://shadertoy.com/view/tdXXRM
+    //     */
+    //     float tvNoise (vec2 p, float ta, float tb) {
+    //         return fract(sin(p.x * ta + p.y * tb) * 5678.);
+    //     }
+    //     vec3 draw(sampler2D image, vec2 uv) {
+    //         return texture2D(image,vec2(uv.x, uv.y)).rgb;   
+    //     }
+    //     float rand(vec2 co){
+    //         return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
+    //     }
+    //     /*
+    //     inspired by https://www.shadertoy.com/view/4tSyzy
+    //     @anastadunbar
+    //     */
+    //     vec3 blur(vec2 uv, sampler2D image, float blurAmount){
+    //     vec3 blurredImage = vec3(0.);
+    //     float gradient = smoothstep(0.8, 0.0, 3.4 - (gl_FragCoord.y / uViewportSize.y) / uViewportSize.y) * uBlurStrength + smoothstep(0.8, 0.0, (gl_FragCoord.y / uViewportSize.y) / uViewportSize.y) * uBlurStrength;
+    //     #define repeats 40.
+    //     for (float i = 0.; i < repeats; i++) { 
+    //             vec2 q = vec2(cos(degrees((i / repeats) * 360.)), sin(degrees((i / repeats) * 360.))) * (rand(vec2(i, uv.x + uv.y)) + blurAmount); 
+    //             vec2 uv2 = uv + (q * blurAmount * gradient);
+    //             blurredImage += draw(image, uv2) / 2.;
+    //             q = vec2(cos(degrees((i / repeats) * 360.)), sin(degrees((i / repeats) * 360.))) * (rand(vec2(i + 2., uv.x + uv.y + 24.)) + blurAmount); 
+    //             uv2 = uv + (q * blurAmount * gradient);
+    //             blurredImage += draw(image, uv2) / 2.;
+    //         }
+    //         return blurredImage / repeats;
+    //     }
+
+    //     void main() {
+    //         vec2 ratio = vec2(
+    //             min((uPlaneSize.x / uPlaneSize.y) / (uImageSize.x / uImageSize.y), 1.0),
+    //             min((uPlaneSize.y / uPlaneSize.x) / (uImageSize.y / uImageSize.x), 1.0)
+    //         );
+
+    //         vec2 uv = vec2(
+    //             vUv.x * ratio.x + (1.0 - ratio.x) * 0.5,
+    //             vUv.y * ratio.y + (1.0 - ratio.y) * 0.5
+    //         );
+
+    //         float t = uTime + 123.0;
+    //         float ta = t * 0.654321;
+    //         float tb = t * (ta * 0.123456);
+    //         vec4 noise = vec4(1. - tvNoise(uv, ta, tb));
+            
+    //         vec4 final = vec4(blur(uv, tMap, 0.08), 1.);
+
+    //         final = final - noise * 0.08;
+
+    //         gl_FragColor = final;
+    //     }
+    // `,
+        fragmentShader: `
+        varying vec2 v_texcoord;
+
+        uniform vec2 u_mouse;
+        uniform vec2 u_resolution;
+        uniform float u_pixelRatio;
+
+        /* common constants */
+        #ifndef PI
+        #define PI 3.1415926535897932384626433832795
+        #endif
+        #ifndef TWO_PI
+        #define TWO_PI 6.2831853071795864769252867665590
+        #endif
+
+        /* variation constant */
+        #ifndef VAR
+        #define VAR 0
+        #endif
+
+        /* Coordinate and unit utils */
+        #ifndef FNC_COORD
+        #define FNC_COORD
+        vec2 coord(in vec2 p) {
+            p = p / u_resolution.xy;
+            // correct aspect ratio
+            if (u_resolution.x > u_resolution.y) {
+                p.x *= u_resolution.x / u_resolution.y;
+                p.x += (u_resolution.y - u_resolution.x) / u_resolution.y / 2.0;
+            } else {
+                p.y *= u_resolution.y / u_resolution.x;
+                p.y += (u_resolution.x - u_resolution.y) / u_resolution.x / 2.0;
+            }
+            // centering
+            p -= 0.5;
+            p *= vec2(-1.0, 1.0);
+            return p;
+        }
+        #endif
+
+        #define st0 coord(gl_FragCoord.xy)
+        #define mx coord(u_mouse * u_pixelRatio)
+
+        /* signed distance functions */
+        float sdRoundRect(vec2 p, vec2 b, float r) {
+            vec2 d = abs(p - 0.5) * 4.2 - b + vec2(r);
+            return min(max(d.x, d.y), 0.0) + length(max(d, 0.0)) - r;
+        }
+        float sdCircle(in vec2 st, in vec2 center) {
+            return length(st - center) * 2.0;
+        }
+        float sdPoly(in vec2 p, in float w, in int sides) {
+            float a = atan(p.x, p.y) + PI;
+            float r = TWO_PI / float(sides);
+            float d = cos(floor(0.5 + a / r) * r - a) * length(max(abs(p) * 1.0, 0.0));
+            return d * 2.0 - w;
+        }
+
+        /* antialiased step function */
+        float aastep(float threshold, float value) {
+            float afwidth = length(vec2(dFdx(value), dFdy(value))) * 0.70710678118654757;
+            return smoothstep(threshold - afwidth, threshold + afwidth, value);
+        }
+        /* Signed distance drawing methods */
+        float fill(in float x) { return 1.0 - aastep(0.0, x); }
+        float fill(float x, float size, float edge) {
+            return 1.0 - smoothstep(size - edge, size + edge, x);
+        }
+
+        float stroke(in float d, in float t) { return (1.0 - aastep(t, abs(d))); }
+        float stroke(float x, float size, float w, float edge) {
+            float d = smoothstep(size - edge, size + edge, x + w * 0.5) - smoothstep(size - edge, size + edge, x - w * 0.5);
+            return clamp(d, 0.0, 1.0);
+        }
+
+        void main() {
+            vec2 pixel = 1.0 / u_resolution.xy;
+            vec2 st = st0 + 0.5;
+            vec2 posMouse = mx * vec2(1., -1.) + 0.5;
+            
+            /* sdf (Round Rect) params */
+            float size = 1.2;
+            float roundness = 0.4;
+            float borderSize = 0.05;
+            
+            /* sdf Circle params */
+            float circleSize = 0.3;
+            float circleEdge = 0.5;
+            
+            /* sdf Circle */
+            float sdfCircle = fill(
+                sdCircle(st, posMouse),
+                circleSize,
+                circleEdge
+            );
+            
+            float sdf;
+            if (VAR == 0) {
+                /* sdf round rectangle with stroke param adjusted by sdf circle */
+                sdf = sdRoundRect(st, vec2(size), roundness);
+                sdf = stroke(sdf, 0.0, borderSize, sdfCircle) * 4.0;
+            } else if (VAR == 1) {
+                /* sdf circle with fill param adjusted by sdf circle */
+                sdf = sdCircle(st, vec2(0.5));
+                sdf = fill(sdf, 0.6, sdfCircle) * 1.2;
+            } else if (VAR == 2) {
+                /* sdf circle with stroke param adjusted by sdf circle */
+                sdf = sdCircle(st, vec2(0.5));
+                sdf = stroke(sdf, 0.58, 0.02, sdfCircle) * 4.0;
+            } else if (VAR == 3) {
+                /* sdf circle with fill param adjusted by sdf circle */
+                sdf = sdPoly(st - vec2(0.5, 0.45), 0.3, 3);
+                sdf = fill(sdf, 0.05, sdfCircle) * 1.4;
+            }
+            
+            vec3 color = vec3(sdf);
+            gl_FragColor = vec4(color.rgb, 1.0);
+        }
+    `,
+});
 
 for (let i = 0; i < 8; i++) {
     let m = material.clone();
