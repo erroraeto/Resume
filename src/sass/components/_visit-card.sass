@@ -1,27 +1,34 @@
 .visit-card
+    display: none
     position: absolute
     height: max-content
     width: 450px
     bottom: 200px
     left: calc( 50% -  (450px / 2))
-    .font__NT
-        font-size: 1rem
-    text
-        filter: none
+    *
         vector-effect: non-scaling-stroke
+    text
         fill: #000000f8
-        font-weight: bold
-    rect
-        filter: url(#roughpaper) url(#neumorphism-outer)
+    .visit-card__bg
+        filter: url(#filter__roughPaper)
         stroke: none
         fill: currentColor
     &__text
-        filter: url(#neumorphism-inner)
+        filter: url(#filter__neumorphism-inner)
         mix-blend-mode: multiply
-        text
-            filter: url(#inkBleed__SVG)
         rect
             fill: none
+        text
+            filter: url(#filter__inkBleed-SVG)
         a
-            stroke: #000000f8
             stroke-width: .5px
+            stroke: #000000f8
+
+.test
+    position: absolute
+    height: 150px
+    width: 450px
+    bottom: 200px
+    left: calc( 50% -  (450px / 2))
+    backdrop-filter: blur(2px)
+    // mask-image: linear-gradient(black, transparent)

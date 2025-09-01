@@ -4,25 +4,17 @@
     height: auto
     width: 100%
     justify-content: space-between
-    z-index: 10
-    &::after
-        content: ''
-        position: absolute
-        height: 100%
-        width: 100%
-        z-index: -1
-        mask-image: linear-gradient(black -5%, transparent)
-        backdrop-filter: blur(3px)
+    z-index: 1
     .subtitle,
     .link
         position: relative
         width: max-content
-        margin: 2rem 4rem
+        margin: 1rem 4rem
         display: inline-flex
         column-gap: .8rem
         align-items: center
         justify-content: center
-        filter: drop-shadow(0 0 4px black)
+        filter: drop-shadow(0 0 4px black) drop-shadow(0 0 4px black) drop-shadow(0 0 4px black)
 
 .subtitle
     h2

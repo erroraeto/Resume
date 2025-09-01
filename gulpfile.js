@@ -8,7 +8,8 @@ const imagemin = require('gulp-imagemin');
 const htmlmin = require('gulp-htmlmin');
 const uglify = require('gulp-uglify');
 const ghPages = require('gulp-gh-pages');
- 
+
+
 gulp.task('deploy', function() {
     return gulp.src('./dist/**/*')
         .pipe(ghPages());
