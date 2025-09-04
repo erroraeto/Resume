@@ -7,10 +7,12 @@ import { BokehPass } from 'https://threejsfundamentals.org/threejs/resources/thr
 import { OutlinePass } from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/postprocessing/OutlinePass.js';
 import { FilmPass } from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/postprocessing/FilmPass.js';
 import { ShaderPass } from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/postprocessing/ShaderPass.js';
-import { mergeBufferGeometries } from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/utils/BufferGeometryUtils.js';
+import { mergeBufferGeometries, mergeVertices } from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/utils/BufferGeometryUtils.js';
 import { FXAAShader } from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/shaders/FXAAShader.js';
 import { OrbitControls } from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/controls/OrbitControls.js';
-// import {OutputPass} from 'https://threejsfundamentals.org/threejs/resources/threejs/r153/examples/jsm/postprocessing/OutputPass.js';
+import { OutlineEffect } from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/effects/OutlineEffect.js';
+// import { OutputPass } from 'https://cdn.skypack.dev/pin/three@v0.136.0-5VP7l7KayxPjnuc5YHYV/mode=raw/examples/jsm/postprocessing/OutputPass.js';
+// import { DepthOfFieldEffect } from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/postprocessing/DepthOfFieldEffect.js';
 // import threeBufferGeometryUtils from 'https://cdn.jsdelivr.net/npm/three-buffer-geometry-utils@1.0.0/+esm';
 // import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 // import geomMerge from 'https://cdn.jsdelivr.net/npm/geom-merge@3.0.0/index.min.js'
@@ -475,18 +477,289 @@ import { OrbitControls } from 'https://threejsfundamentals.org/threejs/resources
 
 
 
+// let scene = new THREE.Scene();
+// let camera = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, 1, 100);
+// camera.position.set(0, 0, 1).setLength(1);
+// let renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+// renderer.setPixelRatio(devicePixelRatio);
+// renderer.setSize(innerWidth, innerHeight);
+// let carousels = document.querySelector('.carousel');
+// carousels.appendChild(renderer.domElement);
+
+// const raycaster = new THREE.Raycaster();
+// const mouse = new THREE.Vector2();
+
+// let textures = [
+//     `../img/1.png`,
+//     `../img/2.png`,
+//     `../img/3.png`,
+//     `../img/4.png`,
+//     `../img/5.png`,
+//     `../img/6.png`,
+//     `../img/7.png`,
+//     `../img/8.png`,
+// ];
+
+// window.addEventListener("resize", (event) => {
+//     camera.aspect = innerWidth / innerHeight;
+//     camera.updateProjectionMatrix();
+//     renderer.setSize(innerWidth, innerHeight);
+// });
+
+// // let controls = new OrbitControls(camera, renderer.domElement);
+// // controls.enableDamping = true;
+
+// let division = { x: 3, y: 3 };
+// // let totalAmount = division.x * division.y;
+// let totalAmount = 7;
+
+// let len = totalAmount * 1.1;
+// let r = len / (Math.PI * 2);
+// let segAngle = (Math.PI * 2) / len / 1.1;
+
+// let seg = new THREE.CylinderGeometry(r, r, 0.5, 10, 1, true, 0, segAngle);
+// let gs = [];
+// for (let i = 0; i < totalAmount; i++) {
+//     let x = i % division.x;
+//     let y = Math.floor(i / division.x);
+
+//     let g = seg.clone();
+//     let gUV = g.attributes.uv;
+//     for (let j = 0; j < gUV.count; j++) {
+//         let u = (gUV.getX(j) + x) / division.x;
+//         let v = (gUV.getY(j) + y) / division.y;
+//         gUV.setXY(j, u, v);
+//     }
+//     g.rotateY(((Math.PI * 2) / totalAmount) * i);
+//     gs.push(g);
+// }
+
+// let g = mergeBufferGeometries(gs);
+// let m = new THREE.MeshBasicMaterial({
+//     side: THREE.DoubleSide,
+//     // wireframe: true,
+//     map: drawCarouselTexture(totalAmount)
+// });
+// let carousel = new THREE.Mesh(g, m);
+// scene.add(carousel);
+
+// renderer.setAnimationLoop(() => {
+//     // controls.update();
+//     renderer.render(scene, camera);
+// });
+
+// function drawCarouselTexture( totalImages = 8, resolution = 512) {
+//     const gridSize = Math.ceil(Math.sqrt(totalImages));
+//     const canvasSize = gridSize * resolution;
+    
+//     const canvas = document.createElement('canvas');
+//     canvas.width = canvasSize;
+//     canvas.height = canvasSize;
+//     const ctx = canvas.getContext('2d');
+    
+//     const texture = new THREE.CanvasTexture(canvas);
+//     texture.colorSpace = THREE.SRGBColorSpace;
+
+//     Array(totalImages).fill(0).map((_, index) => {
+//         const image = document.createElement("img");
+//         image.crossOrigin = "anonymous";
+//         image.onload = () => drawImageAtIndex(image, index);
+//         // image.onerror = (error) => console.error(error);
+//         // image.src = `https://picsum.photos/seed/${Math.random()}/${resolution}/${resolution + 100}`;
+//         // drawImageAtIndex(image, index);
+//         image.src = `${textures[index]}`;
+//     });
+
+//     function drawImageAtIndex(img, index) {
+//         const row = Math.floor(index / gridSize);
+//         const col = index % gridSize;
+//         const x = col * resolution;
+//         const y = row * resolution;
+        
+//         const scale = Math.max(
+//             resolution / img.width,
+//             resolution / img.height
+//         );
+        
+//         const scaledWidth = img.width * scale;
+//         const scaledHeight = img.height * scale;
+        
+//         const offsetX = (scaledWidth - resolution) / 2;
+//         const offsetY = (scaledHeight - resolution) / 2;
+        
+//         ctx.save();
+//         ctx.beginPath();
+//         ctx.rect(x, y, resolution, resolution);
+//         ctx.clip();
+        
+//         ctx.drawImage(
+//             img,
+//             x - offsetX,
+//             y - offsetY,
+//             scaledWidth,
+//             scaledHeight
+//         );
+//         // ctx.drawImage(
+//         //     img,
+//         //     0,
+//         //     0,
+//         //     scaledWidth,
+//         //     scaledHeight
+//         // );
+        
+//         ctx.restore();
+
+//         texture.needsUpdate = true;
+//     }
+    
+//     return texture;
+// }
+
+
+// carousels.addEventListener('wheel', (event) => {
+//     carousel.rotateY(THREE.MathUtils.degToRad(event.deltaX * 0.05)); 
+// });
+
+
+
+
+// function findClosestFace( object ) {
+
+// 	let closestPlane = { face: null };
+
+// 	let closestPlanes = [];
+
+// 	let minDistance = Infinity;
+
+// 		object.userData.triangles.map( item => {
+
+// 			object.attach( planeSnapBox );
+
+// 			var box = planeSnapBox.geometry.boundingBox.clone();
+// 			box.applyMatrix4(planeSnapBox.matrixWorld);
+
+// 			if ( box.intersectsTriangle( item.triangleWorldCoords ) ){
+
+// 				closestPlanes.push( item );
+
+// 			}
+
+// 			scene.attach( planeSnapBox );
+
+// 		})
+
+// 		if ( closestPlanes.length === 0 ){
+
+// 			console.log( 'Cube not intersect')
+			
+// 			 closestPlane.face = null;
+// 			 return closestPlane;
+// 		}
+
+
+// 	closestPlanes.map( item => {
+
+// 		let point = new THREE.Vector3();
+
+// 		let cursor = planeSnapBox.position.clone();
+// 		object.worldToLocal( cursor );
+
+// 		item.triangleWorldCoords.closestPointToPoint( cursor, point);
+		
+// 		let distance = point.distanceTo( cursor );
+
+// 		if ( distance < minDistance ){
+			
+// 			minDistance = distance;
+
+// 			closestPlane.face = item.face;
+// 			closestPlane.triangle= item.triangleWorldCoords;
+
+// 		}
+
+
+// 	})
+
+// 	return closestPlane;
+
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Carousel extends THREE.Mesh {
+  constructor(textures){
+    super();
+    
+    let gap = 0.1;
+    let totalLen = 0;
+    
+    this.materials = textures.map( (tex) => {
+      
+        let ratio = tex.image.width / tex.image.height;
+        let ratioWithGap = ratio + gap;
+
+        let m = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, map: tex});
+        m.userData = {
+            start: totalLen,
+            ratio: ratio,
+            ratioWithGap: ratioWithGap
+        }
+        
+        totalLen += ratioWithGap;
+        
+        return m;
+    });
+    
+    let r = totalLen / (Math.PI * 2);
+    
+    this.geometries = this.materials.map(mat => {
+      let ud = mat.userData;
+      return new THREE.CylinderGeometry(r, r, 1, 20, 1, true, 0, (ud.ratio / r)).rotateY((ud.start / totalLen) * (Math.PI * 2));
+    })
+    
+    this.geometry = mergeBufferGeometries(this.geometries, true);
+    this.material = this.materials;
+  
+  }
+}
+
+let carousels = document.querySelector('.carousel');
 let scene = new THREE.Scene();
-let camera = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, 1, 100);
-camera.position.set(0, 0, 1).setLength(1);
+// scene.background = null;
+// scene.background = new THREE.Color(0xcccccc);
+let camera = new THREE.PerspectiveCamera(30, carousels.clientWidth / carousels.clientHeight, 1, 100);
+// let camera = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, 1, 100);
+camera.position.set(-0.05, 0.1, 1).setLength(6);
+camera.lookAt(new THREE.Vector3(0, 0, 1));
 let renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setPixelRatio(devicePixelRatio);
-renderer.setSize(innerWidth, innerHeight);
-let carousels = document.querySelector('.carousel');
+renderer.setSize(carousels.clientWidth, carousels.clientHeight);
+// renderer.setSize(innerWidth, innerHeight);
 carousels.appendChild(renderer.domElement);
-
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-
 let textures = [
     `../img/1.png`,
     `../img/2.png`,
@@ -499,185 +772,198 @@ let textures = [
 ];
 
 window.addEventListener("resize", (event) => {
-    camera.aspect = innerWidth / innerHeight;
+    // camera.aspect = innerWidth / innerHeight;
+    camera.aspect = carousels.clientWidth / carousels.clientHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(innerWidth, innerHeight);
+    renderer.setSize(carousels.clientWidth, carousels.clientHeight);
+    // renderer.setSize(innerWidth, innerHeight);
 });
 
-// let controls = new OrbitControls(camera, renderer.domElement);
-// controls.enableDamping = true;
+let texs = Array.from({length: 8}, (_, index) => {
+    let c = document.createElement("canvas");
+    let ctx = c.getContext("2d");
+    let tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.src = textures[index];
 
-let division = { x: 3, y: 3 };
-// let totalAmount = division.x * division.y;
-let totalAmount = 7;
+    image.onload = () => {
+        c.height = image.naturalHeight;
+        c.width = image.naturalWidth;
+        ctx.save();
+        // ctx.scale(-1, 1);
+        // ctx.translate(-image.naturalWidth, 0);
+        ctx.drawImage( image, 0, 0 )
+        ctx.restore();
+        tex.needsUpdate = true;
+    };
 
-let len = totalAmount * 1.1;
-let r = len / (Math.PI * 2);
-let segAngle = (Math.PI * 2) / len / 1.1;
+    tex.anisotroly = renderer.capabilities.getMaxAnisotropy();
 
-let seg = new THREE.CylinderGeometry(r, r, 0.5, 10, 1, true, 0, segAngle);
-let gs = [];
-for (let i = 0; i < totalAmount; i++) {
-    let x = i % division.x;
-    let y = Math.floor(i / division.x);
-
-    let g = seg.clone();
-    let gUV = g.attributes.uv;
-    for (let j = 0; j < gUV.count; j++) {
-        let u = (gUV.getX(j) + x) / division.x;
-        let v = (gUV.getY(j) + y) / division.y;
-        gUV.setXY(j, u, v);
-    }
-    g.rotateY(((Math.PI * 2) / totalAmount) * i);
-    gs.push(g);
-}
-
-let g = mergeBufferGeometries(gs);
-let m = new THREE.MeshBasicMaterial({
-    side: THREE.DoubleSide,
-    //wireframe: true,
-    map: drawCarouselTexture(totalAmount)
+    return tex;
 });
-let carousel = new THREE.Mesh(g, m);
+
+
+
+
+const renderPass = new RenderPass( scene, camera );
+
+const bokehPass = new BokehPass( scene, camera, {
+    focus: 3.4,
+    aperture: 0.01,
+    maxblur: 0.01
+} );
+
+const composer = new EffectComposer( renderer );
+let effectFXAA = new ShaderPass( FXAAShader );
+effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+effectFXAA.renderToScreen = true;
+composer.addPass( effectFXAA );
+composer.addPass( renderPass );
+composer.addPass( bokehPass );
+
+
+
+
+
+
+let carousel = new Carousel(texs);
 scene.add(carousel);
 
 renderer.setAnimationLoop(() => {
-    // controls.update();
     renderer.render(scene, camera);
+    composer.render();
 });
-
-function drawCarouselTexture( totalImages = 8, resolution = 512) {
-    const gridSize = Math.ceil(Math.sqrt(totalImages));
-    const canvasSize = gridSize * resolution;
-    
-    const canvas = document.createElement('canvas');
-    canvas.width = canvasSize;
-    canvas.height = canvasSize;
-    const ctx = canvas.getContext('2d');
-    
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.colorSpace = THREE.SRGBColorSpace;
-
-    Array(totalImages).fill(0).map((_, index) => {
-        const image = document.createElement("img");
-        image.crossOrigin = "anonymous";
-        image.onload = () => drawImageAtIndex(image, index);
-        // image.onerror = (error) => console.error(error);
-        // image.src = `https://picsum.photos/seed/${Math.random()}/${resolution}/${resolution + 100}`;
-        // drawImageAtIndex(image, index);
-        image.src = `${textures[index]}`;
-    });
-
-    function drawImageAtIndex(img, index) {
-        const row = Math.floor(index / gridSize);
-        const col = index % gridSize;
-        const x = col * resolution;
-        const y = row * resolution;
-        
-        const scale = Math.max(
-            resolution / img.width,
-            resolution / img.height
-        );
-        
-        const scaledWidth = img.width * scale;
-        const scaledHeight = img.height * scale;
-        
-        const offsetX = (scaledWidth - resolution) / 2;
-        const offsetY = (scaledHeight - resolution) / 2;
-        
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(x, y, resolution, resolution);
-        ctx.clip();
-        
-        ctx.drawImage(
-            img,
-            x - offsetX,
-            y - offsetY,
-            scaledWidth,
-            scaledHeight
-        );
-        // ctx.drawImage(
-        //     img,
-        //     0,
-        //     0,
-        //     scaledWidth,
-        //     scaledHeight
-        // );
-        
-        ctx.restore();
-
-        texture.needsUpdate = true;
-    }
-    
-    return texture;
-}
-
 
 carousels.addEventListener('wheel', (event) => {
-    carousel.rotateY(THREE.MathUtils.degToRad(event.deltaX * 0.05)); 
-});
-
-var faceIdx1 = -1,
-    faceIdx2 = -1;
-var baseColor = new THREE.Color("white");
-var selectionColor = new THREE.Color("red");
-var intersects = [];
-
-carousels.addEventListener( 'pointermove', (event) => {
-
-    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-    raycaster.setFromCamera( mouse, camera );
-
-    // const intersects = raycaster.intersectObject( scene.children[0], true );
-
-    // if (intersects.length > 0) {
-    //     const intersectedObject = intersects[0].object;
-    //     // Check if the intersected object has a MeshBasicMaterial
-    //     if (intersectedObject.material instanceof THREE.MeshBasicMaterial) {
-    //         // Change color or perform other actions
-    //         intersectedObject.material.color.set(0xff0000); // Example: change to red
-    //     } else {
-    //         intersectedObject.material.color.set(0x000000); // Example: change to red
-    //     }
-    // }
-
-    // intersects = raycaster.intersectObject(box);
-    intersects = raycaster.intersectObject( scene.children[0], true );
-    if (intersects.length === 0) return;
-
-    // set previously selected faces to white
-    setFaceColor(faceIdx1, baseColor);
-    setFaceColor(faceIdx2, baseColor);
-
-    // find the new indices of faces
-    faceIdx1 = intersects[0].faceIndex;
-    faceIdx2 = faceIdx1 % 2 === 0 ? faceIdx1 + 1: faceIdx1 - 1;
-
-    // set newly selected faces to red
-    setFaceColor(faceIdx1, selectionColor);
-    setFaceColor(faceIdx2, selectionColor);
-
-    // if ( intersects.length > 0 ) {
-    //     const selectedObject = intersects[ 0 ].object;
-    //     // outlinePass.selectedObjects = selectedObjects;
-    //     outlinePass.selectedObjects = [selectedObject];
-    // } else {
-    //     outlinePass.selectedObjects = [];
-    // }
-    // composer.render(scene, camera);
-
+    carousel.rotateY(THREE.MathUtils.degToRad(-event.deltaX * 0.05)); 
 });
 
 
-function setFaceColor(idx, color){
-    if (idx === -1) return;
-    carousel.geometry.faces[idx].color.copy(color);
-    carousel.geometry.colorsNeedUpdate = true;
-}
 
+
+
+
+// const raycaster = new THREE.Raycaster();
+// const mouse = new THREE.Vector2();
+// const composer = new EffectComposer(renderer);
+// composer.addPass(new RenderPass(scene, camera));
+// const outlinePass = new OutlinePass( new THREE.Vector2( window.innerWidth, window.innerHeight ), scene, camera );
+// outlinePass.edgeStrength = 3;
+// outlinePass.edgeThickness = 1;
+// outlinePass.visibleEdgeColor.set('#ffffff');
+// outlinePass.BlurDirectionX = new THREE.Vector2(0.0, 0.0);
+// outlinePass.BlurDirectionY = new THREE.Vector2(0.0, 0.0);
+// outlinePass.depthMaterial.morphTargets = true;
+// outlinePass.prepareMaskMaterial.morphTargets = true;
+// // outlinePass.selectedObjects = [scene.children[0]];
+// composer.addPass( outlinePass );
+
+// carousels.addEventListener( 'pointermove', onPointerMove );
+
+// function onPointerMove( event ) {
+
+//     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+//     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+//     raycaster.setFromCamera( mouse, camera );
+
+//     const intersects = raycaster.intersectObject( scene, true );
+
+//     if ( intersects.length > 0 ) {
+//         const selectedObject = intersects[ 0 ].object;
+//         // outlinePass.selectedObjects = selectedObjects;
+//         outlinePass.selectedObjects = [selectedObject[0]];
+//     } else {
+//         outlinePass.selectedObjects = [];
+//     }
+//     composer.render(scene, camera);
+
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// const raycaster = new THREE.Raycaster();
+// const mouse = new THREE.Vector2();
+// const composer = new EffectComposer(renderer);
+// composer.addPass(new RenderPass(scene, camera));
+// composer.setSize(window.innerWidth, window.innerHeight);
+// const outlinePass = new OutlinePass( new THREE.Vector2( window.innerWidth, window.innerHeight ), scene, camera );
+// outlinePass.edgeStrength = 3;
+// outlinePass.edgeThickness = 1;
+// outlinePass.visibleEdgeColor.set('#ffffff');
+// outlinePass.hiddenEdgeColor.set("#1abaff");
+// outlinePass.BlurDirectionX = new THREE.Vector2(0.0, 0.0);
+// outlinePass.BlurDirectionY = new THREE.Vector2(0.0, 0.0);
+// outlinePass.depthMaterial.morphTargets = true;
+// outlinePass.prepareMaskMaterial.morphTargets = true;
+// outlinePass.usePatternTexture = false;
+// composer.addPass(outlinePass);
+// // outlinePass.selectedObjects = [carousel.geometries[0]];
+// let effectFXAA;
+// effectFXAA = new ShaderPass( FXAAShader );
+// effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+// effectFXAA.renderToScreen = true;
+// composer.addPass( effectFXAA );
+// let selectedObjects = [];
+
+// carousels.addEventListener( 'pointermove', onPointerMove );
+
+// function onPointerMove( event ) {
+
+//     if ( event.isPrimary === false ) return;
+
+//     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+//     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+//     checkIntersection();
+
+// }
+
+// function checkIntersection() {
+
+//     raycaster.setFromCamera( mouse, camera );
+
+//     const intersects = raycaster.intersectObject( scene, true );
+
+//     if ( intersects.length > 0 ) {
+
+//         const selectedObject = intersects[ 0 ].object;
+//         // addSelectedObject( selectedObject );
+//         outlinePass.selectedObjects = [selectedObjects[0]];
+
+//     } else {
+
+//         // outlinePass.selectedObjects = [];
+
+//     }
+
+// }
+// composer.render(scene, camera);
 
 
 
