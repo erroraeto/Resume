@@ -64,11 +64,15 @@ gulp.task('icons', function () {
         .pipe(gulp.dest("dist/icons"));
 });
 
-
 gulp.task('images', function () {
     return gulp.src("src/img/**/*")
         .pipe(imagemin())
         .pipe(gulp.dest("dist/img"));
 });
 
-gulp.task('default', gulp.parallel('deploy', 'watch', 'server', 'styles', 'scripts', 'fonts', 'icons', 'html', 'images'));
+gulp.task('models', function () {
+    return gulp.src("src/models/**/*")
+        .pipe(gulp.dest("dist/models"));
+});
+
+gulp.task('default', gulp.parallel('deploy', 'watch', 'server', 'styles', 'scripts', 'fonts', 'icons', 'html', 'images', 'models'));

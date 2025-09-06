@@ -1,27 +1,29 @@
 .main
     position: relative
     display: grid
-    grid: repeat(4, 9rem calc(100vh - 18rem) 9rem) / 7rem repeat(3, 1fr) 7rem
+    // grid: repeat(4, 9rem calc(100vh - 18rem) 9rem) / 7rem repeat(3, 1fr) 7rem
+    grid: repeat(4, 100vh) / 100%
     height: 100vh
     overflow-y: scroll
     left: 0
     top: 0
     z-index: 0
-    // background: gray
-    mask: linear-gradient(to bottom, hsla(0, 0%, 0%, 0) 0%, hsla(0, 0%, 0%, 0.013) 4%, hsla(0, 0%, 0%, 0.049) 7.1%, hsla(0, 0%, 0%, 0.104) 9.6%, hsla(0, 0%, 0%, 0.175) 11.8%, hsla(0, 0%, 0%, 0.259) 13.9%, hsla(0, 0%, 0%, 0.352) 16.3%, hsla(0, 0%, 0%, 0.45) 19.3%, hsla(0, 0%, 0%, 0.55) 23.2%, hsla(0, 0%, 0%, 0.648) 28.2%, hsla(0, 0%, 0%, 0.741) 34.7%, hsla(0, 0%, 0%, 0.825) 43%, hsla(0, 0%, 0%, 0.896) 53.4%, hsla(0, 0%, 0%, 0.951) 66.2%, hsla(0, 0%, 0%, 0.987) 81.6%, hsl(0, 0%, 0%) 100%) top / 100% 10% no-repeat, linear-gradient(to top, hsla(0, 0%, 0%, 0) 0%, hsla(0, 0%, 0%, 0.013) 4%, hsla(0, 0%, 0%, 0.049) 7.1%, hsla(0, 0%, 0%, 0.104) 9.6%, hsla(0, 0%, 0%, 0.175) 11.8%, hsla(0, 0%, 0%, 0.259) 13.9%, hsla(0, 0%, 0%, 0.352) 16.3%, hsla(0, 0%, 0%, 0.45) 19.3%, hsla(0, 0%, 0%, 0.55) 23.2%, hsla(0, 0%, 0%, 0.648) 28.2%, hsla(0, 0%, 0%, 0.741) 34.7%, hsla(0, 0%, 0%, 0.825) 43%, hsla(0, 0%, 0%, 0.896) 53.4%, hsla(0, 0%, 0%, 0.951) 66.2%, hsla(0, 0%, 0%, 0.987) 81.6%, hsl(0, 0%, 0%) 100%) bottom / 100% 10% no-repeat, linear-gradient(black) center / 100% 81% no-repeat
+    // background: black
+    background: gray
+    // mask: linear-gradient(to bottom, hsla(0, 0%, 0%, 0) 0%, hsla(0, 0%, 0%, 0.013) 4%, hsla(0, 0%, 0%, 0.049) 7.1%, hsla(0, 0%, 0%, 0.104) 9.6%, hsla(0, 0%, 0%, 0.175) 11.8%, hsla(0, 0%, 0%, 0.259) 13.9%, hsla(0, 0%, 0%, 0.352) 16.3%, hsla(0, 0%, 0%, 0.45) 19.3%, hsla(0, 0%, 0%, 0.55) 23.2%, hsla(0, 0%, 0%, 0.648) 28.2%, hsla(0, 0%, 0%, 0.741) 34.7%, hsla(0, 0%, 0%, 0.825) 43%, hsla(0, 0%, 0%, 0.896) 53.4%, hsla(0, 0%, 0%, 0.951) 66.2%, hsla(0, 0%, 0%, 0.987) 81.6%, hsl(0, 0%, 0%) 100%) top / 100% 10% no-repeat, linear-gradient(to top, hsla(0, 0%, 0%, 0) 0%, hsla(0, 0%, 0%, 0.013) 4%, hsla(0, 0%, 0%, 0.049) 7.1%, hsla(0, 0%, 0%, 0.104) 9.6%, hsla(0, 0%, 0%, 0.175) 11.8%, hsla(0, 0%, 0%, 0.259) 13.9%, hsla(0, 0%, 0%, 0.352) 16.3%, hsla(0, 0%, 0%, 0.45) 19.3%, hsla(0, 0%, 0%, 0.55) 23.2%, hsla(0, 0%, 0%, 0.648) 28.2%, hsla(0, 0%, 0%, 0.741) 34.7%, hsla(0, 0%, 0%, 0.825) 43%, hsla(0, 0%, 0%, 0.896) 53.4%, hsla(0, 0%, 0%, 0.951) 66.2%, hsla(0, 0%, 0%, 0.987) 81.6%, hsl(0, 0%, 0%) 100%) bottom / 100% 10% no-repeat, linear-gradient(black) center / 100% 81% no-repeat
     &::-webkit-scrollbar
         display: none
-    &::after,
-    &::before
-        content: ''
-        position: fixed
-        height: 3%
-        width: 100%
-        z-index: 1
-        backdrop-filter: blur(.2rem)
-    &::after
-        top: 0
-        mask-image: linear-gradient(to top, hsla(0, 0%, 0%, 0) 0%, hsla(0, 0%, 0%, 0.013) 4%, hsla(0, 0%, 0%, 0.049) 7.1%, hsla(0, 0%, 0%, 0.104) 9.6%, hsla(0, 0%, 0%, 0.175) 11.8%, hsla(0, 0%, 0%, 0.259) 13.9%, hsla(0, 0%, 0%, 0.352) 16.3%, hsla(0, 0%, 0%, 0.45) 19.3%, hsla(0, 0%, 0%, 0.55) 23.2%, hsla(0, 0%, 0%, 0.648) 28.2%, hsla(0, 0%, 0%, 0.741) 34.7%, hsla(0, 0%, 0%, 0.825) 43%, hsla(0, 0%, 0%, 0.896) 53.4%, hsla(0, 0%, 0%, 0.951) 66.2%, hsla(0, 0%, 0%, 0.987) 81.6%, hsl(0, 0%, 0%) 100%)
-    &::before
-        bottom: 0
-        mask-image: linear-gradient(to bottom, hsla(0, 0%, 0%, 0) 0%, hsla(0, 0%, 0%, 0.013) 4%, hsla(0, 0%, 0%, 0.049) 7.1%, hsla(0, 0%, 0%, 0.104) 9.6%, hsla(0, 0%, 0%, 0.175) 11.8%, hsla(0, 0%, 0%, 0.259) 13.9%, hsla(0, 0%, 0%, 0.352) 16.3%, hsla(0, 0%, 0%, 0.45) 19.3%, hsla(0, 0%, 0%, 0.55) 23.2%, hsla(0, 0%, 0%, 0.648) 28.2%, hsla(0, 0%, 0%, 0.741) 34.7%, hsla(0, 0%, 0%, 0.825) 43%, hsla(0, 0%, 0%, 0.896) 53.4%, hsla(0, 0%, 0%, 0.951) 66.2%, hsla(0, 0%, 0%, 0.987) 81.6%, hsl(0, 0%, 0%) 100%)
+    // &::after,
+    // &::before
+    //     content: ''
+    //     position: fixed
+    //     height: 3%
+    //     width: 100%
+    //     z-index: 1
+    //     backdrop-filter: blur(.2rem)
+    // &::after
+    //     top: 0
+    //     mask-image: linear-gradient(to top, hsla(0, 0%, 0%, 0) 0%, hsla(0, 0%, 0%, 0.013) 4%, hsla(0, 0%, 0%, 0.049) 7.1%, hsla(0, 0%, 0%, 0.104) 9.6%, hsla(0, 0%, 0%, 0.175) 11.8%, hsla(0, 0%, 0%, 0.259) 13.9%, hsla(0, 0%, 0%, 0.352) 16.3%, hsla(0, 0%, 0%, 0.45) 19.3%, hsla(0, 0%, 0%, 0.55) 23.2%, hsla(0, 0%, 0%, 0.648) 28.2%, hsla(0, 0%, 0%, 0.741) 34.7%, hsla(0, 0%, 0%, 0.825) 43%, hsla(0, 0%, 0%, 0.896) 53.4%, hsla(0, 0%, 0%, 0.951) 66.2%, hsla(0, 0%, 0%, 0.987) 81.6%, hsl(0, 0%, 0%) 100%)
+    // &::before
+    //     bottom: 0
+    //     mask-image: linear-gradient(to bottom, hsla(0, 0%, 0%, 0) 0%, hsla(0, 0%, 0%, 0.013) 4%, hsla(0, 0%, 0%, 0.049) 7.1%, hsla(0, 0%, 0%, 0.104) 9.6%, hsla(0, 0%, 0%, 0.175) 11.8%, hsla(0, 0%, 0%, 0.259) 13.9%, hsla(0, 0%, 0%, 0.352) 16.3%, hsla(0, 0%, 0%, 0.45) 19.3%, hsla(0, 0%, 0%, 0.55) 23.2%, hsla(0, 0%, 0%, 0.648) 28.2%, hsla(0, 0%, 0%, 0.741) 34.7%, hsla(0, 0%, 0%, 0.825) 43%, hsla(0, 0%, 0%, 0.896) 53.4%, hsla(0, 0%, 0%, 0.951) 66.2%, hsla(0, 0%, 0%, 0.987) 81.6%, hsl(0, 0%, 0%) 100%)

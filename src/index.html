@@ -12,6 +12,14 @@
     <!-- <link rel="shortcut icon" href="./img/Logo-1.webp"> -->
     <link rel="stylesheet" href="./css/style.min.css">
     <title>Document</title>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.166.1/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.166.1/examples/jsm/"
+            }
+        }
+    </script>
 </head>
 <body>
     <svg width="0" height="0" style="position: absolute;">
@@ -93,8 +101,15 @@
             </svg>
         </a>
     </nav>
+    <ul class="scrollbar__list">
+        <li class="scrollbar__item" data-num="00"></li>
+        <li class="scrollbar__item" data-num="01"></li>
+        <li class="scrollbar__item" data-num="02"></li>
+        <li class="scrollbar__item" data-num="03"></li>
+        <li class="scrollbar__item" data-num="VC"></li>
+    </ul>
     <main class="main">
-        <section class="cover">
+        <section class="section section__cover">
             <h1 class="cover__title txt_uppercase">Resume</h1>
             <svg class="line line_hr" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
                 <line x1="0" y1="50" x2="100" y2="50" stroke-width="100"/>
@@ -106,65 +121,69 @@
             </h3>
         </section>
         <!-- Section About -->
-        <div class="carousel">
-            <!-- <canvas id="gl" data-engine="three.js r158" width="527" height="912"></canvas> -->
-        </div>
-        <div class="about__description description">
-            <h2 class="description__title txt_uppercase" data-title="01">About</h2>
-            <svg class="line line_hr" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                <line x1="-5" y1="50" x2="104" y2="50" stroke-width="100"/>
-            </svg>
-            <p class="description__paragraph"><span>I am a passionate front-end developer advancing in the implementation of 3D and intuitive websites.</span>
-                <span>My experience also includes modeling:</span>
-            </p>
-            <fieldset class="radio__list">
-                <legend>Select phase:</legend>
-                <div class="radio__item">
-                    <input id="c&d" type="radio" name="drone" value="c&d"/>
-                    <label for="c&d">Concepts & design</label>
-                </div>
-                <div class="radio__item">
-                    <input id="retopology" type="radio" name="drone" value="retopology"/>
-                    <label for="retopology">Retopology</label>
-                </div>
-                <div class="radio__item">
-                    <input id="unwrap" type="radio" name="drone" value="unwrap"/>
-                    <label for="unwrap">Unwrap</label>
-                </div>
-                <div class="radio__item">
-                    <input id="sculpting" type="radio" name="drone" value="sculpting"/>
-                    <label for="sculpting">Sculpting</label>
-                </div>
-                <div class="radio__item">
-                    <input id="bm" type="radio" name="drone" value="bm"/>
-                    <label for="bm">Baking maps</label>
-                </div>
-                <div class="radio__item">
-                    <input id="texturing" type="radio" name="drone" value="texturing"/>
-                    <label for="texturing">Texturing</label>
-                </div>
-                <div class="radio__item">
-                    <input id="r&s" type="radio" name="drone" value="r&s"/>
-                    <label for="r&s">Rigging & skinning</label>
-                </div>
-            </fieldset>
-        </div>
-        <!-- Section Experience -->
-        <div class="experience__description description">
-            <h2 class="description__title txt_uppercase" data-title="02">Experience</h2>
-            <svg class="line line_hr" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                <line x1="-5" y1="50" x2="104" y2="50" stroke-width="100"/>
-            </svg>
-            <p class="description__paragraph">Descriptions of any skills related to a person's personality, such as communication skills, teamwork, problem solving, etc.</p>
-        </div>
-        <!-- Section Tool -->
-        <div class="tool__description description">
-            <h2 class="description__title txt_uppercase" data-title="03">Tool</h2>
-            <svg class="line line_hr" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                <line x1="-5" y1="50" x2="104" y2="50" stroke-width="100"/>
-            </svg>
-            <p class="description__paragraph">My last year activity on languages and progression frontend developer.</p>
-        </div>
+        <section class="section section__about">
+            <div class="description">
+                <h2 class="description__title txt_uppercase" data-title="01">About</h2>
+                <svg class="line line_hr" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="-5" y1="50" x2="104" y2="50" stroke-width="100"/>
+                </svg>
+                <p class="description__paragraph"><span>I am a passionate front-end developer advancing in the implementation of 3D and intuitive websites.</span>
+                    <span>My experience also includes modeling:</span>
+                </p>
+                <fieldset class="radio__list">
+                    <legend>Select phase:</legend>
+                    <div class="radio__item">
+                        <input id="c&d" type="radio" name="drone" value="c&d"/>
+                        <label for="c&d">Concepts & design</label>
+                    </div>
+                    <div class="radio__item">
+                        <input id="retopology" type="radio" name="drone" value="retopology"/>
+                        <label for="retopology">Retopology</label>
+                    </div>
+                    <div class="radio__item">
+                        <input id="unwrap" type="radio" name="drone" value="unwrap"/>
+                        <label for="unwrap">Unwrap</label>
+                    </div>
+                    <div class="radio__item">
+                        <input id="sculpting" type="radio" name="drone" value="sculpting"/>
+                        <label for="sculpting">Sculpting</label>
+                    </div>
+                    <div class="radio__item">
+                        <input id="bm" type="radio" name="drone" value="bm"/>
+                        <label for="bm">Baking maps</label>
+                    </div>
+                    <div class="radio__item">
+                        <input id="texturing" type="radio" name="drone" value="texturing"/>
+                        <label for="texturing">Texturing</label>
+                    </div>
+                    <div class="radio__item">
+                        <input id="r&s" type="radio" name="drone" value="r&s"/>
+                        <label for="r&s">Rigging & skinning</label>
+                    </div>
+                </fieldset>
+            </div>
+        </section>
+        <!-- Section Soft skills -->
+        <section class="section section__soft-skills">
+            <div class="description">
+                <h2 class="description__title txt_uppercase" data-title="02">Soft skills</h2>
+                <svg class="line line_hr" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="-5" y1="50" x2="104" y2="50" stroke-width="100"/>
+                </svg>
+                <p class="description__paragraph">Descriptions of any skills related to a person's personality, such as communication skills, teamwork, problem solving, etc.</p>
+            </div>
+        </section>
+        <!-- Section Hard skills -->
+        <section class="section section__hard-skills">
+            <div class="description">
+                <h2 class="description__title txt_uppercase" data-title="03">Hard skills</h2>
+                <svg class="line line_hr" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="-5" y1="50" x2="104" y2="50" stroke-width="100"/>
+                </svg>
+                <p class="description__paragraph">My last year activity on languages and progression frontend developer.</p>
+            </div>
+        </section>
+
         <svg class="visit-card" viewBox="0 0 100 54" xmlns="http://www.w3.org/2000/svg">
             <rect class="visit-card__bg" width="100" height="54"/>
             <g class="visit-card__text">
@@ -185,6 +204,8 @@
 
     </main>
     <script type="module" src="js/events.js"></script>
+    <script type="module" src="js/carousel.js"></script>
+    <script type="module" src="js/stackItem.js"></script>
 
 </body>
 </html>
