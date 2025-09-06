@@ -1,1 +1,113 @@
-import*as THREE from"three";import{EffectComposer}from"three/addons/postprocessing/EffectComposer.js";import{RenderPass}from"three/addons/postprocessing/RenderPass.js";import{BokehPass}from"three/addons/postprocessing/BokehPass.js";import{FXAAShader}from"three/addons/shaders/FXAAShader.js";import{GodraysPass}from"three/addons/shaders/GodraysPass.js";import{OrbitControls}from"three/addons/controls/OrbitControls.js";let sectionSoftSkills=document.querySelector(".section__soft-skills"),camera,scene,renderer,renderPass,bokehPass,composer,spotLight,pale=0,postprocessing={enabled:!0},bgColor=1297,sunColor=16772608,textures=["../img/1.png","../img/2.png","../img/3.png","../img/4.png","../img/5.png","../img/6.png","../img/7.png","../img/8.png"];function init(){scene=new THREE.Scene,(camera=new THREE.PerspectiveCamera(30,sectionSoftSkills.clientWidth/sectionSoftSkills.clientHeight,1,100)).position.set(0,0,1).setLength(5.5),(renderer=new THREE.WebGLRenderer({antialias:!0})).setPixelRatio(devicePixelRatio),renderer.setSize(sectionSoftSkills.clientWidth,sectionSoftSkills.clientHeight),renderer.domElement.className="stackItem",sectionSoftSkills.insertAdjacentElement("afterbegin",renderer.domElement),renderer.shadowMap.enabled=!0,renderer.shadowMap.type=THREE.PCFSoftShadowMap,renderer.toneMapping=THREE.ACESFilmicToneMapping,renderer.toneMappingExposure=1,(spotLight=new THREE.SpotLight(16777215,100)).position.set(1,2,1),spotLight.angle=Math.PI/6,spotLight.penumbra=1,spotLight.decay=2,spotLight.distance=0;var e=new THREE.HemisphereLight(16777215,9276813,.15),e=(scene.add(e),spotLight.castShadow=!0,spotLight.shadow.mapSize.width=1024,spotLight.shadow.mapSize.height=1024,spotLight.shadow.camera.near=1,spotLight.shadow.camera.far=10,spotLight.shadow.focus=1,spotLight.shadow.bias=-.003,scene.add(spotLight),new THREE.SpotLightHelper(spotLight));scene.add(e),createCarousel(),postEffects(),onWindowResize(),new OrbitControls(camera,renderer.domElement);window.addEventListener("resize",onWindowResize),renderer.setAnimationLoop(animate)}function createCarousel(){var e=(new THREE.TextureLoader).load("../img/Thing.png"),t=new THREE.PlaneGeometry(1,1),e=new THREE.MeshLambertMaterial({map:e,transparent:!0,side:THREE.DoubleSide}),t=new THREE.Mesh(t,e),e=(t.position.x=1.2,scene.add(t),new THREE.BoxGeometry(1,1,1)),t=new THREE.MeshLambertMaterial({color:16776960}),e=new THREE.Mesh(e,t);e.receiveShadow=!0,scene.add(e)}function postEffects(){new EffectComposer(renderer).addPass(new RenderPass(scene,camera)),new GodraysPass(dirLight,camera,{density:.006,maxDensity:2/3,distanceAttenuation:2,color:new THREE.Color(16777215).getHex(),edgeStrength:2,edgeRadius:2,raymarchSteps:60,enableBlur:!0,blurVariance:.1,blurKernelSize:KernelSize.SMALL,gammaCorrection:!1});this.composer.addPass(this.godraysPass);var e=new SMAAEffect,e=new EffectPass(this.camera,e);e.encodeOutput=!1,this.composer.addPass(e)}function onWindowResize(){var e=sectionSoftSkills.clientWidth/sectionSoftSkills.clientHeight;camera.aspect=e,camera.updateProjectionMatrix(),renderer.getPixelRatio();renderer.setSize(sectionSoftSkills.clientWidth,sectionSoftSkills.clientHeight)}function animate(){renderer.render(scene,camera)}function wheelItem(e){e=.002*e.deltaX;camera.translateX(e),a+e<pale&&a}init();
+import*as THREE from"three";import{EffectComposer}from"three/addons/postprocessing/EffectComposer.js";import{RenderPass}from"three/addons/postprocessing/RenderPass.js";import{BokehPass}from"three/addons/postprocessing/BokehPass.js";import{FXAAShader}from"three/addons/shaders/FXAAShader.js";import{GodRaysFakeSunShader,GodRaysDepthMaskShader,GodRaysCombineShader,GodRaysGenerateShader}from"three/addons/shaders/GodRaysShader.js";import{OrbitControls}from"three/addons/controls/OrbitControls.js";import Stats from"three/addons/libs/stats.module.js";import{DRACOLoader}from"three/addons/loaders/DRACOLoader.js";import{GLTFLoader}from"three/addons/loaders/GLTFLoader.js";let sectionSoftSkills=document.querySelector(".section__soft-skills"),scene,cameraPost,controls,time,isPlaying,baseTexture,width,height,container,renderer,camera,karasi,material,materialOrtho,scenePost,sw="../img/Thing.png";function init(e){scene=new THREE.Scene,container=e,width=container.clienttWidth,height=container.clientHeight,(renderer=new THREE.WebGLRenderer).setPixelRatio(Math.min(window.devicePixelRatio,2)),renderer.setSize(width,height),renderer.setClearColor(0,1),renderer.physicallyCorrectLights=!0,renderer.outputEncoding=THREE.sRGBEncoding,container.appendChild(renderer.domElement),camera=new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,.001,1e3);cameraPost=new THREE.OrthographicCamera(-.5,.5,.5,-.5,-1e3,1e3),camera.position.set(0,0,1),controls=new OrbitControls(camera,renderer.domElement),time=0;e=new DRACOLoader;e.setDecoderPath("https://unpkg.com/three@0.160.0/examples/jsm/libs/draco/draco_decoder.js"),(new GLTFLoader).setDRACOLoader(e),isPlaying=!0,initPost(),addObjects(),resize(),render(),setupResize()}function setupResize(){window.addEventListener("resize",resize)}function initPost(){baseTexture=new THREE.WebGLRenderTarget(width,height,{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,format:THREE.RGBAFormat}),materialOrtho=new THREE.ShaderMaterial({extensions:{derivatives:"#extension GL_OES_standard_derivatives : enable"},side:THREE.DoubleSide,side:THREE.DoubleSide,uniforms:{time:{value:0},uMap:{value:null}},vertexShader:`
+            uniform float time;
+            varying vec2 vUv;
+            varying vec3 vPosition;
+            uniform vec2 pixels;
+            float PI = 3.141592653589793238;
+            void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+            }
+        `,fragmentShader:`
+            uniform float time;
+            uniform float progress;
+            uniform sampler2D uMap;
+            uniform vec4 resolution;
+            varying vec2 vUv;
+            varying vec3 vPosition;
+            float PI = 3.141592653589793238;
+            float rand(vec2 co){
+                return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+            }
+            void main()	{
+
+                vec4 c = texture2D(uMap, vUv);
+
+                vec2 toCenter = vec2(0.5) - vUv;
+
+                vec4 original = texture2D(uMap, vUv );
+
+                vec4 color = vec4(0.0);
+                float total = 0.0;
+                for(float i = 0.; i < 20.; i++) {
+                    float lerp = (i + rand(vec2(gl_FragCoord.x,gl_FragCoord.y )))/20.;
+
+                    float weight = sin(lerp * PI);
+                    vec4 mysample = texture2D(uMap, vUv + toCenter*lerp*0.5);
+                    mysample.rgb *=mysample.a;
+                    color += mysample*weight;
+                    total +=weight;
+                }
+                color.a = 1.0;
+                color.rgb /= total;
+
+
+                vec4 finalColor = 1. - (1. - color)*(1. - original);
+
+
+                gl_FragColor = vec4(toCenter, 0.0, 1.0);
+                gl_FragColor = color;
+                gl_FragColor = finalColor;
+                // gl_FragColor = original;
+                // gl_FragColor = vec4(
+                // 	vec3(rand(vUv)),
+                // 	1.
+                // 	);
+            }
+        `});var e=new THREE.Mesh(new THREE.PlaneGeometry(1,1),materialOrtho);(scenePost=new THREE.Scene).add(e)}function resize(){var e=container.offsetWidth,r=container.offsetHeight;renderer.setSize(e,r),camera.aspect=e/r,camera.updateProjectionMatrix()}function addObjects(){var e=(new THREE.TextureLoader).load(sw),e=(e.wrapT=THREE.RepeatWrapping,e.wrapS=THREE.RepeatWrapping,material=new THREE.ShaderMaterial({extensions:{derivatives:"#extension GL_OES_standard_derivatives : enable"},side:THREE.DoubleSide,uniforms:{time:{value:0},uMap:{value:e},resolution:{value:new THREE.Vector4}},vertexShader:`
+            uniform float time;
+            varying vec2 vUv;
+            varying vec3 vPosition;
+            uniform vec2 pixels;
+            float PI = 3.141592653589793238;
+            void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+            }
+        `,fragmentShader:`
+            uniform float time;
+            uniform float progress;
+            uniform sampler2D uMap;
+            uniform vec4 resolution;
+            varying vec2 vUv;
+            varying vec3 vPosition;
+            float PI = 3.141592653589793238;
+            float rand(vec2 co){
+                return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+            }
+            void main()	{
+
+                vec4 c = texture2D(uMap, vUv);
+
+                vec2 toCenter = vec2(0.5) - vUv;
+
+                vec4 original = texture2D(uMap, vUv );
+
+                vec4 color = vec4(0.0);
+                float total = 0.0;
+                for(float i = 0.; i < 20.; i++) {
+                    float lerp = (i + rand(vec2(gl_FragCoord.x,gl_FragCoord.y )))/20.;
+
+                    float weight = sin(lerp * PI);
+                    vec4 mysample = texture2D(uMap, vUv + toCenter*lerp*0.5);
+                    mysample.rgb *=mysample.a;
+                    color += mysample*weight;
+                    total +=weight;
+                }
+                color.a = 1.0;
+                color.rgb /= total;
+
+
+                vec4 finalColor = 1. - (1. - color)*(1. - original);
+
+
+                gl_FragColor = vec4(toCenter, 0.0, 1.0);
+                gl_FragColor = color;
+                gl_FragColor = finalColor;
+                // gl_FragColor = original;
+                // gl_FragColor = vec4(
+                // 	vec3(rand(vUv)),
+                // 	1.
+                // 	);
+            }
+        `}),new THREE.SphereGeometry(.5,30,30));karasi=new THREE.Mesh(e,material),scene.add(karasi)}function stop(){isPlaying=!1}function play(){isPlaying||(isPlaying=!0,render())}function render(){isPlaying&&(time+=.05,karasi.rotation.y=-time/20,material.uniforms.time.value=time,requestAnimationFrame(render),renderer.setRenderTarget(baseTexture),renderer.render(scene,camera),materialOrtho.uniforms.uMap.value=baseTexture.texture,materialOrtho.uniforms.time.value=time,renderer.setRenderTarget(null),renderer.render(scenePost,cameraPost))}init(sectionSoftSkills);
