@@ -5,6 +5,7 @@
 h1,
 h2,
 ul,
+summary,
 .font__lat-ASL
     font-family: "Averia Serif Libre", serif
     font-weight: lighter
@@ -15,7 +16,7 @@ h1
     line-height: .8em
 
 h2
-    font-size: 3.2rem
+    font-size: 4.4rem
 
 h3,
 p,
@@ -36,11 +37,16 @@ a:link, a:visited
     font-weight: normal
     font-style: normal
 
-.txt_uppercase
-    text-transform: uppercase
+.nav
+    *
+        color: #d5d2d3 !important
+    h3
+        font-size: 2.4rem
+        line-height: 1em
+    a
+        font-size: 1.4rem
+        letter-spacing: .1em
 
-.subtitle *
-    color: var(--color-gray)
 
 // Cover
 .cover__title
@@ -55,16 +61,28 @@ a:link, a:visited
     &::after
         font-family: "Averia Libre", system-ui
         letter-spacing: normal
-        font-size: 2rem
+        font-size: 1.6rem
 
 .description__paragraph
-    line-height: 1.2em
+    line-height: 1.5em
     text-indent: 2rem
 
+// Visit card
 .visit-card
     text
         font-weight: bold
+    // &__link
+    //     &:link, &:visited
+    //         color: #8d8d8d !important
+    //         // color: #d5d2d3
+
+// List details
+.list-details
+    &__summary
+        font-size: 2.4rem
+    // &__content
+
 
 // Scrollbar
 .scrollbar__list
-    font-size: 1.4rem
+    font-size: 1.2rem

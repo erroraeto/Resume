@@ -4,19 +4,22 @@
     height: 100%
     width: max-content
     right: 0
+    row-gap: 2rem
     flex-direction: column
-    justify-content: space-evenly
+    justify-content: center
     z-index: 1
     // filter: url(#filter__inkBleed)
 
 .scrollbar__item
     position: relative
-    margin-right: .2rem
+    margin-right: .6rem
     direction: rtl
+    cursor: pointer
     list-style-type: none
     transition: color .3s ease
-    --opacity-marker: 1
+    --opacity-marker: .5
     --opacity-text: 0
+    --visibility-circle: visible
     &::after,
     &::before
         width: 100%
@@ -27,12 +30,14 @@
         position: absolute
         left: 0
         top: 0
+        visibility: var(--visibility-circle)
         opacity: var(--opacity-marker)
-        cursor: pointer
     &::before
         content: attr(data-num)
         display: inline-block
         color: currentColor
         opacity: var(--opacity-text)
+    &:hover::after
+        opacity: 1
     &:last-of-type
         color: yellow
