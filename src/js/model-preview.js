@@ -207,8 +207,9 @@ let sectionAbout = document.querySelector('.section__about');
 
 
 
-
-const model = [];
+let renderer;
+const model = [],
+    scenes = [];
 const transitionParams = {
 //   useTexture: true,
     transition: 0,
@@ -217,8 +218,11 @@ const transitionParams = {
     animate: true,
 //   threshold: 0.3,
 };
+let i = 0,
+    j = 1;
 
 function getTransition({ renderer, sceneA, sceneB }) {
+// function getTransition({ renderer, scenes }) {
 
     const scene = new THREE.Scene();
     const w = window.innerWidth;
@@ -228,7 +232,7 @@ function getTransition({ renderer, sceneA, sceneB }) {
     const textures = [];
     const loader = new THREE.TextureLoader();
 
-    textures[0] = loader.load(`../img/transition${[0]}.png`);
+    textures[0] = loader.load(`../img/texture/transition${[0]}.png`);
 
     const material = new THREE.ShaderMaterial({
         transparent: true,
@@ -288,6 +292,8 @@ function getTransition({ renderer, sceneA, sceneB }) {
 
     material.uniforms.tDiffuse1.value = sceneA.fbo.texture;
     material.uniforms.tDiffuse2.value = sceneB.fbo.texture;
+    // material.uniforms.tDiffuse1.value = scenes[i].fbo.texture;
+    // material.uniforms.tDiffuse2.value = scenes[j].fbo.texture;
 
     new TWEEN.Tween(transitionParams)
         .to({ transition: 1 }, 4500)
@@ -295,51 +301,43 @@ function getTransition({ renderer, sceneA, sceneB }) {
         .delay(5000)
         .yoyo(true)
         .start();
-    let needsTextureChange = false;
 
     const render = () => {
     // Transition animation
-        if (transitionParams.animate) {
-            TWEEN.update();
-            // Change the current alpha texture after each transition
-            if (transitionParams.cycle) {
-                if ( transitionParams.transition == 0 || transitionParams.transition == 1 ) {
-                    if (needsTextureChange) {
-                        transitionParams.texture = (transitionParams.texture + 1) % textures.length;
-                        material.uniforms.tMixTexture.value = textures[transitionParams.texture];
-                        needsTextureChange = false;
-                    }
-                } else {
-                    needsTextureChange = true;
-                }
-            } else {
-                needsTextureChange = true;
-            }
-        }
+        if (transitionParams.animate) TWEEN.update();
 
         material.uniforms.mixRatio.value = transitionParams.transition;
 
         // Prevent render both scenes when it's not necessary
         if (transitionParams.transition === 0) {
-              sceneA.update();
+            sceneA.update();
             sceneB.render(false);
+            // scenes[i].update();
+            // scenes[j].render(false);
         } else if (transitionParams.transition === 1) {
             sceneA.render(false);
-              sceneB.update();
+            sceneB.update();
+            // scenes[i].render(false);
+            // scenes[j].update();
         } else {
             // When 0<transition<1 render transition between two scenes
             sceneA.render(true);
             sceneB.render(true);
+            // scenes[i].render(true);
+            // scenes[j].render(true);
 
             renderer.setRenderTarget(null); // null sets the rt to the canvas
             renderer.render(scene, camera);
         }
+        // transition = getTransition({ renderer, sceneA: scenes[i], sceneB: scenes[j] });
+        // i < -scenes.length ? i++ : i = 0;
+        // j < -scenes.length ? j++ : j = 0;
     };
 
     return { render };
 }
 
-function getFXScene({ renderer, source, material }) {
+function getFXScene({ renderer, source, material = false }) {
 
     const w = window.innerWidth;
     const h = window.innerHeight;
@@ -352,13 +350,8 @@ function getFXScene({ renderer, source, material }) {
 
     scene.add(new THREE.HemisphereLight(0xffffff, 0x555555, 1.0));
 
-    new PLYLoader().load( source, function ( geometry ) {
-        geometry.scale( 1, 1, 1 );
-        geometry.computeVertexNormals();
-
-        // const material = new THREE.MeshLambertMaterial({});
-
-        let mesh = new THREE.Mesh( geometry, material );
+    
+    function positionate(mesh) {
         mesh.rotation.y = - Math.PI / 0.9;
         mesh.position.x = 1.5;
         mesh.position.y = 1.7;
@@ -367,7 +360,31 @@ function getFXScene({ renderer, source, material }) {
         mesh.receiveShadow = true;
         scene.add( mesh );
         model.push(mesh);
-    } );
+    }
+
+    if (material) {
+        new PLYLoader().load( source, function ( geometry ) {
+            geometry.scale( 1, 1, 1 );
+            geometry.computeVertexNormals();
+            let mesh = new THREE.Mesh( geometry, material );
+            positionate(mesh);
+        });
+    } else {
+        const texture = new THREE.TextureLoader().load( source, (loadedTexture) => {
+            const aspectRatio = loadedTexture.image.width / loadedTexture.image.height;
+            mesh.scale.set(aspectRatio, 1, 1);
+        });
+        const geometry = new THREE.PlaneGeometry( -3, 3);
+        const material = new THREE.MeshBasicMaterial({
+            map: texture,
+            side: THREE.DoubleSide,
+            transparent: true,
+        });
+        let mesh = new THREE.Mesh(geometry, material);
+        positionate(mesh);
+    }
+
+
 
     const fbo = new THREE.WebGLRenderTarget(w, h);
 
@@ -399,60 +416,43 @@ animate();
 function init() {
     const container = sectionAbout;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     container.appendChild(renderer.domElement);
 
     const sceneA = getFXScene({
         renderer,
+        source: '../img/Ref.png',
+    });
+    scenes.push(sceneA);
+
+    const sceneB = getFXScene({
+        renderer,
         source: '../models/Bust-HP.ply',
         material: new THREE.MeshLambertMaterial({})
     });
+    scenes.push(sceneB);
 
-    let uniforms = {
-        segU: {value: 72},
-        segV: {value: 16},
-        isWire: {value: false},
-        wireWidthFactor: {value: 2},
-        wireColor: {value: new THREE.Color(0xffff00)}
-    };
-    const sceneB = getFXScene({
+    const sceneC = getFXScene({
         renderer,
         source: '../models/Bust.ply',
-        // material: new THREE.MeshStandardMaterial({
-        //     side: THREE.DoubleSide,
-        //     onBeforeCompile: shader => {
-        //         shader.uniforms.segU = uniforms.segU;
-        //         shader.uniforms.segV = uniforms.segV;
-        //         shader.uniforms.wireColor = uniforms.wireColor;
-        //         shader.uniforms.isWire = uniforms.isWire;
-        //         shader.uniforms.wireWidthFactor = uniforms.wireWidthFactor;
-        //         shader.fragmentShader = `
-        //             uniform float segU;
-        //             uniform float segV;
-        //             uniform vec3 wireColor;
-        //             uniform float isWire;
-        //             uniform float wireWidthFactor;
-        //             #include <dithering_fragment>
-
-        //             // http://madebyevan.com/shaders/grid/
-        //             vec2 coord = vUv * vec2(segU, segV);
-
-        //             vec2 grid = abs(fract(coord - 0.5) - 0.5) / fwidth(coord);
-        //             float line = min(grid.x, grid.y) / wireWidthFactor;
-        //             line = 1.0 - min(line, 1.0);
-                    
-        //             if (isWire > 0.5 && line < 0.5) discard;
-        //             if (isWire > 0.5) gl_FragColor = vec4(0);
-        //             gl_FragColor = mix(gl_FragColor, vec4(wireColor, 1.0), line);
-        //         `
-        //     }
-        // })
+        material: new THREE.MeshLambertMaterial({
+            map: new THREE.TextureLoader().load("../img/texture/Unwrap.webp"),
+            transparent: true,
+        }),
     });
+    scenes.push(sceneC);
+
+    const sceneD = getFXScene({
+        renderer,
+        source: '../img/Unwrap.webp',
+    });
+    scenes.push(sceneD);
 
     transition = getTransition({ renderer, sceneA, sceneB });
-}
+    // transition = getTransition({ renderer, scenes });
+};
 
 function animate() {
     requestAnimationFrame(animate);
