@@ -29,6 +29,39 @@
                 <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9" result="goo"></feColorMatrix>
                 <feComposite in="BackgroundImage" in2="goo" operator="atop"></feComposite>
             </filter>
+
+            <filter id="inner-light" filterUnits="userSpaceOnUse">
+                <feColorMatrix in="SourceGraphic" type="matrix" values="
+                    1 0 0 .2 0 
+                    0 1 0 .2 0 
+                    0 0 1 .2 0 
+                    0 0 0 1 0" result="opaque-source"/>
+                <feGaussianBlur stdDeviation="8"/>
+                <feOffset dx="3" dy="3"/>
+                <feComposite operator="xor" in2="opaque-source"/>
+                <feComposite operator="in" in2="opaque-source"/>
+                <feComposite operator="over" in2="SourceGraphic"/>
+            </filter>
+
+            <filter id="inner-shadow" filterUnits="userSpaceOnUse">
+                <feColorMatrix in="SourceGraphic" type="matrix" values="
+                    0 0 0 0 0 
+                    0 0 0 0 0 
+                    0 0 0 0 0 
+                    0 0 0 1 0" result="opaque-source"/>
+                <feGaussianBlur stdDeviation="8"/>
+                <feOffset dx="-3" dy="-3"/>
+                <feComposite operator="xor" in2="opaque-source"/>
+                <feComposite operator="in" in2="opaque-source"/>
+                <feComposite operator="over" in2="SourceGraphic"/>
+            </filter>
+
+            <filter id="light">
+                <feSpecularLighting surfaceScale="40" specularConstant="0.1" specularExponent="200" lighting-color="#ffffff" x="0%" y="0%" width="100%" height="100%" in="SourceGraphic" result="specularLighting">
+                    <fePointLight x="10" y="10" z="150"/>
+                </feSpecularLighting>
+                <feComposite in2="SourceGraphic" operator="atop" result="composite"/>
+            </filter>
         </defs>
         <defs>
 
@@ -186,7 +219,7 @@
                     <summary class="list-details__summary">Team Work</summary>
                     <p class="list-details__content">- agreement with colleagues and smooth work with common processes.</p>
                 </details>
-                <details name="requirements">
+                <details name="requirements" open>
                     <summary class="list-details__summary">Communication</summary>
                     <p class="list-details__content">- free, easy, unobtrusive communication with people.</p>
                 </details>
@@ -194,63 +227,105 @@
         </section>
         <!-- Section Hard skills -->
         <section class="section section__hard-skills">
-            <div class="grid_hexagon">
-                <div class="grid_hexagon__column">
-                    <div class="grid_hexagon__item">
-                        <img src="../img/svg/stackoverflow.svg">
-                    </div>
-                    <div class="grid_hexagon__item">
-                        <img src="../img/svg/github.svg">
-                    </div>
-                </div>
-                <div class="grid_hexagon__column">
-                    <div class="grid_hexagon__item">
-                        <img src="../img/svg/photoshop.svg">
-                    </div>
-                    <div class="grid_hexagon__item">
-                        <img src="../img/svg/git.svg">
-                    </div>
-                    <div class="grid_hexagon__item">
-                        <img src="../img/svg/react.svg">
-                    </div>
-                </div>
-                <div class="grid_hexagon__column">
-                    <div class="grid_hexagon__item">
-                        <img src="../img/svg/figma.svg">
-                    </div>
-                    <div class="grid_hexagon__item">
-                        <img src="../img/svg/html.svg">
-                    </div>
-                    <div class="grid_hexagon__item">
-                        <img src="../img/svg/js.svg">
-                    </div>
-                    <div class="grid_hexagon__item">
-                        <img src="../img/svg/typescript.svg">
-                    </div>
-                </div>
-                <div class="grid_hexagon__column">
-                    <div class="grid_hexagon__item">
-                        <img src="../img/svg/bootstrap.svg">
-                    </div>
-                    <div class="grid_hexagon__item">
-                        <img src="../img/svg/css.svg">
-                    </div>
-                    <div class="grid_hexagon__item">
-                        <img src="../img/svg/nextjs.svg">
-                    </div>
-                </div>
-                <div class="grid_hexagon__column">
-                    <div class="grid_hexagon__item">
-                        <img src="../img/svg/sass.svg">
-                    </div>
-                    <div class="grid_hexagon__item">
-                        <img src="../img/svg/tailwind.svg">
-                    </div>
-                </div>
-            </div>
             <div class="description">
                 <h2 class="description__title" data-title="03">HARD SKILLS</h2>
                 <p class="description__paragraph">My last year activity on languages and progression frontend developer.</p>
+            </div>
+            <div class="grid-hexagon">
+                <div class="grid-hexagon__column">
+                    <div class="grid-hexagon__item">
+                        <img src="../icons/stackoverflow.svg">
+                        <dialog class="grid-hexagon__dialog">
+                            <p>Stackoverflow</p>
+                        </dialog>
+                    </div>
+                    <div class="grid-hexagon__item">
+                        <img src="../icons/github.svg">
+                        <dialog class="grid-hexagon__dialog">
+                            <p>Github</p>
+                        </dialog>
+                    </div>
+                </div>
+                <div class="grid-hexagon__column">
+                    <div class="grid-hexagon__item">
+                        <img src="../icons/photoshop.svg">
+                        <dialog class="grid-hexagon__dialog">
+                            <p>Photoshop</p>
+                        </dialog>
+                    </div>
+                    <div class="grid-hexagon__item">
+                        <img src="../icons/git.svg">
+                        <dialog class="grid-hexagon__dialog">
+                            <p>Git</p>
+                        </dialog>
+                    </div>
+                    <div class="grid-hexagon__item">
+                        <img src="../icons/react.svg">
+                        <dialog class="grid-hexagon__dialog">
+                            <p>React</p>
+                        </dialog>
+                    </div>
+                </div>
+                <div class="grid-hexagon__column">
+                    <div class="grid-hexagon__item">
+                        <img src="../icons/figma.svg">
+                        <dialog class="grid-hexagon__dialog">
+                            <p>Figma</p>
+                        </dialog>
+                    </div>
+                    <div class="grid-hexagon__item">
+                        <img src="../icons/html.svg">
+                        <dialog class="grid-hexagon__dialog">
+                            <p>HTML</p>
+                        </dialog>
+                    </div>
+                    <div class="grid-hexagon__item">
+                        <img src="../icons/js.svg">
+                        <dialog class="grid-hexagon__dialog">
+                            <p>Javascript</p>
+                        </dialog>
+                    </div>
+                    <div class="grid-hexagon__item">
+                        <img src="../icons/typescript.svg">
+                        <dialog class="grid-hexagon__dialog">
+                            <p>Typescript</p>
+                        </dialog>
+                    </div>
+                </div>
+                <div class="grid-hexagon__column">
+                    <div class="grid-hexagon__item">
+                        <img src="../icons/bootstrap.svg">
+                        <dialog class="grid-hexagon__dialog">
+                            <p>Bootstrap</p>
+                        </dialog>
+                    </div>
+                    <div class="grid-hexagon__item">
+                        <img src="../icons/css.svg">
+                        <dialog class="grid-hexagon__dialog">
+                            <p>CSS</p>
+                        </dialog>
+                    </div>
+                    <div class="grid-hexagon__item">
+                        <img src="../icons/nextjs.svg">
+                        <dialog class="grid-hexagon__dialog">
+                            <p>Next</p>
+                            .js</dialog>
+                    </div>
+                </div>
+                <div class="grid-hexagon__column">
+                    <div class="grid-hexagon__item">
+                        <img src="../icons/sass.svg">
+                        <dialog class="grid-hexagon__dialog">
+                            <p>Sass</p>
+                        </dialog>
+                    </div>
+                    <div class="grid-hexagon__item">
+                        <img src="../icons/tailwind.svg">
+                        <dialog class="grid-hexagon__dialog">
+                            <p>Tailwind</p>
+                        </dialog>
+                    </div>
+                </div>
             </div>
         </section>
 

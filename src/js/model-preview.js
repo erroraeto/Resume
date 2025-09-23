@@ -296,9 +296,9 @@ function getTransition({ renderer, sceneA, sceneB }) {
     // material.uniforms.tDiffuse2.value = scenes[j].fbo.texture;
 
     new TWEEN.Tween(transitionParams)
-        .to({ transition: 1 }, 4500)
+        .to({ transition: 1 }, 2000)
         .repeat(Infinity)
-        .delay(5000)
+        .delay(2000)
         .yoyo(true)
         .start();
 
@@ -330,8 +330,8 @@ function getTransition({ renderer, sceneA, sceneB }) {
             renderer.render(scene, camera);
         }
         // transition = getTransition({ renderer, sceneA: scenes[i], sceneB: scenes[j] });
-        // i < -scenes.length ? i++ : i = 0;
-        // j < -scenes.length ? j++ : j = 0;
+        // i < scenes.length-1 ? i++ : i = 0;
+        // j < scenes.length-1 ? j++ : j = 0;
     };
 
     return { render };
@@ -457,6 +457,9 @@ function init() {
 function animate() {
     requestAnimationFrame(animate);
     transition.render(clock.getDelta());
+    // transition = getTransition({ renderer, sceneA: scenes[i], sceneB: scenes[j] });
+    // i < scenes.length-1 ? i++ : i = 0;
+    // j < scenes.length-1 ? j++ : j = 0;
 };
 
 sectionAbout.addEventListener( 'wheel', wheelCarousel );

@@ -1,11 +1,10 @@
 .list-details
     display: flex
+    height: 100%
     justify-content: center
     column-gap: .5rem
     details
-        flex-grow: 1
-        // flex-basxis: max-content
-        // flex-shrink: 0
+        flex-shrink: 0
         position: relative
         display: flex
         flex-direction: row-reverse
@@ -15,6 +14,7 @@
         border-radius: 1rem
         overflow: hidden
         writing-mode: sideways-lr
+        transition: flex-grow 1s ease, flex-shrink 1s ease
         &::before
             content: ''
             position: absolute
@@ -26,7 +26,7 @@
             opacity: .6
             filter: blur(2px)
             background-size: cover
-            background-position: left
+            background-position: center
             box-shadow: inset 0 0 3rem black
             transition: all 1s ease
         &:nth-of-type(1)::before
@@ -50,8 +50,11 @@
         &[open]::details-content
             opacity: 1
             block-size: auto
+        &[open]
+            flex-shrink: 1
+            flex-grow: 1
         summary
-            height: 100%
+            width: max-content
             text-shadow: 0 0 .5rem black, 0 0 1rem black
             cursor: pointer
             writing-mode: vertical-lr
@@ -63,6 +66,3 @@
             text-shadow: 0 0 .5rem black, 0 0 1rem black
             writing-mode: horizontal-tb
             text-align: left
-            height: 100%
-            // width: 3rem
-            // width: 100%

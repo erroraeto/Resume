@@ -1,0 +1,73 @@
+.grid-hexagon
+    place-self: center
+    display: flex
+    // flex-direction: column
+    justify-content: center
+    align-items: center
+    box-sizing: content-box
+    column-gap: 2rem
+    // row-gap: 2rem
+    height: max-content
+    width: max-content
+    &__column
+        display: flex
+        flex-direction: column
+        // flex-direction: row
+        // column-gap: 2rem
+        row-gap: 2rem
+    &__item
+        display: flex
+        justify-content: center
+        align-items: center
+        position: relative
+        width: 8rem
+        height: 8rem
+        padding: 1.4rem
+        border-radius: 50%
+        border: 3px solid rgba(255, 255, 255, .1)
+        // box-shadow: rgba(46, 45, 45, 0.7) -2px -2px 4px, rgba(0, 0, 0, 0.8) 4px 4px 4px, rgba(255, 255, 255, 0.2) 0px 0px 0px inset, rgba(0, 0, 0, 0.4) 0px 0px 0px inset
+        cursor: pointer
+        transition: all .4s ease
+        &::after
+            content: ''
+            position: absolute
+            height: 100%
+            width: 100%
+            padding: 4px
+            border-radius: 50%
+            outline: 3px solid rgba(255, 255, 255, .1)
+            box-shadow: rgba(255, 255, 255, 0) 0px 0px 18px inset
+            transition: all .2s ease
+        &:hover
+            border: 3px solid rgba(255, 255, 255, .6)
+            &::after
+                height: 85%
+                width: 85%
+                outline-offset: -3px
+                box-shadow: rgba(255, 255, 255, .3) 0px 0px 12px inset
+            img
+                filter: saturate(.8) contrast(.8)
+                // filter: url(#inner-light) url(#inner-shadow) saturate(.7)
+                // filter: url(#light) saturate(.7)
+        img
+            width: 80%
+            height: 80%
+            filter: saturate(.2) contrast(.6)
+            // filter: saturate(0)
+            // filter: url(#inner-light) url(#inner-shadow) saturate(.2)
+            // filter: url(#light) saturate(.2)
+            transition: all .4s ease
+    &__dialog
+        top: 0
+        left: 50%
+        border: none
+        background: none
+        opacity: 0
+        translate: -50% -200%
+        transition: all 0.7s allow-discrete
+        &[open]
+            opacity: 1
+            translate: -50% -160%
+            @starting-style
+                opacity: 0
+                translate: -50% -200%

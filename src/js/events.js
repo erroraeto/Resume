@@ -36,12 +36,47 @@ Array.from(scrollbar.children).forEach((item) => item.onclick = (event) => {
 // LIST DETAILS
 let listItem = document.querySelectorAll('.list-details > *');
 
+function onWindowResize() {
+    let open = Array.from(listItem).find((item) => item.open == true);
+    Array.from(listItem).forEach((item) => {
+        item.children[1].style.width = `${ open.clientWidth - parseFloat(getComputedStyle(open).paddingInline) * 2 }px`;
+    });
+}
+
+onWindowResize();
+window.addEventListener( 'resize', onWindowResize );
+
 Array.from(listItem).forEach((item) => {
-    item.addEventListener( 'mouseover', selectItem );
-    item.addEventListener( 'click', (event) => event.preventDefault());
+    // item.addEventListener( 'mouseover', selectItem );
+    // item.addEventListener( 'click', (event) => event.preventDefault());
+    item.addEventListener( 'click', (event) => {
+        if ( event.target.closest('details').open != true ) return;
+        event.preventDefault();
+    });
 });
 
-function selectItem(event) {
-    if (event.target.closest('details').open == true) return;
-    event.target.closest('details').open = true;
-};
+// function selectItem(event) {
+//     if (event.target.closest('details').open == true) return;
+//     event.target.closest('details').open = true;
+// };
+
+// GRID HEXAGON
+let gridItem = document.querySelectorAll('.grid-hexagon__item');
+
+Array.from(gridItem).forEach((item) => {
+    item.addEventListener( 'mouseover', (event) => {
+        if (event.target.className != 'grid-hexagon__item') return;
+        // event.target.querySelector('#popover').showPopover();
+        event.target.querySelector('.grid-hexagon__dialog').show();
+    });
+    item.addEventListener( 'mouseout', (event) => {
+        // event.target.querySelector('#popover').hidePopover();
+        event.target.querySelector('.grid-hexagon__dialog').close();
+    });
+});
+
+
+// function selectItem(event) {
+//     if (event.target.closest('details').open == true) return;
+//     event.target.closest('details').open = true;
+// };
