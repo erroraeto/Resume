@@ -63,17 +63,17 @@ Array.from(listItem).forEach((item) => {
 // GRID HEXAGON
 let gridItem = document.querySelectorAll('.grid-hexagon__item');
 
-Array.from(gridItem).forEach((item) => {
-    item.addEventListener( 'mouseover', (event) => {
-        if (event.target.className != 'grid-hexagon__item') return;
-        // event.target.querySelector('#popover').showPopover();
-        event.target.querySelector('.grid-hexagon__dialog').show();
-    });
-    item.addEventListener( 'mouseout', (event) => {
-        // event.target.querySelector('#popover').hidePopover();
-        event.target.querySelector('.grid-hexagon__dialog').close();
-    });
-});
+// Array.from(gridItem).forEach((item) => {
+//     item.addEventListener( 'mouseover', (event) => {
+//         if (event.target.className != 'grid-hexagon__item') return;
+//         // event.target.querySelector('#popover').showPopover();
+//         event.target.querySelector('.grid-hexagon__dialog').show();
+//     });
+//     item.addEventListener( 'mouseout', (event) => {
+//         // event.target.querySelector('#popover').hidePopover();
+//         event.target.querySelector('.grid-hexagon__dialog').close();
+//     });
+// });
 
 
 // function selectItem(event) {
