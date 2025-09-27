@@ -12,6 +12,7 @@ import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import * as TWEEN from 'three/addons/libs/tween.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 
 
@@ -494,86 +495,6 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 
 
-// `uniform sampler2D map0;
-//       uniform float mixVal;
-//       uniform vec3 diffuse;
-// uniform vec3 emissive;
-// uniform float opacity;
-// varying vec3 vLightFront;
-// varying vec3 vIndirectFront;
-// #ifdef DOUBLE_SIDED
-// 	varying vec3 vLightBack;
-// 	varying vec3 vIndirectBack;
-// #endif
-// #include <common>
-// #include <packing>
-// #include <dithering_pars_fragment>
-// #include <color_pars_fragment>
-// #include <uv_pars_fragment>
-// #include <uv2_pars_fragment>
-// #include <map_pars_fragment>
-// #include <alphamap_pars_fragment>
-// #include <alphatest_pars_fragment>
-// #include <aomap_pars_fragment>
-// #include <lightmap_pars_fragment>
-// #include <emissivemap_pars_fragment>
-// #include <envmap_common_pars_fragment>
-// #include <envmap_pars_fragment>
-// #include <cube_uv_reflection_fragment>
-// #include <bsdfs>
-// #include <lights_pars_begin>
-// #include <fog_pars_fragment>
-// #include <shadowmap_pars_fragment>
-// #include <shadowmask_pars_fragment>
-// #include <specularmap_pars_fragment>
-// #include <logdepthbuf_pars_fragment>
-// #include <clipping_planes_pars_fragment>
-// void main() {
-// 	#include <clipping_planes_fragment>
-// 	vec4 diffuseColor = vec4( diffuse, opacity );
-// 	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );
-// 	vec3 totalEmissiveRadiance = emissive;
-// 	#include <logdepthbuf_fragment>
-	
-//       #ifdef USE_MAP
-//       	vec4 texelColor0 = texture2D( map0, vUv );
-//         vec4 texelColor1 = texture2D( map, vUv );
-//         vec4 texelColor = mix(texelColor0, texelColor1, mixVal);
-//         texelColor = mapTexelToLinear( texelColor );
-//         diffuseColor *= texelColor;
-//       #endif
-      
-// 	#include <color_fragment>
-// 	#include <alphamap_fragment>
-// 	#include <alphatest_fragment>
-// 	#include <specularmap_fragment>
-// 	#include <emissivemap_fragment>
-// 	#ifdef DOUBLE_SIDED
-// 		reflectedLight.indirectDiffuse += ( gl_FrontFacing ) ? vIndirectFront : vIndirectBack;
-// 	#else
-// 		reflectedLight.indirectDiffuse += vIndirectFront;
-// 	#endif
-// 	#include <lightmap_fragment>
-// 	reflectedLight.indirectDiffuse *= BRDF_Lambert( diffuseColor.rgb );
-// 	#ifdef DOUBLE_SIDED
-// 		reflectedLight.directDiffuse = ( gl_FrontFacing ) ? vLightFront : vLightBack;
-// 	#else
-// 		reflectedLight.directDiffuse = vLightFront;
-// 	#endif
-// 	reflectedLight.directDiffuse *= BRDF_Lambert( diffuseColor.rgb ) * getShadowMask();
-// 	#include <aomap_fragment>
-// 	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance;
-// 	#include <envmap_fragment>
-// 	#include <output_fragment>
-// 	#include <tonemapping_fragment>
-// 	#include <encodings_fragment>
-// 	#include <fog_fragment>
-// 	#include <premultiplied_alpha_fragment>
-// 	#include <dithering_fragment>`
-
-
-
-
 
 
 
@@ -610,25 +531,22 @@ let camera, scene, renderer, model, material;
 
 let changingInProgress = false;
 
-// const textures = {
-//     'c&d' : '../img/Communication.webp',
-//     'retopology' : '../img/Fast-learner.webp',
-//     'unwrap' : '../img/Problem-solving.webp',
-//     'sculpting' : '../img/Ref.png',
-//     'bm' : '../img/Research.webp',
-//     'texturing' : '../img/Team-work.webp',
-//     'r&s' : '../img/Unwrap.webp'
-// };
 const textures = [
-    '../img/Communication.webp',
     '../img/Fast-learner.webp',
     '../img/Problem-solving.webp',
-    '../img/Ref.png',
-    '../img/Research.webp',
+    '../img/texture/bust__uv.png',
+    '../img/uv_grid_opengl.jpg',
+    '../img/texture/bust__normal.webp',
     '../img/Team-work.webp',
     '../img/Unwrap.webp'
 ].map((t) => {
-    return new THREE.TextureLoader().load( t );
+    let texture = new THREE.TextureLoader().load( t );
+    // texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    // texture.repeat.set( 1.5, 1.5 );
+    texture.flipY = false;
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+    // return new THREE.TextureLoader().load( t );
 });
 
 const config = {
@@ -657,11 +575,100 @@ function init() {
     sectionAbout.insertAdjacentElement('afterbegin' , renderer.domElement);
 
     // MODEL
-    new PLYLoader().load( '../models/Bust-HP.ply', function ( geometry ) {
-        geometry.scale( 1, 1, 1 );
-        geometry.computeVertexNormals();
+    // const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+    // material = new THREE.MeshLambertMaterial({ map: textures[0] });
+    // material.onBeforeCompile = ( shader ) => {
+    //     shader.uniforms.map0 = material.userData.map0;
+    //     shader.uniforms.mixVal = material.userData.mixVal;
 
-        material = new THREE.MeshLambertMaterial({ map: textures[0] });
+    //     shader.fragmentShader = `
+    //         uniform sampler2D map0;
+    //         uniform float mixVal;
+    //         ${shader.fragmentShader}
+    //     `.replace(
+    //         `#include <map_fragment>`,
+    //         `
+    //         #ifdef USE_MAP
+    //             vec4 texelColor0 = texture2D( map0, vMapUv );
+    //             vec4 texelColor1 = texture2D( map, vMapUv );
+    //             vec4 texelColor = mix(texelColor0, texelColor1, mixVal);
+    //             diffuseColor *= texelColor;
+    //         #endif
+    //         `
+    //     );
+    // };
+    // material.userData = {
+    //     prevIdx: 0,
+    //     map0:{ value: textures[0] },
+    //     mixVal: { value: 1 },
+    // };
+
+    // model = new THREE.Mesh( geometry, material );
+    // model.rotation.y = - Math.PI / 0.9;
+    // model.position.x = 0.4;
+    // model.position.y = 1.7;
+    // model.position.z = 0;
+    // model.castShadow = true;
+    // model.receiveShadow = true;
+    // scene.add( model );
+
+    // new PLYLoader().load( '../models/Bust-HP.ply', function ( geometry ) {
+    //     geometry.scale( 1, 1, 1 );
+    //     geometry.computeVertexNormals();
+
+    //     material = new THREE.MeshLambertMaterial({ map: textures[0] });
+    //     material.onBeforeCompile = ( shader ) => {
+    //         shader.uniforms.map0 = material.userData.map0;
+    //         shader.uniforms.mixVal = material.userData.mixVal;
+
+    //         shader.fragmentShader = `
+    //             uniform sampler2D map0;
+    //             uniform float mixVal;
+    //             ${shader.fragmentShader}
+    //         `.replace(
+    //             `#include <map_fragment>`,
+    //             `
+    //             #ifdef USE_MAP
+    //                 vec4 texelColor0 = texture2D( map0, vMapUv );
+    //                 vec4 texelColor1 = texture2D( map, vMapUv );
+    //                 vec4 texelColor = mix(texelColor0, texelColor1, mixVal);
+    //                 diffuseColor *= texelColor;
+    //             #endif
+    //             `
+    //         );
+    //     };
+    //     material.userData = {
+    //         prevIdx: 0,
+    //         map0:{ value: textures[0] },
+    //         mixVal: { value: 1 },
+    //     };
+
+    //     model = new THREE.Mesh( geometry, material );
+    //     model.rotation.y = - Math.PI / 0.9;
+    //     model.position.x = 0.4;
+    //     model.position.y = 1.7;
+    //     model.position.z = 0;
+    //     model.castShadow = true;
+    //     model.receiveShadow = true;
+    //     scene.add( model );
+    // });
+
+    // FUNCTION
+    // new GLTFLoader().load( '../models/Bust.gltf', async function ( gltf ) {
+    new GLTFLoader().load( '../models/bust-topo.gltf', async function ( gltf ) {
+        // const model = gltf.scene;
+        const model = gltf.scene.children[0];
+
+        // await renderer.compileAsync( model, camera, scene );
+
+        // scene.add( model );
+
+        // animate();
+
+        material = new THREE.MeshLambertMaterial({
+            map: textures[0],
+            side: THREE.DoubleSide,
+        });
         material.onBeforeCompile = ( shader ) => {
             shader.uniforms.map0 = material.userData.map0;
             shader.uniforms.mixVal = material.userData.mixVal;
@@ -688,17 +695,23 @@ function init() {
             mixVal: { value: 1 },
         };
 
-        model = new THREE.Mesh( geometry, material );
-        model.rotation.y = - Math.PI / 0.9;
+        const normalTexture = new THREE.TextureLoader().load('../img/texture/bust__normal.webp');
+        normalTexture.flipY = false;
+        // material.normalMap = normalTexture
+        // material.normalMapType = THREE.TangentSpaceNormalMap;
+        // material.normalScale.set(10, 10)
+
+        // model = new THREE.Mesh( geometry, material );
+        model.material = material;
+        // model.rotation.y = - Math.PI / 0.9;
         model.position.x = 0.4;
         model.position.y = 1.7;
         model.position.z = 0;
         model.castShadow = true;
         model.receiveShadow = true;
+
         scene.add( model );
     });
-
-    // FUNCTION
     onWindowResize();
     window.addEventListener( 'resize', onWindowResize );
     sectionAbout.addEventListener( 'wheel', wheelCarousel );
@@ -713,7 +726,8 @@ function onWindowResize() {
 };
 
 function animate() {
-    if (scene.children[1]) scene.children[1].rotation.y += 0.002;
+    // if (scene.children[1]) scene.children[1].rotation.y += 0.002;
+    if (scene.children[1]) scene.children[1].rotation.z += -0.002;
     TWEEN.update();
     renderer.render(scene, camera);
 };
@@ -736,7 +750,8 @@ function changeTexture(idx){
 };
 
 function wheelCarousel(event) {
-    scene.children[1].rotation.y += -event.deltaX * 0.002;
+    // scene.children[1].rotation.y += -event.deltaX * 0.002;
+    scene.children[1].rotation.z += event.deltaX * 0.002;
 };
 
 Array.from(phaseList).forEach((radio) => {
