@@ -13,6 +13,8 @@ import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import * as TWEEN from 'three/addons/libs/tween.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 
 
 
@@ -207,6 +209,9 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 
 
+// -------------------------------TRANSITION SCENES: WORK------------------------------------------------------
+// let sectionAbout = document.querySelector('.section__about');
+// let phaseList = document.querySelectorAll('.section__about .radio__list input');
 
 // let renderer;
 // const model = [],
@@ -351,39 +356,65 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 //     scene.add(new THREE.HemisphereLight(0xffffff, 0x555555, 1.0));
 
+//     new GLTFLoader().load( source, function ( gltf ) {
+//         const model = gltf.scene.children[0];
+//         model.material = material;
+//         model.position.x = 0.4;
+//         model.position.y = 1.7;
+//         model.position.z = 0;
+//         model.castShadow = true;
+//         model.receiveShadow = true;
+        
+//         scene.add( model );
+//     });
     
-//     function positionate(mesh) {
-//         mesh.rotation.y = - Math.PI / 0.9;
-//         mesh.position.x = 0.4;
-//         mesh.position.y = 1.7;
-//         mesh.position.z = 0;
-//         mesh.castShadow = true;
-//         mesh.receiveShadow = true;
-//         scene.add( mesh );
-//         model.push(mesh);
-//     }
+//     // function positionate(mesh) {
+//     //     // mesh.rotation.y = - Math.PI / 0.9;
+//     //     // mesh.position.x = 0.4;
+//     //     // mesh.position.y = 1.7;
+//     //     // mesh.position.z = 0;
+//     //     // mesh.castShadow = true;
+//     //     // mesh.receiveShadow = true;
+//     //     // scene.add( mesh );
+//     //     // model.push(mesh);
 
-//     if (material) {
-//         new PLYLoader().load( source, function ( geometry ) {
-//             geometry.scale( 1, 1, 1 );
-//             geometry.computeVertexNormals();
-//             let mesh = new THREE.Mesh( geometry, material );
-//             positionate(mesh);
-//         });
-//     } else {
-//         const texture = new THREE.TextureLoader().load( source, (loadedTexture) => {
-//             const aspectRatio = loadedTexture.image.width / loadedTexture.image.height;
-//             mesh.scale.set(aspectRatio, 1, 1);
-//         });
-//         const geometry = new THREE.PlaneGeometry( -3, 3);
-//         const material = new THREE.MeshBasicMaterial({
-//             map: texture,
-//             side: THREE.DoubleSide,
-//             transparent: true,
-//         });
-//         let mesh = new THREE.Mesh(geometry, material);
-//         positionate(mesh);
-//     }
+//     //     mesh.material = material;
+//     //     mesh.position.x = 0.4;
+//     //     mesh.position.y = 1.7;
+//     //     mesh.position.z = 0;
+//     //     mesh.castShadow = true;
+//     //     mesh.receiveShadow = true;
+        
+//     //     scene.add( mesh );
+//     //     model.push(mesh);
+//     // }
+
+//     // if (material) {
+//     //     // new PLYLoader().load( source, function ( geometry ) {
+//     //     //     geometry.scale( 1, 1, 1 );
+//     //     //     geometry.computeVertexNormals();
+//     //     //     let mesh = new THREE.Mesh( geometry, material );
+//     //     //     positionate(mesh);
+//     //     // });
+//     //     new GLTFLoader().load( source, function ( gltf ) {
+//     //         const model = gltf.scene.children[0];
+//     //         model.material = material;
+//     //         positionate(model);
+//     //     });
+//     // } else {
+//     //     const texture = new THREE.TextureLoader().load( source, (loadedTexture) => {
+//     //         const aspectRatio = loadedTexture.image.width / loadedTexture.image.height;
+//     //         mesh.scale.set(aspectRatio, 1, 1);
+//     //     });
+//     //     const geometry = new THREE.PlaneGeometry( -3, 3);
+//     //     const material = new THREE.MeshBasicMaterial({
+//     //         map: texture,
+//     //         side: THREE.DoubleSide,
+//     //         transparent: true,
+//     //     });
+//     //     let mesh = new THREE.Mesh(geometry, material);
+//     //     positionate(mesh);
+//     // }
 
 
 
@@ -430,27 +461,28 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 //     const sceneB = getFXScene({
 //         renderer,
-//         source: '../models/Bust-HP.ply',
-//         material: new THREE.MeshLambertMaterial({})
+//         source: '../models/bust-topo.gltf',
+//         material: new THREE.MeshLambertMaterial({ side: THREE.DoubleSide })
 //     });
 //     scenes.push(sceneB);
 
 //     // const sceneC = getFXScene({
 //     const sceneA = getFXScene({
 //         renderer,
-//         source: '../models/Bust.ply',
-//         material: new THREE.MeshLambertMaterial({
-//             map: new THREE.TextureLoader().load("../img/texture/Unwrap.webp"),
-//             transparent: true,
-//         }),
+//         source: '../models/bust-sculpt.gltf',
+//         material: new THREE.MeshLambertMaterial({ side: THREE.DoubleSide }),
+//         // material: new THREE.MeshLambertMaterial({
+//         //     map: new THREE.TextureLoader().load("../img/texture/Unwrap.webp"),
+//         //     transparent: true,
+//         // }),
 //     });
 //     // scenes.push(sceneC);
 
-//     const sceneD = getFXScene({
-//         renderer,
-//         source: '../img/Unwrap.webp',
-//     });
-//     scenes.push(sceneD);
+//     // const sceneD = getFXScene({
+//     //     renderer,
+//     //     source: '../img/Unwrap.webp',
+//     // });
+//     // scenes.push(sceneD);
 
 //     transition = getTransition({ renderer, sceneA, sceneB });
 //     // transition = getTransition({ renderer, scenes });
@@ -523,11 +555,681 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 
 
+// -------------------------------CHANGE TEXTURE: WORK------------------------------------------------------
+// let sectionAbout = document.querySelector('.section__about');
+// let phaseList = document.querySelectorAll('.section__about .radio__list input');
 
+// let camera, scene, renderer, model, material;
+
+// let changingInProgress = false;
+
+// const textures = [
+//     '../img/Fast-learner.webp',
+//     '../img/Problem-solving.webp',
+//     '../img/texture/bust__uv.png',
+//     '../img/uv_grid_opengl.jpg',
+//     '../img/texture/bust__normal.webp',
+//     '../img/Team-work.webp',
+//     '../img/Unwrap.webp'
+// ].map((t) => {
+//     let texture = new THREE.TextureLoader().load( t );
+//     // texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+//     // texture.repeat.set( 1.5, 1.5 );
+//     texture.flipY = false;
+//     texture.colorSpace = THREE.SRGBColorSpace;
+//     return texture;
+//     // return new THREE.TextureLoader().load( t );
+// });
+
+// const config = {
+//     texture1 : textures[0],
+//     texture2 : textures[1],
+//     blendFactor : 1,
+// };
+
+// function init() {
+
+//     // CAMERA
+//     camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+//     camera.position.set( 0, 1.65, 4.5 );
+
+//     // SCENE
+//     scene = new THREE.Scene();
+
+//     // LIGHT
+//     scene.add(new THREE.HemisphereLight(0xffffff, 0x555555, 1.0));
+
+//     // RENDER
+//     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+//     renderer.setPixelRatio(devicePixelRatio);
+//     renderer.setSize(window.innerWidth, window.innerHeight);
+//     renderer.domElement.className = 'carousel';
+//     sectionAbout.insertAdjacentElement('afterbegin' , renderer.domElement);
+
+//     // MODEL
+//     // const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+//     // material = new THREE.MeshLambertMaterial({ map: textures[0] });
+//     // material.onBeforeCompile = ( shader ) => {
+//     //     shader.uniforms.map0 = material.userData.map0;
+//     //     shader.uniforms.mixVal = material.userData.mixVal;
+
+//     //     shader.fragmentShader = `
+//     //         uniform sampler2D map0;
+//     //         uniform float mixVal;
+//     //         ${shader.fragmentShader}
+//     //     `.replace(
+//     //         `#include <map_fragment>`,
+//     //         `
+//     //         #ifdef USE_MAP
+//     //             vec4 texelColor0 = texture2D( map0, vMapUv );
+//     //             vec4 texelColor1 = texture2D( map, vMapUv );
+//     //             vec4 texelColor = mix(texelColor0, texelColor1, mixVal);
+//     //             diffuseColor *= texelColor;
+//     //         #endif
+//     //         `
+//     //     );
+//     // };
+//     // material.userData = {
+//     //     prevIdx: 0,
+//     //     map0:{ value: textures[0] },
+//     //     mixVal: { value: 1 },
+//     // };
+
+//     // model = new THREE.Mesh( geometry, material );
+//     // model.rotation.y = - Math.PI / 0.9;
+//     // model.position.x = 0.4;
+//     // model.position.y = 1.7;
+//     // model.position.z = 0;
+//     // model.castShadow = true;
+//     // model.receiveShadow = true;
+//     // scene.add( model );
+
+//     // new PLYLoader().load( '../models/Bust-HP.ply', function ( geometry ) {
+//     //     geometry.scale( 1, 1, 1 );
+//     //     geometry.computeVertexNormals();
+
+//     //     material = new THREE.MeshLambertMaterial({ map: textures[0] });
+//     //     material.onBeforeCompile = ( shader ) => {
+//     //         shader.uniforms.map0 = material.userData.map0;
+//     //         shader.uniforms.mixVal = material.userData.mixVal;
+
+//     //         shader.fragmentShader = `
+//     //             uniform sampler2D map0;
+//     //             uniform float mixVal;
+//     //             ${shader.fragmentShader}
+//     //         `.replace(
+//     //             `#include <map_fragment>`,
+//     //             `
+//     //             #ifdef USE_MAP
+//     //                 vec4 texelColor0 = texture2D( map0, vMapUv );
+//     //                 vec4 texelColor1 = texture2D( map, vMapUv );
+//     //                 vec4 texelColor = mix(texelColor0, texelColor1, mixVal);
+//     //                 diffuseColor *= texelColor;
+//     //             #endif
+//     //             `
+//     //         );
+//     //     };
+//     //     material.userData = {
+//     //         prevIdx: 0,
+//     //         map0:{ value: textures[0] },
+//     //         mixVal: { value: 1 },
+//     //     };
+
+//     //     model = new THREE.Mesh( geometry, material );
+//     //     model.rotation.y = - Math.PI / 0.9;
+//     //     model.position.x = 0.4;
+//     //     model.position.y = 1.7;
+//     //     model.position.z = 0;
+//     //     model.castShadow = true;
+//     //     model.receiveShadow = true;
+//     //     scene.add( model );
+//     // });
+
+//     // FUNCTION
+//     // new GLTFLoader().load( '../models/Bust.gltf', async function ( gltf ) {
+//     new GLTFLoader().load( '../models/bust-topo.gltf', async function ( gltf ) {
+//         // const model = gltf.scene;
+//         const model = gltf.scene.children[0];
+
+//         // await renderer.compileAsync( model, camera, scene );
+
+//         // scene.add( model );
+
+//         // animate();
+
+//         material = new THREE.MeshLambertMaterial({
+//             map: textures[0],
+//             side: THREE.DoubleSide,
+//         });
+//         material.onBeforeCompile = ( shader ) => {
+//             shader.uniforms.map0 = material.userData.map0;
+//             shader.uniforms.mixVal = material.userData.mixVal;
+
+//             shader.fragmentShader = `
+//                 uniform sampler2D map0;
+//                 uniform float mixVal;
+//                 ${shader.fragmentShader}
+//             `.replace(
+//                 `#include <map_fragment>`,
+//                 `
+//                 #ifdef USE_MAP
+//                     vec4 texelColor0 = texture2D( map0, vMapUv );
+//                     vec4 texelColor1 = texture2D( map, vMapUv );
+//                     vec4 texelColor = mix(texelColor0, texelColor1, mixVal);
+//                     diffuseColor *= texelColor;
+//                 #endif
+//                 `
+//             );
+//         };
+//         material.userData = {
+//             prevIdx: 0,
+//             map0:{ value: textures[0] },
+//             mixVal: { value: 1 },
+//         };
+
+
+//         // const normalTexture = new THREE.TextureLoader().load('../img/texture/bust__normal.webp');
+//         // normalTexture.flipY = false;
+//         // material.normalMap = normalTexture
+//         // material.normalMapType = THREE.TangentSpaceNormalMap;
+//         // material.normalScale.set(10, 10)
+
+//         // model = new THREE.Mesh( geometry, material );
+//         model.material = material;
+//         // model.rotation.y = - Math.PI / 0.9;
+//         model.position.x = 0.4;
+//         model.position.y = 1.7;
+//         model.position.z = 0;
+//         model.castShadow = true;
+//         model.receiveShadow = true;
+
+//         scene.add( model );
+//     });
+
+//     onWindowResize();
+//     window.addEventListener( 'resize', onWindowResize );
+//     sectionAbout.addEventListener( 'wheel', wheelCarousel );
+//     renderer.setAnimationLoop( animate );
+// };
+
+// init();
+
+// function onWindowResize() {
+//     renderer.setPixelRatio(devicePixelRatio);
+//     renderer.setSize( window.innerWidth, window.innerHeight );
+// };
+
+// function animate() {
+//     // if (scene.children[1]) scene.children[1].rotation.y += 0.002;
+//     if (scene.children[1]) scene.children[1].rotation.z += -0.002;
+//     TWEEN.update();
+//     renderer.render(scene, camera);
+// };
+
+// function changeTexture(idx){
+
+//     // if (idx === material.userData.prevIdx || changingInProgress === true) return;
+//     if ( changingInProgress === true ) return;
+  
+//     material.map = textures[idx];
+//     material.userData.map0.value = textures[material.userData.prevIdx];
+//     material.userData.prevIdx = idx;
+
+//     material.userData.mixVal.value = 0;
+//     new TWEEN.Tween(material.userData.mixVal)
+//         .to({value: 1}, 1000)
+//         .onStart(() => {changingInProgress = true;})
+//         .onComplete(() => {changingInProgress = false;})
+//         .start();
+// };
+
+// function wheelCarousel(event) {
+//     // scene.children[1].rotation.y += -event.deltaX * 0.002;
+//     scene.children[1].rotation.z += event.deltaX * 0.002;
+// };
+
+// Array.from(phaseList).forEach((radio) => {
+//     radio.addEventListener("input", (event) => {
+//         changeTexture(event.target.defaultValue);
+//         // img.addEventListener("click", event => { changeTexture(idx);})
+//         // model.material.map = new THREE.TextureLoader().load( textures[event.target.defaultValue] );
+//         // model.material.needsUpdate = true;
+//     });
+// });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// -------------------------------CHANGE SCENES: TRY------------------------------------------------------
+// let sectionAbout = document.querySelector('.section__about');
+// let phaseList = document.querySelectorAll('.section__about .radio__list input');
+
+// let camera, scene, renderer, model, material;
+
+// let changingInProgress = false;
+
+// const textures = [
+//     '../img/Fast-learner.webp',
+//     '../img/Problem-solving.webp',
+//     '../img/texture/bust__uv.png',
+//     '../img/uv_grid_opengl.jpg',
+//     '../img/texture/bust__normal.webp',
+//     '../img/Team-work.webp',
+//     '../img/Unwrap.webp'
+// ].map((t) => {
+//     let texture = new THREE.TextureLoader().load( t );
+//     // texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+//     // texture.repeat.set( 1.5, 1.5 );
+//     texture.flipY = false;
+//     texture.colorSpace = THREE.SRGBColorSpace;
+//     return texture;
+//     // return new THREE.TextureLoader().load( t );
+// });
+
+// const config = {
+//     texture1 : textures[0],
+//     texture2 : textures[1],
+//     blendFactor : 1,
+// };
+
+
+
+
+
+
+
+
+
+
+// // let renderer;
+// // const model = [],
+// const scenes = [];
+// const transitionParams = {
+// //   useTexture: true,
+//     transition: 0,
+//     texture: 5,
+//     cycle: true,
+//     animate: true,
+// //   threshold: 0.3,
+// };
+
+// const clock = new THREE.Clock();
+// let transition;
+// init();
+// animate();
+
+
+// function init() {
+
+//     // CAMERA
+//     const w = window.innerWidth;
+//     const h = window.innerHeight;
+//     const cameraTrnsp = new THREE.OrthographicCamera(w / -2, w / 2, h / 2, h / -2, -10, 10);
+
+//     // SCENE
+//     const sceneTrnsp = new THREE.Scene();
+
+//     // LIGHT
+//     scene.add(new THREE.HemisphereLight(0xffffff, 0x555555, 1.0));
+
+//     // MESH
+//     const geometryTrnsp = new THREE.PlaneGeometry(w, h);
+//     const meshTrnsp = new THREE.Mesh(geometryTrnsp, materialTrnsp);
+//     sceneTrnsp.add(meshTrnsp);
+
+//     // RENDER
+//     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+//     renderer.setPixelRatio(window.devicePixelRatio);
+//     renderer.setSize(window.innerWidth, window.innerHeight);
+//     sectionAbout.insertAdjacentElement('afterbegin' , renderer.domElement);
+
+//     // TRANSITION LAYER
+//     const textures = [];
+//     const loader = new THREE.TextureLoader();
+
+//     textures[0] = loader.load(`../img/texture/transition${[0]}.png`);
+
+//     const materialTrnsp = new THREE.ShaderMaterial({
+//         transparent: true,
+//         uniforms: {
+//             tDiffuse1: {
+//                 value: null,
+//             },
+//             tDiffuse2: {
+//                 value: null,
+//             },
+//             mixRatio: {
+//                 value: 0.0,
+//             },
+//             threshold: {
+//                 value: 0.1,
+//             },
+//             useTexture: {
+//                 value: 1,
+//             },
+//             tMixTexture: {
+//                 value: textures[0],
+//             },
+//         },
+//     vertexShader: `varying vec2 vUv;
+//         void main() {
+//             vUv = vec2( uv.x, uv.y );
+//             gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+//         }`,
+//     fragmentShader: `
+//         uniform float mixRatio;
+//         uniform sampler2D tDiffuse1;
+//         uniform sampler2D tDiffuse2;
+//         uniform sampler2D tMixTexture;
+//         uniform int useTexture;
+//         uniform float threshold;
+//         varying vec2 vUv;
+
+//         void main() {
+//             vec4 texel1 = texture2D( tDiffuse1, vUv );
+//             vec4 texel2 = texture2D( tDiffuse2, vUv );
+
+//             if (useTexture == 1) {
+//                 vec4 transitionTexel = texture2D( tMixTexture, vUv );
+//                 float r = mixRatio * (1.0 + threshold * 2.0) - threshold;
+//                 float mixf=clamp((transitionTexel.r - r)*(1.0/threshold), 0.0, 1.0);
+
+//                 gl_FragColor = sRGBTransferOETF( mix( texel1, texel2, mixf ) );
+//             } else {
+//                 gl_FragColor = sRGBTransferOETF( mix( texel2, texel1, mixRatio ) );
+//             }
+//         }`,
+//     });
+
+//     materialTrnsp.uniforms.tDiffuse1.value = sceneA.fbo.texture;
+//     materialTrnsp.uniforms.tDiffuse2.value = sceneB.fbo.texture;
+//     // materialTrnsp.uniforms.tDiffuse1.value = scenes[i].fbo.texture;
+//     // materialTrnsp.uniforms.tDiffuse2.value = scenes[j].fbo.texture;
+
+//     new TWEEN.Tween(transitionParams)
+//         .to({ transition: 1 }, 2000)
+//         .repeat(Infinity)
+//         .delay(2000)
+//         .yoyo(true)
+//         .start();
+
+//     const render = () => {
+//     // Transition animation
+//         if (transitionParams.animate) TWEEN.update();
+
+//         materialTrnsp.uniforms.mixRatio.value = transitionParams.transition;
+
+//         // Prevent render both scenes when it's not necessary
+//         if (transitionParams.transition === 0) {
+//             sceneA.update();
+//             sceneB.render(false);
+//             // scenes[i].update();
+//             // scenes[j].render(false);
+//         } else if (transitionParams.transition === 1) {
+//             sceneA.render(false);
+//             sceneB.update();
+//             // scenes[i].render(false);
+//             // scenes[j].update();
+//         } else {
+//             // When 0<transition<1 render transition between two scenes
+//             sceneA.render(true);
+//             sceneB.render(true);
+//             // scenes[i].render(true);
+//             // scenes[j].render(true);
+
+//             renderer.setRenderTarget(null); // null sets the rt to the canvas
+//             renderer.render(scene, camera);
+//         }
+//         // transition = getTransition({ renderer, sceneA: scenes[i], sceneB: scenes[j] });
+//         // i < scenes.length-1 ? i++ : i = 0;
+//         // j < scenes.length-1 ? j++ : j = 0;
+//     };
+
+//     return { render };
+
+//     const sceneA = getFXScene({
+//         renderer,
+//         source: '../models/bust-topo.gltf',
+//         material: new THREE.MeshLambertMaterial({})
+//     });
+//     scenes.push(sceneA);
+
+//     const sceneB = getFXScene({
+//         renderer,
+//         source: '../models/Bust.gltf',
+//         material: new THREE.MeshLambertMaterial({})
+//     });
+//     scenes.push(sceneB);
+
+//     onWindowResize();
+//     window.addEventListener( 'resize', onWindowResize );
+//     sectionAbout.addEventListener( 'wheel', wheelCarousel );
+//     renderer.setAnimationLoop( animate );
+// };
+
+// init();
+
+// function onWindowResize() {
+//     renderer.setPixelRatio(devicePixelRatio);
+//     renderer.setSize( window.innerWidth, window.innerHeight );
+// };
+
+// function animate() {
+//     // if (scene.children[1]) scene.children[1].rotation.y += 0.002;
+//     if (scene.children[1]) scene.children[1].rotation.z += -0.002;
+//     TWEEN.update();
+//     renderer.render(scene, camera);
+// };
+
+// function changeTexture(idx){
+
+//     // if (idx === material.userData.prevIdx || changingInProgress === true) return;
+//     if ( changingInProgress === true ) return;
+  
+//     material.map = textures[idx];
+//     material.userData.map0.value = textures[material.userData.prevIdx];
+//     material.userData.prevIdx = idx;
+
+//     material.userData.mixVal.value = 0;
+//     new TWEEN.Tween(material.userData.mixVal)
+//         .to({value: 1}, 1000)
+//         .onStart(() => {changingInProgress = true;})
+//         .onComplete(() => {changingInProgress = false;})
+//         .start();
+// };
+
+// function changeScene({ renderer, sceneA, sceneB }) {
+
+//     if ( changingInProgress === true ) return;
+
+//     material.uniforms.tDiffuse1.value = sceneA.fbo.texture;
+//     material.uniforms.tDiffuse2.value = sceneB.fbo.texture;
+
+//     new TWEEN.Tween(transitionParams)
+//         .to({ transition: 1 }, 2000)
+//         .onStart(() => {changingInProgress = true;})
+//         .onComplete(() => {changingInProgress = false;})
+//         .start();
+
+//     // const render = () => {
+//     //     if (transitionParams.animate) TWEEN.update();
+
+//     //     material.uniforms.mixRatio.value = transitionParams.transition;
+
+//     //     if (transitionParams.transition === 0) {
+//     //         sceneA.update();
+//     //         sceneB.render(false);
+//     //     } else if (transitionParams.transition === 1) {
+//     //         sceneA.render(false);
+//     //         sceneB.update();
+//     //     } else {
+//     //         sceneA.render(true);
+//     //         sceneB.render(true);
+
+//     //         renderer.setRenderTarget(null); // null sets the rt to the canvas
+//     //         renderer.render(scene, camera);
+//     //     }
+//     // };
+// };
+
+// function getFXScene({ renderer, source, material = false }) {
+
+//     // CAMERA
+//     const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+//     camera.position.set( 0, 1.65, 4.5 );
+
+//     // SCENE
+//     const scene = new THREE.Scene();
+    
+//     // LIGHT
+//     scene.add(new THREE.HemisphereLight(0xffffff, 0x555555, 1.0));
+
+//     // MODEL
+//     new GLTFLoader().load( source, function ( gltf ) {
+//         const model = gltf.scene.children[0];
+//         model.material = material;
+//         model.material = material;
+//         model.position.x = 0.4;
+//         model.position.y = 1.7;
+//         model.position.z = 0;
+//         model.castShadow = true;
+//         model.receiveShadow = true;
+        
+//         scene.add( model );
+//     });
+
+//     // RENDER TARGET
+//     const fbo = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
+
+//     // ROTATE
+//     const update = () => {
+//         if (scene.children[1]) scene.children[1].rotation.y += 0.002;
+//     }
+    
+//     // RENDER
+//     const render = (rtt) => {
+//         update();
+
+//         if (rtt) {
+//             renderer.setRenderTarget(fbo);
+//             renderer.clear();
+//             renderer.render(scene, camera);
+//         } else {
+//             renderer.setRenderTarget(null);
+//             renderer.render(scene, camera);
+//         }
+//     };
+
+//   return { fbo, render, update };
+// };
+
+// function wheelCarousel(event) {
+//     // scene.children[1].rotation.y += -event.deltaX * 0.002;
+//     scene.children[1].rotation.z += event.deltaX * 0.002;
+// };
+
+// Array.from(phaseList).forEach((radio) => {
+//     radio.addEventListener("input", (event) => {
+//         // changeTexture(event.target.defaultValue);
+//         changeScene(event.target.defaultValue);
+//     });
+// });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// -------------------------------CAROUSEL SCENES: TRY------------------------------------------------------
 let sectionAbout = document.querySelector('.section__about');
 let phaseList = document.querySelectorAll('.section__about .radio__list input');
 
-let camera, scene, renderer, model, material;
+// let camera, scene, renderer, model, material;
+let camera, scene, renderer, material;
 
 let changingInProgress = false;
 
@@ -548,6 +1250,7 @@ const textures = [
     return texture;
     // return new THREE.TextureLoader().load( t );
 });
+const models = [];
 
 const config = {
     texture1 : textures[0],
@@ -555,14 +1258,20 @@ const config = {
     blendFactor : 1,
 };
 
-function init() {
+let clock = new THREE.Clock();
+let time = 0;
+let radius = 4;
+let circles;
+
+async function init() {
 
     // CAMERA
-    camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+    camera = new THREE.PerspectiveCamera( 40, sectionAbout.clientWidth / sectionAbout.clientHeight, 1, 100 );
     camera.position.set( 0, 1.65, 4.5 );
 
     // SCENE
     scene = new THREE.Scene();
+    scene.add(new THREE.GridHelper(10, 10));
 
     // LIGHT
     scene.add(new THREE.HemisphereLight(0xffffff, 0x555555, 1.0));
@@ -571,163 +1280,166 @@ function init() {
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.domElement.className = 'carousel';
     sectionAbout.insertAdjacentElement('afterbegin' , renderer.domElement);
 
+    let controls = new OrbitControls(camera, renderer.domElement);
+
     // MODEL
-    // const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-    // material = new THREE.MeshLambertMaterial({ map: textures[0] });
-    // material.onBeforeCompile = ( shader ) => {
-    //     shader.uniforms.map0 = material.userData.map0;
-    //     shader.uniforms.mixVal = material.userData.mixVal;
+    await new THREE.TextureLoader().loadAsync( '../img/texture/reference.webp').then((loadedTexture) => {
+        const aspectRatio = loadedTexture.image.width / loadedTexture.image.height;
+        let mesh = new THREE.Mesh(
+            new THREE.PlaneGeometry( 3, 3),
+            new THREE.MeshBasicMaterial({
+                map: loadedTexture,
+                side: THREE.DoubleSide,
+            })
+        );
+        mesh.scale.set(aspectRatio, 1, 1);
+        // mesh.rotateY(Math.PI * 0.5);
+        // mesh.rotateZ(Math.PI * 0.5);
+        models.push(mesh);
+    });
 
-    //     shader.fragmentShader = `
-    //         uniform sampler2D map0;
-    //         uniform float mixVal;
-    //         ${shader.fragmentShader}
-    //     `.replace(
-    //         `#include <map_fragment>`,
-    //         `
-    //         #ifdef USE_MAP
-    //             vec4 texelColor0 = texture2D( map0, vMapUv );
-    //             vec4 texelColor1 = texture2D( map, vMapUv );
-    //             vec4 texelColor = mix(texelColor0, texelColor1, mixVal);
-    //             diffuseColor *= texelColor;
-    //         #endif
-    //         `
-    //     );
-    // };
-    // material.userData = {
-    //     prevIdx: 0,
-    //     map0:{ value: textures[0] },
-    //     mixVal: { value: 1 },
-    // };
-
-    // model = new THREE.Mesh( geometry, material );
-    // model.rotation.y = - Math.PI / 0.9;
-    // model.position.x = 0.4;
-    // model.position.y = 1.7;
-    // model.position.z = 0;
-    // model.castShadow = true;
-    // model.receiveShadow = true;
-    // scene.add( model );
-
-    // new PLYLoader().load( '../models/Bust-HP.ply', function ( geometry ) {
-    //     geometry.scale( 1, 1, 1 );
-    //     geometry.computeVertexNormals();
-
-    //     material = new THREE.MeshLambertMaterial({ map: textures[0] });
-    //     material.onBeforeCompile = ( shader ) => {
-    //         shader.uniforms.map0 = material.userData.map0;
-    //         shader.uniforms.mixVal = material.userData.mixVal;
-
-    //         shader.fragmentShader = `
-    //             uniform sampler2D map0;
-    //             uniform float mixVal;
-    //             ${shader.fragmentShader}
-    //         `.replace(
-    //             `#include <map_fragment>`,
-    //             `
-    //             #ifdef USE_MAP
-    //                 vec4 texelColor0 = texture2D( map0, vMapUv );
-    //                 vec4 texelColor1 = texture2D( map, vMapUv );
-    //                 vec4 texelColor = mix(texelColor0, texelColor1, mixVal);
-    //                 diffuseColor *= texelColor;
-    //             #endif
-    //             `
-    //         );
-    //     };
-    //     material.userData = {
-    //         prevIdx: 0,
-    //         map0:{ value: textures[0] },
-    //         mixVal: { value: 1 },
-    //     };
-
-    //     model = new THREE.Mesh( geometry, material );
-    //     model.rotation.y = - Math.PI / 0.9;
-    //     model.position.x = 0.4;
-    //     model.position.y = 1.7;
-    //     model.position.z = 0;
-    //     model.castShadow = true;
-    //     model.receiveShadow = true;
-    //     scene.add( model );
-    // });
-
-    // FUNCTION
-    // new GLTFLoader().load( '../models/Bust.gltf', async function ( gltf ) {
-    new GLTFLoader().load( '../models/bust-topo.gltf', async function ( gltf ) {
-        // const model = gltf.scene;
+    await new GLTFLoader().loadAsync( '../models/bust-sculpt.gltf').then((gltf) => {
         const model = gltf.scene.children[0];
-
-        // await renderer.compileAsync( model, camera, scene );
-
-        // scene.add( model );
-
-        // animate();
-
-        material = new THREE.MeshLambertMaterial({
-            map: textures[0],
-            side: THREE.DoubleSide,
-        });
-        material.onBeforeCompile = ( shader ) => {
-            shader.uniforms.map0 = material.userData.map0;
-            shader.uniforms.mixVal = material.userData.mixVal;
-
-            shader.fragmentShader = `
-                uniform sampler2D map0;
-                uniform float mixVal;
-                ${shader.fragmentShader}
-            `.replace(
-                `#include <map_fragment>`,
-                `
-                #ifdef USE_MAP
-                    vec4 texelColor0 = texture2D( map0, vMapUv );
-                    vec4 texelColor1 = texture2D( map, vMapUv );
-                    vec4 texelColor = mix(texelColor0, texelColor1, mixVal);
-                    diffuseColor *= texelColor;
-                #endif
-                `
-            );
-        };
-        material.userData = {
-            prevIdx: 0,
-            map0:{ value: textures[0] },
-            mixVal: { value: 1 },
-        };
-
-        const normalTexture = new THREE.TextureLoader().load('../img/texture/bust__normal.webp');
-        normalTexture.flipY = false;
-        // material.normalMap = normalTexture
-        // material.normalMapType = THREE.TangentSpaceNormalMap;
-        // material.normalScale.set(10, 10)
-
-        // model = new THREE.Mesh( geometry, material );
-        model.material = material;
-        // model.rotation.y = - Math.PI / 0.9;
-        model.position.x = 0.4;
-        model.position.y = 1.7;
-        model.position.z = 0;
+        model.material = new THREE.MeshLambertMaterial({ side: THREE.DoubleSide });
         model.castShadow = true;
         model.receiveShadow = true;
-
-        scene.add( model );
+        models.push(model);
     });
+
+    await new GLTFLoader().loadAsync( '../models/bust-topo.gltf').then((gltf) => {
+        const model = gltf.scene.children[0];
+        let texture = new THREE.TextureLoader().load( '../img/texture/bust__uv.png' );
+        texture.flipY = false;
+        texture.colorSpace = THREE.SRGBColorSpace;
+        model.material = new THREE.MeshLambertMaterial({
+            map: texture,
+            side: THREE.DoubleSide
+        });
+        model.castShadow = true;
+        model.receiveShadow = true;
+        models.push(model);
+    });
+
+    await new GLTFLoader().loadAsync( '../models/bust-topo.gltf').then((gltf) => {
+        const model = gltf.scene.children[0];
+        let textureTopo = new THREE.TextureLoader().load( '../img/uv_grid_opengl.jpg' );
+        textureTopo.flipY = false;
+        textureTopo.colorSpace = THREE.SRGBColorSpace;
+        model.material = new THREE.MeshLambertMaterial({
+            map: textureTopo,
+            side: THREE.DoubleSide
+        });
+        model.castShadow = true;
+        model.receiveShadow = true;
+        model.scale.setScalar(0.7);
+        // model.position.set(-1, 0, 0);
+
+        const textureUV = new THREE.TextureLoader().load( '../img/texture/bust__uv.png', (loadedTexture) => {
+            const aspectRatio = loadedTexture.image.width / loadedTexture.image.height;
+            meshUV.scale.set(aspectRatio, 1, 1);
+        });
+        const meshUV = new THREE.Mesh(
+            new THREE.PlaneGeometry( 2, 2),
+            new THREE.MeshBasicMaterial({
+                map: textureUV,
+                side: THREE.DoubleSide,
+                transparent: true,
+            })
+        );
+        // meshUV.position.set(0, 0, 0);
+        meshUV.rotateY(Math.PI * 0.25);
+        meshUV.rotateZ(Math.PI * 0.25);
+
+        const group = new THREE.Group();
+        group.add(model);
+        group.add(meshUV);
+
+        models.push(group);
+        // scene.add(group);
+    });
+
+    await new GLTFLoader().loadAsync( '../models/bust-topo.gltf').then((gltf) => {
+        const model = gltf.scene.children[0];
+        let texture = new THREE.TextureLoader().load( '../img/texture/bust__normal.webp' );
+        texture.flipY = false;
+        texture.colorSpace = THREE.SRGBColorSpace;
+        model.material = new THREE.MeshLambertMaterial({
+            map: texture,
+            side: THREE.DoubleSide
+        });
+        model.castShadow = true;
+        model.receiveShadow = true;
+        models.push(model);
+    });
+
+    circles = setCircle(models);
+    // circles = setCircle();
     onWindowResize();
     window.addEventListener( 'resize', onWindowResize );
     sectionAbout.addEventListener( 'wheel', wheelCarousel );
     renderer.setAnimationLoop( animate );
 };
 
+// function setCircle() {
+function setCircle(arr) {
+    let gs = new Array(arr.length).fill().map((g, idx) => {
+        let angleStep = Math.PI * 2 / arr.length;
+        let angle = angleStep * idx;
+        arr[idx].position.set( Math.cos(angle) * radius, 0, Math.sin(angle) * radius );
+        arr[idx].lookAt(0, 0, 0);
+        arr[idx].rotateX(Math.PI * 0.5);
+        let pos = arr[idx].getWorldPosition(new THREE.Vector3());
+        // arr[idx].rotateZ(angle + Math.PI * -0.5);
+        // // arr[idx].position.set( Math.cos(angle) * radius, Math.sin(angle) * radius, 0 );
+
+        if (arr[idx].type == 'Group') {
+            arr[idx].children.forEach((mesh, idx, arr) => {
+                mesh.lookAt(0, 0, 0);
+        //         // mesh.rotateZ(angle + Math.PI * -0.5);
+        //         // mesh.position.set( Math.cos(angle) * radius, 0, Math.sin(angle) * radius );
+        //         // mesh.position.set( Math.cos(angle - idx) * radius, 0, Math.sin(angle - idx) * radius );
+            });
+        };
+        // // const v = new THREE.Vector3();
+        // // ud.dir.getWorldPosition(v);
+        // // group.lookAt(v);
+        scene.add(arr[idx]);
+
+        return arr[idx];
+    });
+    // let c = new THREE.Mesh( BufferGeometryUtils.mergeGeometries(gs), new THREE.MeshBasicMaterial({ color: "white" }) );
+    // c.rotateX(Math.PI * 0.5);
+    // c.position.y = 1.6;
+    // c.position.z = -1.6;
+    // scene.add(c);
+    // return c;
+
+    // let itemCount = 7;
+    // for (let idx = 0; idx < itemCount; idx++) {
+    //     let ng = new THREE.ConeGeometry(0.5, 1, 8);
+    //     let angleStep = Math.PI * 2 / itemCount;
+    //     let angle = angleStep * idx;
+    //     ng.rotateZ(angle + Math.PI * 0.5);
+    //     ng.translate( Math.cos(angle) * radius, Math.sin(angle) * radius, 0 );
+    //     let c = new THREE.Mesh( ng, new THREE.MeshBasicMaterial({ color: "white" }) );
+    //     scene.add(c);
+    // };
+};
+
 init();
 
 function onWindowResize() {
     renderer.setPixelRatio(devicePixelRatio);
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize( sectionAbout.clientWidth, sectionAbout.clientHeight );
 };
 
 function animate() {
     // if (scene.children[1]) scene.children[1].rotation.y += 0.002;
     if (scene.children[1]) scene.children[1].rotation.z += -0.002;
+    // time = clock.getElapsedTime() * 0.1 * Math.PI;
+    // circles.rotation.z = time;
     TWEEN.update();
     renderer.render(scene, camera);
 };
@@ -762,140 +1474,3 @@ Array.from(phaseList).forEach((radio) => {
         // model.material.needsUpdate = true;
     });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// let scene = new THREE.Scene();
-// let camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 1, 100);
-// camera.position.set(-0.5, 0.5, 1).setLength(10);
-// let renderer = new THREE.WebGLRenderer({antialias: true});
-// renderer.setSize(innerWidth, innerHeight);
-// sectionAbout.appendChild(renderer.domElement);
-// window.addEventListener("resize", event => {
-//     camera.aspect = innerWidth / innerHeight;
-//     camera.updateProjectionMatrix();
-//     renderer.setSize(innerWidth, innerHeight);
-// });
-
-// let controls = new OrbitControls(camera, renderer.domElement);
-
-// let tl = new THREE.TextureLoader();
-// let changingInProgress = false;
-// let textures = [
-//     "https://threejs.org/examples/textures/758px-Canestra_di_frutta_(Caravaggio).jpg",
-//     "https://threejs.org/examples/textures/uv_grid_opengl.jpg",
-//     "https://threejs.org/examples/textures/colors.png"
-// ].map((t, idx) => {
-//     let img = new Image();
-//     img.width = img.height = 100;
-//     img.src = t;
-//     img.addEventListener("click", event => { changeTexture(idx);})
-//     // sectionAbout.appendChild(img);
-//     imgLib.appendChild(img);
-
-//     return tl.load(t, tex => {tex.needsUpdate = true});
-// });
-
-// function changeTexture(idx){
-
-//     if (idx === m.userData.prevIdx || changingInProgress === true) return;
-
-//     m.map = textures[idx];
-//     m.userData.map0.value = textures[m.userData.prevIdx];
-//     m.userData.prevIdx = idx;
-
-//     m.userData.mixVal.value = 0;
-//     new TWEEN.Tween(m.userData.mixVal)
-//         .to({value: 1}, 1000)
-//         .onStart(() => {changingInProgress = true;})
-//         .onComplete(() => {changingInProgress = false;})
-//         .start();
-// }
-
-// let light = new THREE.DirectionalLight(0xffffff, 1);
-// light.position.setScalar(1);
-// scene.add(light, new THREE.AmbientLight(0xffffff, 0.5));
-
-// let g = new THREE.BoxGeometry(5, 5, 5);
-// let m = new THREE.MeshLambertMaterial({
-//     map: textures[0],
-//     onBeforeCompile: shader => {
-
-//         shader.uniforms.map0 = m.userData.map0;
-//         shader.uniforms.mixVal = m.userData.mixVal;
-
-//         shader.fragmentShader = `
-//             uniform sampler2D map0;
-//             uniform float mixVal;
-//             ${shader.fragmentShader}
-//         `.replace(
-//             `#include <map_fragment>`,
-//             `
-//             #ifdef USE_MAP
-//                 vec4 texelColor0 = texture2D( map0, vMapUv );
-//                 vec4 texelColor1 = texture2D( map, vMapUv );
-//                 vec4 texelColor = mix(texelColor0, texelColor1, mixVal);
-//                 diffuseColor *= texelColor;
-//             #endif
-//             `
-//         );
-//         console.log(shader.fragmentShader);
-//     }
-// });
-// m.userData = {
-//     prevIdx: 0,
-//     map0:{
-//         value: textures[0]
-//     },
-//     mixVal: {
-//         value: 1
-//     }
-// };
-
-// let o = new THREE.Mesh(g, m);
-// scene.add(o);
-
-// renderer.setAnimationLoop(() => {
-//     TWEEN.update();
-//     renderer.render(scene, camera);
-// })

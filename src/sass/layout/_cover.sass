@@ -1,14 +1,38 @@
 .section__cover
     grid-area: 1 / 1 / 2 / 2
-    // grid-area: 2 / 3 / 3 / 4
+    display: flex
+    flex-direction: column
+    align-items: center
+    justify-content: center
+    justify-self: center
+    row-gap: 1.4rem
+
+.cover__title
     display: flex
     align-items: center
     justify-content: center
-    flex-direction: column
-    width: max-content
     justify-self: center
+    row-gap: 1.4rem
+    h1
 
-.cover__subtitle
-    display: grid
-    grid: repeat(3, auto) / repeat(3, auto)
-    column-gap: .8rem
+// .cover__subtitle
+//     position: relative
+//     row-gap: .4rem
+//     display: flex
+//     flex-direction: column
+//     width: 93%
+//     &-row
+//         position: relative
+//         display: flex
+//         h3
+//             flex-shrink: 0
+//         .stretch__dots
+//             flex-grow: 1
+//             height: 1em
+//             overflow: hidden
+//             word-wrap: break-word
+//             letter-spacing: 5px
+//             text-align: center
+//             &::after
+//                 content: '......................................................................................................................'
+//                 color: #727272

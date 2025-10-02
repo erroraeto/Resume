@@ -1,46 +1,71 @@
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+};
 // SCROLLBAR
-let scrollbar = document.querySelector('.scrollbar__list'),
+let scrollbar = document.querySelector('.scrollbar'),
+    thumb = document.querySelector('.scrollbar__thumb'),
     main = document.querySelector('.main'),
     thumbSelect = true;
 
-const scrolling = new IntersectionObserver( (entries) => {
-    entries.forEach((entry) => {
-        if (entry.intersectionRatio >= 0.5) {
-            for (let i = 0; i < main.children.length; i++) {
-                if (main.children[i] == entry.target) {
-                    scrollbar.children[i].style = '--opacity-marker: 0; --opacity-text: 1; --visibility-circle: hidden';
-                } else {
-                    scrollbar.children[i].style = '';
-                };
-            }
-            thumbSelect = false;
-        } else if (entry.intersectionRatio <= 0.5) {
-            thumbSelect = true;
+main.addEventListener('scroll', thumbPosition);
+scrollbar.addEventListener('scroll', thumbPosition);
+
+async function thumbPosition() {
+    // thumb.style.setProperty( "opacity", 1 );
+    let scrollThumbPos = ( main.offsetHeight * main.scrollTop ) / main.scrollHeight;
+    scrollbar.style.setProperty( "--scroll-y", `${scrollThumbPos}px` );
+    await sleep(2000);
+    // thumb.style.removeProperty("opacity");
+};
+
+
+let pointerIsDown,
+pointerStartY,
+pointerSnap = [],
+pointerScrollTop;
+
+thumb.addEventListener('mousedown', (event) => {
+
+    document.body.style = 'user-select: none';
+    pointerIsDown = true;
+    pointerStartY = event.clientY;
+    pointerScrollTop = main.scrollTop;
+    thumb.style.setProperty( "width", 'calc( 100% + 4px )' );
+    thumb.style.setProperty( "opacity", 1 );
+
+    document.onmousemove = (event) => {
+        if (pointerIsDown) {
+            const y = event.clientY;
+            const walkY = (y - pointerStartY) * main.scrollHeight / main.offsetHeight;
+            main.classList.add('main-scrolling');
+            main.scrollTop = pointerScrollTop + walkY;
         }
-    })
-}, {
-    root: main,
-    threshold: 0.5,
-});
+    };
 
-Array.from(main.children).forEach((section) => scrolling.observe(section));
-
-Array.from(scrollbar.children).forEach((item) => item.onclick = (event) => {
-    for (let i = 0; i < scrollbar.children.length; i++) {
-        if (scrollbar.children[i] == event.target) {
-            main.children[i].scrollIntoView({behavior: "smooth"});
-        };
-    }
+    document.onmouseup = () => {
+        pointerIsDown = false;
+        thumb.style.removeProperty("width");
+        thumb.style.removeProperty("opacity");
+    };
 });
 
 // LIST DETAILS
 let listItem = document.querySelectorAll('.list-details > *');
+let coverTitle = document.querySelector('.section__cover > .cover__title');
+let cover = document.querySelector('.section__cover');
 
 function onWindowResize() {
+
+    // SCROLLBAR: HEIGHT
+    scrollbar.style.setProperty("--scrollbar-height", `${main.offsetHeight / main.children.length - parseFloat(getComputedStyle(scrollbar).marginBlock) * 2 - 2}px`);
+    // COVER: WIDTH
+    cover.style.width = `${coverTitle.clientWidth}px`
+    // SOFT SKILLS: LIST
     let open = Array.from(listItem).find((item) => item.open == true);
     Array.from(listItem).forEach((item) => {
         item.children[1].style.width = `${ open.clientWidth - parseFloat(getComputedStyle(open).paddingInline) * 2 }px`;
     });
+
 }
 
 onWindowResize();
