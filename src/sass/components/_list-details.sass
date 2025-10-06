@@ -53,6 +53,8 @@
         &[open]
             flex-shrink: 1
             flex-grow: 1
+        &[open] summary
+            text-shadow: 0 0 .5rem black, 0 0 1rem black, 0 0 1rem black
         summary
             width: max-content
             text-shadow: 0 0 .5rem black, 0 0 1rem black
@@ -63,6 +65,16 @@
                 content: ''
         p
             position: relative
+            width: var(--comp-width)
             text-shadow: 0 0 .5rem black, 0 0 1rem black
             writing-mode: horizontal-tb
             text-align: left
+            &::before
+                content: ''
+                position: absolute
+                height: calc( 100% + 8rem )
+                width: calc( 100% + 5rem )
+                left: -2rem
+                bottom: -2rem
+                background: linear-gradient(transparent, rgba(0, 0, 0, .8))
+                z-index: -1

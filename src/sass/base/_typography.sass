@@ -1,9 +1,15 @@
 *, ::after, ::before
     color: var(--color-white)
-    letter-spacing: .06em
-    font-family: "Averia Serif Libre", serif
+    font-family: "Quicksand", sans-serif
+    letter-spacing: .04em
     font-weight: lighter
     font-style: normal
+
+h1,
+h2,
+summary
+    font-family: "Cormorant Garamond", serif
+    font-weight: bold
 
 h1
     font-size: 7.2rem
@@ -22,57 +28,45 @@ a:link, a:visited
     text-decoration: none
     color: var(--color-white)
 
-.font__kanji-NT
-    font-family: "New Tegomin", serif
-    font-size: 3.4rem
-    font-weight: normal
-    font-style: normal
-
-.nav
-    *
-        color: #d5d2d3 !important
-    p
-        font-family: "Cormorant Garamond", serif
-        font-weight: 600
-        font-size: 2rem
-        // &:last-of-type
-        //     font-size: 1.6rem
-    a
-        font-size: 1.6rem
-        letter-spacing: .1em
+.nav__titul
+    color: #d5d2d3 !important
+    font-family: "Cormorant Garamond", serif
+    font-weight: 600
+    font-size: 2rem
+    letter-spacing: -.08em
 
 
 // Cover
 .cover__title
-    *
+    h1,
+    h2
         font-family: "Cormorant Garamond", serif
         font-weight: 600
     h1
         font-size: 20rem
         margin-right: -.08em
-    // h2
-    //     letter-spacing: .3em
-    //     margin-right: -.3em
-    //     font-size: 2rem
-
-.cover__subtitle
     h2
-        font-family: "Averia Serif Libre", serif
-        font-size: 2.4rem
+        font-size: 14rem
+        line-height: .8em
+        letter-spacing: -.08em
+    p
+        letter-spacing: .42em
 
 // Description
 .description__title
+    font-weight: normal
     &::after
-        font-family: "Averia Libre", system-ui
+        font-family: "Cormorant Garamond", serif
         letter-spacing: normal
         font-size: 1.6rem
+
 
 .description__paragraph
     line-height: 1.2em
 
 // Grid hexagon
-.grid-hexagon__item-name
-    // font-size: 1.6rem
+.grid-hexagon__item::before
+    font-size: 1.6rem
 
 // Visit card
 .visit-card
@@ -86,10 +80,19 @@ a:link, a:visited
 // List details
 .list-details
     &__summary
-        font-size: 2.4rem
+        font-size: 2.5rem
+        font-weight: normal
+        // font-size: 2.7rem
+        // letter-spacing: .08em
+        // font-weight: bolder
     // &__content
 
 
 // Scrollbar
 .scrollbar__list
     font-size: 1.2rem
+
+.footer
+    a,
+    p
+        // font-family: "Cormorant Garamond", serif

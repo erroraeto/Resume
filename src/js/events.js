@@ -12,10 +12,12 @@ scrollbar.addEventListener('scroll', thumbPosition);
 
 async function thumbPosition() {
     // thumb.style.setProperty( "opacity", 1 );
+    // thumb.style.setProperty( "width", 'calc( 100% + 4px )' );
     let scrollThumbPos = ( main.offsetHeight * main.scrollTop ) / main.scrollHeight;
     scrollbar.style.setProperty( "--scroll-y", `${scrollThumbPos}px` );
     await sleep(2000);
     // thumb.style.removeProperty("opacity");
+    // thumb.style.removeProperty("width");
 };
 
 
@@ -50,7 +52,8 @@ thumb.addEventListener('mousedown', (event) => {
 });
 
 // LIST DETAILS
-let listItem = document.querySelectorAll('.list-details > *');
+let listDetail = document.querySelector('.list-details');
+let listItems = document.querySelectorAll('.list-details > *');
 let coverTitle = document.querySelector('.section__cover > .cover__title');
 let cover = document.querySelector('.section__cover');
 
@@ -59,19 +62,16 @@ function onWindowResize() {
     // SCROLLBAR: HEIGHT
     scrollbar.style.setProperty("--scrollbar-height", `${main.offsetHeight / main.children.length - parseFloat(getComputedStyle(scrollbar).marginBlock) * 2 - 2}px`);
     // COVER: WIDTH
-    cover.style.width = `${coverTitle.clientWidth}px`
+    // cover.style.width = `${coverTitle.clientWidth}px`
     // SOFT SKILLS: LIST
-    let open = Array.from(listItem).find((item) => item.open == true);
-    Array.from(listItem).forEach((item) => {
-        item.children[1].style.width = `${ open.clientWidth - parseFloat(getComputedStyle(open).paddingInline) * 2 }px`;
-    });
-
+    let open = Array.from(listItems).find((item) => item.open == true);
+    listDetail.style = `--comp-width: ${ open.clientWidth - parseFloat(getComputedStyle(open).paddingInline) * 2 }px`;
 }
 
 onWindowResize();
 window.addEventListener( 'resize', onWindowResize );
 
-Array.from(listItem).forEach((item) => {
+Array.from(listItems).forEach((item) => {
     // item.addEventListener( 'mouseover', selectItem );
     // item.addEventListener( 'click', (event) => event.preventDefault());
     item.addEventListener( 'click', (event) => {

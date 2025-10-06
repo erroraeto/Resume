@@ -15,7 +15,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
-
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 
 
 // let sectionAbout = document.querySelector('.section__about');
@@ -1229,49 +1229,24 @@ let sectionAbout = document.querySelector('.section__about');
 let phaseList = document.querySelectorAll('.section__about .radio__list input');
 
 // let camera, scene, renderer, model, material;
-let camera, scene, renderer, material;
+let camera, scene, renderer, composer, gimbal, material;
 
-let changingInProgress = false;
-
-const textures = [
-    '../img/Fast-learner.webp',
-    '../img/Problem-solving.webp',
-    '../img/texture/bust__uv.png',
-    '../img/uv_grid_opengl.jpg',
-    '../img/texture/bust__normal.webp',
-    '../img/Team-work.webp',
-    '../img/Unwrap.webp'
-].map((t) => {
-    let texture = new THREE.TextureLoader().load( t );
-    // texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    // texture.repeat.set( 1.5, 1.5 );
-    texture.flipY = false;
-    texture.colorSpace = THREE.SRGBColorSpace;
-    return texture;
-    // return new THREE.TextureLoader().load( t );
-});
 const models = [];
 
-const config = {
-    texture1 : textures[0],
-    texture2 : textures[1],
-    blendFactor : 1,
-};
-
-let clock = new THREE.Clock();
-let time = 0;
-let radius = 4;
-let circles;
+let radius = 5,
+    step,
+    changed = 0;
 
 async function init() {
 
     // CAMERA
     camera = new THREE.PerspectiveCamera( 40, sectionAbout.clientWidth / sectionAbout.clientHeight, 1, 100 );
-    camera.position.set( 0, 1.65, 4.5 );
+    camera.position.z = -.5;
+    gimbal = new THREE.Object3D();
+    gimbal.add(camera);
 
     // SCENE
     scene = new THREE.Scene();
-    scene.add(new THREE.GridHelper(10, 10));
 
     // LIGHT
     scene.add(new THREE.HemisphereLight(0xffffff, 0x555555, 1.0));
@@ -1282,150 +1257,153 @@ async function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     sectionAbout.insertAdjacentElement('afterbegin' , renderer.domElement);
 
-    let controls = new OrbitControls(camera, renderer.domElement);
+    // let controls = new OrbitControls(camera, renderer.domElement);
+    // scene.add(new THREE.GridHelper(10, 10));
+
 
     // MODEL
+    //          :REFERENCE
     await new THREE.TextureLoader().loadAsync( '../img/texture/reference.webp').then((loadedTexture) => {
         const aspectRatio = loadedTexture.image.width / loadedTexture.image.height;
         let mesh = new THREE.Mesh(
-            new THREE.PlaneGeometry( 3, 3),
+            new THREE.PlaneGeometry( 2.5, 2.5),
             new THREE.MeshBasicMaterial({
                 map: loadedTexture,
                 side: THREE.DoubleSide,
             })
         );
         mesh.scale.set(aspectRatio, 1, 1);
-        // mesh.rotateY(Math.PI * 0.5);
-        // mesh.rotateZ(Math.PI * 0.5);
         models.push(mesh);
     });
 
-    await new GLTFLoader().loadAsync( '../models/bust-sculpt.gltf').then((gltf) => {
+    //          :SCULPT
+    await new GLTFLoader().loadAsync( '../models/bust-sculpt.glb').then((gltf) => {
         const model = gltf.scene.children[0];
         model.material = new THREE.MeshLambertMaterial({ side: THREE.DoubleSide });
-        model.castShadow = true;
-        model.receiveShadow = true;
         models.push(model);
     });
-
-    await new GLTFLoader().loadAsync( '../models/bust-topo.gltf').then((gltf) => {
+    
+    //          :TOPOLOGY
+    await new GLTFLoader().loadAsync( '../models/bust-topo.glb').then((gltf) => {
         const model = gltf.scene.children[0];
-        let texture = new THREE.TextureLoader().load( '../img/texture/bust__uv.png' );
-        texture.flipY = false;
-        texture.colorSpace = THREE.SRGBColorSpace;
-        model.material = new THREE.MeshLambertMaterial({
-            map: texture,
-            side: THREE.DoubleSide
-        });
-        model.castShadow = true;
-        model.receiveShadow = true;
-        models.push(model);
+        model.material = new THREE.MeshLambertMaterial({ side: THREE.DoubleSide });
+
+        const model2 = gltf.scene.children[1];
+        model2.material.transparent = true;
+        model2.material.opacity = 0.2;
+
+        models.push(gltf.scene);
     });
 
-    await new GLTFLoader().loadAsync( '../models/bust-topo.gltf').then((gltf) => {
+    //          :UNWRAP
+    await new GLTFLoader().loadAsync( '../models/bust-uv.glb').then((gltf) => {
         const model = gltf.scene.children[0];
-        let textureTopo = new THREE.TextureLoader().load( '../img/uv_grid_opengl.jpg' );
+        let textureTopo = new THREE.TextureLoader().load( '../img/texture/texture__uv-grid.webp' );
         textureTopo.flipY = false;
         textureTopo.colorSpace = THREE.SRGBColorSpace;
         model.material = new THREE.MeshLambertMaterial({
             map: textureTopo,
             side: THREE.DoubleSide
         });
-        model.castShadow = true;
-        model.receiveShadow = true;
-        model.scale.setScalar(0.7);
-        // model.position.set(-1, 0, 0);
 
-        const textureUV = new THREE.TextureLoader().load( '../img/texture/bust__uv.png', (loadedTexture) => {
-            const aspectRatio = loadedTexture.image.width / loadedTexture.image.height;
-            meshUV.scale.set(aspectRatio, 1, 1);
+        const model2 = gltf.scene.children[1];
+        model2.material = new THREE.LineBasicMaterial({
+            color: 0xffff00,
+            linewidth: 1,
         });
-        const meshUV = new THREE.Mesh(
-            new THREE.PlaneGeometry( 2, 2),
-            new THREE.MeshBasicMaterial({
-                map: textureUV,
-                side: THREE.DoubleSide,
-                transparent: true,
-            })
-        );
-        // meshUV.position.set(0, 0, 0);
-        meshUV.rotateY(Math.PI * 0.25);
-        meshUV.rotateZ(Math.PI * 0.25);
 
-        const group = new THREE.Group();
-        group.add(model);
-        group.add(meshUV);
-
-        models.push(group);
-        // scene.add(group);
+        models.push(gltf.scene);
     });
 
-    await new GLTFLoader().loadAsync( '../models/bust-topo.gltf').then((gltf) => {
-        const model = gltf.scene.children[0];
-        let texture = new THREE.TextureLoader().load( '../img/texture/bust__normal.webp' );
-        texture.flipY = false;
-        texture.colorSpace = THREE.SRGBColorSpace;
+    //          :BAKING
+    await new GLTFLoader().loadAsync( '../models/bust-bake.glb').then((gltf) => {
+        const model = gltf.scene.children[1];
+        let textureBake = new THREE.TextureLoader().load( '../img/texture/texture__norm.webp' );
+        textureBake.flipY = false;
+        textureBake.colorSpace = THREE.SRGBColorSpace;
         model.material = new THREE.MeshLambertMaterial({
-            map: texture,
+            map: textureBake,
             side: THREE.DoubleSide
         });
-        model.castShadow = true;
-        model.receiveShadow = true;
+
+        const model2 = gltf.scene.children[0];
+        model2.material.transparent = true;
+        model2.material.opacity = 0.2;
+
+        models.push(gltf.scene);
+    });
+
+    //          :PAINT
+    await new GLTFLoader().loadAsync( '../models/bust-paint.glb').then((gltf) => {
+        const model = gltf.scene.children[0];
+        let texture = new THREE.TextureLoader().load( '../img/texture/texture__paint.webp' );
+        texture.flipY = false;
+        let textureBake = new THREE.TextureLoader().load( '../img/texture/texture__norm.webp' );
+        textureBake.flipY = false;
+        model.material = new THREE.MeshLambertMaterial({
+            map: texture,
+            normalMap: textureBake,
+            normalMapType: THREE.ObjectSpaceNormalMap,
+            side: THREE.DoubleSide
+        });
         models.push(model);
     });
 
-    circles = setCircle(models);
-    // circles = setCircle();
+    //          :RIGGING & SKINNING
+    await new GLTFLoader().loadAsync( '../models/bust-rig.glb').then((gltf) => {
+        const model = gltf.scene.children[1];
+        let textureBake = new THREE.TextureLoader().load( '../img/texture/texture__norm.webp' );
+        textureBake.flipY = false;
+        model.material = new THREE.MeshLambertMaterial({
+            normalMap: textureBake,
+            normalMapType: THREE.ObjectSpaceNormalMap,
+            side: THREE.DoubleSide
+        });
+
+        const model2 = gltf.scene.children[0];
+        model2.material.transparent = true;
+        model2.material.opacity = 0.4;
+
+        models.push(gltf.scene);
+    });
+
+    // COMPOSER
+    // composer = new EffectComposer(renderer);
+    // composer.addPass(new RenderPass(scene, camera));
+    // composer.setSize(window.innerWidth, window.innerHeight);
+
+    // const bokehPass = new BokehPass( scene, camera, {
+    //     focus: 4.5,
+    //     aperture: 0.01,
+    //     maxblur: 0.01
+    // } );
+    // composer.addPass(bokehPass);
+
+    step = (360 / models.length);
+    setCircle(models);
     onWindowResize();
     window.addEventListener( 'resize', onWindowResize );
     sectionAbout.addEventListener( 'wheel', wheelCarousel );
     renderer.setAnimationLoop( animate );
+    // composer.render(scene, camera);
 };
 
-// function setCircle() {
 function setCircle(arr) {
     let gs = new Array(arr.length).fill().map((g, idx) => {
-        let angleStep = Math.PI * 2 / arr.length;
+        let angleStep = THREE.MathUtils.degToRad(360) / arr.length;
         let angle = angleStep * idx;
-        arr[idx].position.set( Math.cos(angle) * radius, 0, Math.sin(angle) * radius );
+        arr[idx].position.set( Math.sin(angle) * radius, 0, -Math.cos(angle) * radius );
         arr[idx].lookAt(0, 0, 0);
-        arr[idx].rotateX(Math.PI * 0.5);
-        let pos = arr[idx].getWorldPosition(new THREE.Vector3());
-        // arr[idx].rotateZ(angle + Math.PI * -0.5);
-        // // arr[idx].position.set( Math.cos(angle) * radius, Math.sin(angle) * radius, 0 );
 
         if (arr[idx].type == 'Group') {
             arr[idx].children.forEach((mesh, idx, arr) => {
                 mesh.lookAt(0, 0, 0);
-        //         // mesh.rotateZ(angle + Math.PI * -0.5);
-        //         // mesh.position.set( Math.cos(angle) * radius, 0, Math.sin(angle) * radius );
-        //         // mesh.position.set( Math.cos(angle - idx) * radius, 0, Math.sin(angle - idx) * radius );
             });
         };
-        // // const v = new THREE.Vector3();
-        // // ud.dir.getWorldPosition(v);
-        // // group.lookAt(v);
-        scene.add(arr[idx]);
 
+        scene.add(gimbal, arr[idx]);
         return arr[idx];
     });
-    // let c = new THREE.Mesh( BufferGeometryUtils.mergeGeometries(gs), new THREE.MeshBasicMaterial({ color: "white" }) );
-    // c.rotateX(Math.PI * 0.5);
-    // c.position.y = 1.6;
-    // c.position.z = -1.6;
-    // scene.add(c);
-    // return c;
-
-    // let itemCount = 7;
-    // for (let idx = 0; idx < itemCount; idx++) {
-    //     let ng = new THREE.ConeGeometry(0.5, 1, 8);
-    //     let angleStep = Math.PI * 2 / itemCount;
-    //     let angle = angleStep * idx;
-    //     ng.rotateZ(angle + Math.PI * 0.5);
-    //     ng.translate( Math.cos(angle) * radius, Math.sin(angle) * radius, 0 );
-    //     let c = new THREE.Mesh( ng, new THREE.MeshBasicMaterial({ color: "white" }) );
-    //     scene.add(c);
-    // };
 };
 
 init();
@@ -1436,41 +1414,32 @@ function onWindowResize() {
 };
 
 function animate() {
-    // if (scene.children[1]) scene.children[1].rotation.y += 0.002;
-    if (scene.children[1]) scene.children[1].rotation.z += -0.002;
-    // time = clock.getElapsedTime() * 0.1 * Math.PI;
-    // circles.rotation.z = time;
+
+
+    // new TWEEN.Tween(material.userData.mixVal)
+    //     .to({value: 1}, 1000)
+    //     .onStart(() => {changingInProgress = true;})
+    //     .onComplete(() => {changingInProgress = false;})
+    //     .start();
+
+
     TWEEN.update();
     renderer.render(scene, camera);
-};
-
-function changeTexture(idx){
-
-    // if (idx === material.userData.prevIdx || changingInProgress === true) return;
-    if ( changingInProgress === true ) return;
-  
-    material.map = textures[idx];
-    material.userData.map0.value = textures[material.userData.prevIdx];
-    material.userData.prevIdx = idx;
-
-    material.userData.mixVal.value = 0;
-    new TWEEN.Tween(material.userData.mixVal)
-        .to({value: 1}, 1000)
-        .onStart(() => {changingInProgress = true;})
-        .onComplete(() => {changingInProgress = false;})
-        .start();
+    // composer.render(scene, camera);
 };
 
 function wheelCarousel(event) {
-    // scene.children[1].rotation.y += -event.deltaX * 0.002;
-    scene.children[1].rotation.z += event.deltaX * 0.002;
+    models[changed].rotation.y += -event.deltaX / 2000;
 };
 
 Array.from(phaseList).forEach((radio) => {
     radio.addEventListener("input", (event) => {
-        changeTexture(event.target.defaultValue);
-        // img.addEventListener("click", event => { changeTexture(idx);})
-        // model.material.map = new THREE.TextureLoader().load( textures[event.target.defaultValue] );
-        // model.material.needsUpdate = true;
+        changed = event.target.defaultValue;
+        new TWEEN.Tween(gimbal.rotation)
+            .to( { y: THREE.MathUtils.degToRad(-step * event.target.defaultValue) } , 1000)
+            .easing(TWEEN.Easing.Quadratic.InOut)
+            .start();
+            // .onStart(() => {changingInProgress = true;})
+            // .onComplete(() => {changingInProgress = false;})
     });
 });
