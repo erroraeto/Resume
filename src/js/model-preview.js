@@ -1237,6 +1237,12 @@ let radius = 5,
     step,
     changed = 0;
 
+let isDragging = false;
+let previousMousePosition = {
+    x: 0,
+    y: 0
+};
+
 async function init() {
 
     // CAMERA
@@ -1318,11 +1324,11 @@ async function init() {
     //          :BAKING
     await new GLTFLoader().loadAsync( '../models/bust-bake.glb').then((gltf) => {
         const model = gltf.scene.children[1];
-        let textureBake = new THREE.TextureLoader().load( '../img/texture/texture__norm.webp' );
-        textureBake.flipY = false;
-        textureBake.colorSpace = THREE.SRGBColorSpace;
+        let textureNormal = new THREE.TextureLoader().load( '../img/texture/texture__norm.webp' );
+        textureNormal.flipY = false;
+        textureNormal.colorSpace = THREE.SRGBColorSpace;
         model.material = new THREE.MeshLambertMaterial({
-            map: textureBake,
+            map: textureNormal,
             side: THREE.DoubleSide
         });
 
@@ -1336,26 +1342,29 @@ async function init() {
     //          :PAINT
     await new GLTFLoader().loadAsync( '../models/bust-paint.glb').then((gltf) => {
         const model = gltf.scene.children[0];
-        let texture = new THREE.TextureLoader().load( '../img/texture/texture__paint.webp' );
-        texture.flipY = false;
-        let textureBake = new THREE.TextureLoader().load( '../img/texture/texture__norm.webp' );
-        textureBake.flipY = false;
+        let texturePaint = new THREE.TextureLoader().load( '../img/texture/texture__paint.webp' );
+        texturePaint.flipY = false;
+        let textureNormal = new THREE.TextureLoader().load( '../img/texture/texture__norm.webp' );
+        textureNormal.flipY = false;
         model.material = new THREE.MeshLambertMaterial({
-            map: texture,
-            normalMap: textureBake,
+            map: texturePaint,
+            normalMap: textureNormal,
             normalMapType: THREE.ObjectSpaceNormalMap,
             side: THREE.DoubleSide
         });
-        models.push(model);
+        models.push(gltf.scene);
     });
 
     //          :RIGGING & SKINNING
     await new GLTFLoader().loadAsync( '../models/bust-rig.glb').then((gltf) => {
         const model = gltf.scene.children[1];
-        let textureBake = new THREE.TextureLoader().load( '../img/texture/texture__norm.webp' );
-        textureBake.flipY = false;
+        let textureNormal = new THREE.TextureLoader().load( '../img/texture/texture__norm.webp' );
+        textureNormal.flipY = false;
+        let textureWeight = new THREE.TextureLoader().load( '../img/texture/texture__weight.webp' );
+        textureWeight.flipY = false;
         model.material = new THREE.MeshLambertMaterial({
-            normalMap: textureBake,
+            map: textureWeight,
+            normalMap: textureNormal,
             normalMapType: THREE.ObjectSpaceNormalMap,
             side: THREE.DoubleSide
         });
@@ -1389,17 +1398,12 @@ async function init() {
 };
 
 function setCircle(arr) {
-    let gs = new Array(arr.length).fill().map((g, idx) => {
+    new Array(arr.length).fill().map((g, idx) => {
         let angleStep = THREE.MathUtils.degToRad(360) / arr.length;
         let angle = angleStep * idx;
         arr[idx].position.set( Math.sin(angle) * radius, 0, -Math.cos(angle) * radius );
-        arr[idx].lookAt(0, 0, 0);
-
-        if (arr[idx].type == 'Group') {
-            arr[idx].children.forEach((mesh, idx, arr) => {
-                mesh.lookAt(0, 0, 0);
-            });
-        };
+        
+        arr[idx].type == 'Group' ? arr[idx].children.forEach(mesh => mesh.lookAt(0, 0, 0)) : arr[idx].lookAt(0, 0, 0);
 
         scene.add(gimbal, arr[idx]);
         return arr[idx];
@@ -1431,6 +1435,34 @@ function animate() {
 function wheelCarousel(event) {
     models[changed].rotation.y += -event.deltaX / 2000;
 };
+sectionAbout.addEventListener('mousedown', (event) => {
+    isDragging = true;
+    previousMousePosition = {
+        x: event.clientX,
+        y: event.clientY
+    };
+});
+sectionAbout.addEventListener('mousemove', (event) => {
+    if (isDragging) {
+        const deltaX = event.clientX - previousMousePosition.x;
+        const deltaY = event.clientY - previousMousePosition.y;
+
+        // Rotate around Y-axis for horizontal movement
+        models[changed].rotation.y += deltaX * 0.01;
+        // Rotate around X-axis for vertical movement
+        models[changed].rotation.x += deltaY * 0.01;
+
+        previousMousePosition = {
+            x: event.clientX,
+            y: event.clientY
+        };
+
+        renderer.render(scene, camera);
+    }
+});
+sectionAbout.addEventListener('mouseup', () => {
+    isDragging = false;
+});
 
 Array.from(phaseList).forEach((radio) => {
     radio.addEventListener("input", (event) => {
