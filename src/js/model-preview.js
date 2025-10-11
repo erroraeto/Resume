@@ -16,7 +16,14 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+import { TransformControls, TransformControlsGizmo } from 'three/addons/controls/TransformControls.js';
+import { DragControls } from 'three/addons/controls/DragControls.js';
+import Stats from 'three/addons/libs/stats.module.js';
+import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
+import { OBB } from 'three/addons/math/OBB';
+// import { Value } from 'sass';
 
+// import { pass, color, rangeFogFactor } from 'three/tsl';
 
 // let sectionAbout = document.querySelector('.section__about');
 // let camera, scene, renderer, renderPass, bokehPass, composer;
@@ -1229,33 +1236,63 @@ let sectionAbout = document.querySelector('.section__about');
 let phaseList = document.querySelectorAll('.section__about .radio__list input');
 
 // let camera, scene, renderer, model, material;
-let camera, scene, renderer, composer, gimbal, material;
+let camera, scene, raycaster, renderer, control, controls, composer, gimbal, material, stats, groupS;
 
+const pointer = new THREE.Vector2();
+// const radius = 5;
+let INTERSECTED;
+let theta = 0;
+
+const rayMeshes = [];
 const models = [];
+const group = [];
+const step = [];
+let fogFar = { value: 12 };
 
 let radius = 5,
-    step,
+    // step,
     changed = 0;
 
-let isDragging = false;
-let previousMousePosition = {
-    x: 0,
-    y: 0
-};
+let enableSelection = false;
+// let isDragging = false;
+// let previousMousePosition = {
+//     x: 0,
+//     y: 0
+// };
 
 async function init() {
 
     // CAMERA
-    camera = new THREE.PerspectiveCamera( 40, sectionAbout.clientWidth / sectionAbout.clientHeight, 1, 100 );
-    camera.position.z = -.5;
-    gimbal = new THREE.Object3D();
-    gimbal.add(camera);
+    camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+    // camera.position.z = -.5;
+    groupS = new THREE.Group();
+    // groupS.position.z = -.5;
+    // gimbal = new THREE.Object3D();
+    // gimbal.add(camera);
 
     // SCENE
     scene = new THREE.Scene();
+    
+    // FOG
+    scene.fog = new THREE.Fog(0x000000, 4, fogFar);
+    // scene.fog = new THREE.FogExp2(0xcccccc, 0.01);
+    // const scenePass = new Pass( scene, camera );
+    // const scenePassViewZ = scenePass.getViewZNode();
+    // scene.fog = new THREE.Fog( 0x4080cc, 2.7, 4 );
+    // // tone-mapped scene pass
+    // const scenePassTM = scenePass.toneMapping( THREE.ACESFilmicToneMapping, 1 );
+    // // mix fog using fog factor and fog color
+    // const compose = fogFactor.mix( scenePassTM, fogColor );
+    // postProcessing = new THREE.PostProcessing( renderer );
+    // postProcessing.outputColorTransform = true; // no tone mapping will be applied, only the default color space transform
+    // postProcessing.outputNode = compose;
+    
 
     // LIGHT
     scene.add(new THREE.HemisphereLight(0xffffff, 0x555555, 1.0));
+
+    // RAYCASTER
+    raycaster = new THREE.Raycaster();
 
     // RENDER
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -1263,118 +1300,167 @@ async function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     sectionAbout.insertAdjacentElement('afterbegin' , renderer.domElement);
 
+    // STATS
+    stats = new Stats();
+    sectionAbout.appendChild(stats.dom);
+
+    // CONTROLS
     // let controls = new OrbitControls(camera, renderer.domElement);
     // scene.add(new THREE.GridHelper(10, 10));
 
-
     // MODEL
-    //          :REFERENCE
+    //          :TEXTURES
+    //                    - NORMAL MAP HP
+    const textureNormalHP = await new THREE.TextureLoader().loadAsync( '../img/texture/texture__norm-sculpt.webp');
+    textureNormalHP.flipY = false;
+    //                    - NORMAL MAP LP
+    const textureNormalLP = await new THREE.TextureLoader().loadAsync( '../img/texture/texture__norm.webp');
+    textureNormalLP.flipY = false;
+    //                    - MATCAP
+    const textureMatcap = await new THREE.TextureLoader().loadAsync( '../img/texture/texture__matcap.webp');
+    textureMatcap.encoding = THREE.SRGBColorSpace;
+    //                    - UV GRID
+    const textureUvGrid = await new THREE.TextureLoader().loadAsync( '../img/texture/texture__uv-grid.webp' );
+    textureUvGrid.flipY = false;
+    textureUvGrid.colorSpace = THREE.SRGBColorSpace;
+    //                    - PAINT
+    const texturePaint = await new THREE.TextureLoader().loadAsync( '../img/texture/texture__paint.webp' );
+    texturePaint.flipY = false;
+    //                    - WEIGHT
+    const textureWeight = new THREE.TextureLoader().load( '../img/texture/texture__weight.webp' );
+    textureWeight.flipY = false;
+
+    //          :OBJECTS
+    //                   - HP MODEL
+    await new GLTFLoader().loadAsync( '../models/bust-highpoly.glb').then((gltf) => {
+        const model = gltf.scene.children[0];
+        models.push(model);
+        rayMeshes.push(model);
+    });
+    //                   - LP MODEL
+    await new GLTFLoader().loadAsync( '../models/bust-lowpoly.glb').then((gltf) => {
+        const model = gltf.scene.children[0];
+        models.push(model);
+        rayMeshes.push(model);
+    });
+    //                   - WIREFRAME
+    await new GLTFLoader().loadAsync( '../models/bust-wireframe.glb').then((gltf) => {
+        const lineSeg = gltf.scene.children[0];
+        lineSeg.material.transparent = true;
+        lineSeg.material.opacity = 0.2;
+        models.push(lineSeg);
+    });
+    //                   - SEAM
+    await new GLTFLoader().loadAsync( '../models/bust-seam.glb').then((gltf) => {
+        const lineSeg = gltf.scene.children[0];
+        lineSeg.material.transparent = true;
+        lineSeg.material.opacity = 0.2;
+        models.push(lineSeg);
+    });
+    //                   - RIG
+    await new GLTFLoader().loadAsync( '../models/bust-rig.glb').then((gltf) => {
+        const lineSeg = gltf.scene.children[0];
+        lineSeg.material.transparent = true;
+        lineSeg.material.opacity = 0.4;
+        models.push(lineSeg);
+    });
+
+    // GROUP
+    //      :REFERENCE
     await new THREE.TextureLoader().loadAsync( '../img/texture/reference.webp').then((loadedTexture) => {
         const aspectRatio = loadedTexture.image.width / loadedTexture.image.height;
         let mesh = new THREE.Mesh(
             new THREE.PlaneGeometry( 2.5, 2.5),
-            new THREE.MeshBasicMaterial({
+            new THREE.MeshLambertMaterial({
                 map: loadedTexture,
-                side: THREE.DoubleSide,
+                side: THREE.DoubleSide
             })
         );
         mesh.scale.set(aspectRatio, 1, 1);
-        models.push(mesh);
+        rayMeshes.push(mesh);
+        let groupRef = new THREE.Group().add(mesh);
+        group.push(groupRef);
     });
 
-    //          :SCULPT
-    await new GLTFLoader().loadAsync( '../models/bust-sculpt.glb').then((gltf) => {
-        const model = gltf.scene.children[0];
-        model.material = new THREE.MeshLambertMaterial({ side: THREE.DoubleSide });
-        models.push(model);
+    //      :SCULPT
+    let groupSculpt = new THREE.Group();
+    let sculpt = models[0].clone();
+    sculpt.material = new THREE.MeshMatcapMaterial({
+        color: new THREE.Color().setHex(0xb0b0b0),
+        matcap: textureMatcap,
+        normalMap: textureNormalHP,
+        side: THREE.DoubleSide
     });
-    
-    //          :TOPOLOGY
-    await new GLTFLoader().loadAsync( '../models/bust-topo.glb').then((gltf) => {
-        const model = gltf.scene.children[0];
-        model.material = new THREE.MeshLambertMaterial({ side: THREE.DoubleSide });
+    groupSculpt.add(sculpt);
+    group.push(groupSculpt);
 
-        const model2 = gltf.scene.children[1];
-        model2.material.transparent = true;
-        model2.material.opacity = 0.2;
 
-        models.push(gltf.scene);
+    //      :TOPOLOGY
+    let groupTopo = new THREE.Group();
+    let modelTopo = models[1].clone();
+    modelTopo.material = new THREE.MeshLambertMaterial({ normalMap: textureNormalLP, side: THREE.DoubleSide });
+    groupTopo.add(modelTopo);
+    let lineTopo = models[2].clone();
+    groupTopo.add(lineTopo);
+    group.push(groupTopo);
+
+
+    //      :UNWRAP
+    let groupUnwrap = new THREE.Group();
+    let modelUnwrap = models[1].clone();
+    modelUnwrap.material = new THREE.MeshLambertMaterial({
+        map: textureUvGrid,
+        side: THREE.DoubleSide
     });
-
-    //          :UNWRAP
-    await new GLTFLoader().loadAsync( '../models/bust-uv.glb').then((gltf) => {
-        const model = gltf.scene.children[0];
-        let textureTopo = new THREE.TextureLoader().load( '../img/texture/texture__uv-grid.webp' );
-        textureTopo.flipY = false;
-        textureTopo.colorSpace = THREE.SRGBColorSpace;
-        model.material = new THREE.MeshLambertMaterial({
-            map: textureTopo,
-            side: THREE.DoubleSide
-        });
-
-        const model2 = gltf.scene.children[1];
-        model2.material = new THREE.LineBasicMaterial({
-            color: 0xffff00,
-            linewidth: 1,
-        });
-
-        models.push(gltf.scene);
+    groupUnwrap.add(modelUnwrap);
+    let lineUnwrap = models[3].clone();
+    lineUnwrap.material = new THREE.LineBasicMaterial({
+        color: 0xffff00,
+        linewidth: 1,
     });
+    groupUnwrap.add(lineUnwrap);
+    group.push(groupUnwrap);
 
-    //          :BAKING
-    await new GLTFLoader().loadAsync( '../models/bust-bake.glb').then((gltf) => {
-        const model = gltf.scene.children[1];
-        let textureNormal = new THREE.TextureLoader().load( '../img/texture/texture__norm.webp' );
-        textureNormal.flipY = false;
-        textureNormal.colorSpace = THREE.SRGBColorSpace;
-        model.material = new THREE.MeshLambertMaterial({
-            map: textureNormal,
-            side: THREE.DoubleSide
-        });
 
-        const model2 = gltf.scene.children[0];
-        model2.material.transparent = true;
-        model2.material.opacity = 0.2;
-
-        models.push(gltf.scene);
+    //      :BAKING
+    let groupBake = new THREE.Group();
+    let modelBake = models[1].clone();
+    modelBake.material = new THREE.MeshLambertMaterial({
+        map: textureNormalLP,
+        side: THREE.DoubleSide
     });
+    groupBake.add(modelBake);
+    let lineBake = models[2].clone();
+    groupBake.add(lineBake);
+    group.push(groupBake);
 
-    //          :PAINT
-    await new GLTFLoader().loadAsync( '../models/bust-paint.glb').then((gltf) => {
-        const model = gltf.scene.children[0];
-        let texturePaint = new THREE.TextureLoader().load( '../img/texture/texture__paint.webp' );
-        texturePaint.flipY = false;
-        let textureNormal = new THREE.TextureLoader().load( '../img/texture/texture__norm.webp' );
-        textureNormal.flipY = false;
-        model.material = new THREE.MeshLambertMaterial({
-            map: texturePaint,
-            normalMap: textureNormal,
-            normalMapType: THREE.ObjectSpaceNormalMap,
-            side: THREE.DoubleSide
-        });
-        models.push(gltf.scene);
+
+    //      :PAINT
+    let groupPaint = new THREE.Group();
+    let modelPaint = models[1].clone();
+    modelPaint.material = new THREE.MeshLambertMaterial({
+        // map: texturePaint,
+        normalMap: textureNormalLP,
+        side: THREE.DoubleSide
     });
+    groupPaint.add(modelPaint);
+    group.push(groupPaint);
 
-    //          :RIGGING & SKINNING
-    await new GLTFLoader().loadAsync( '../models/bust-rig.glb').then((gltf) => {
-        const model = gltf.scene.children[1];
-        let textureNormal = new THREE.TextureLoader().load( '../img/texture/texture__norm.webp' );
-        textureNormal.flipY = false;
-        let textureWeight = new THREE.TextureLoader().load( '../img/texture/texture__weight.webp' );
-        textureWeight.flipY = false;
-        model.material = new THREE.MeshLambertMaterial({
-            map: textureWeight,
-            normalMap: textureNormal,
-            normalMapType: THREE.ObjectSpaceNormalMap,
-            side: THREE.DoubleSide
-        });
 
-        const model2 = gltf.scene.children[0];
-        model2.material.transparent = true;
-        model2.material.opacity = 0.4;
-
-        models.push(gltf.scene);
+    //      :RIGGING & SKINNING
+    let groupRS = new THREE.Group();
+    let modelRS = models[1].clone();
+    modelRS.material = new THREE.MeshLambertMaterial({
+        map: textureWeight,
+        normalMap: textureNormalLP,
+        normalMapType: THREE.ObjectSpaceNormalMap,
+        side: THREE.DoubleSide
     });
+    groupRS.add(modelRS);
+    let lineRS = models[4].clone();
+    groupRS.add(lineRS);
+    group.push(groupRS);
+
 
     // COMPOSER
     // composer = new EffectComposer(renderer);
@@ -1388,11 +1474,35 @@ async function init() {
     // } );
     // composer.addPass(bokehPass);
 
-    step = (360 / models.length);
-    setCircle(models);
+    // step = (360 / models.length);
+    // setCircle(models);
+    // step = (360 / group.length);
+    // step = new Array(group.length).fill().map((g, idx) => {
+    //     return 360 / group.length * idx;
+    // });
+    setCircle(group);
+
     onWindowResize();
     window.addEventListener( 'resize', onWindowResize );
-    sectionAbout.addEventListener( 'wheel', wheelCarousel );
+    // renderer.domElement.addEventListener( 'wheel', wheelCarousel );
+    // renderer.domElement.addEventListener( 'mousemove', onPointerMove );
+    // renderer.domElement.addEventListener('click', onPointerClick );
+    renderer.domElement.addEventListener('dblclick', onPointerDblClick );
+    // renderer.domElement.addEventListener( 'pointerdown', onDocumentMouseDown, false );
+    renderer.domElement.addEventListener('pointerdown', onPointerDown, false );
+
+    // CONTROLS
+    controls = new ArcballControls( camera, renderer.domElement, scene );
+    controls.addEventListener( 'change', render );
+    controls.setGizmosVisible(false);
+    controls.enableFocus = false;
+    controls.enableZoom = false;
+    controls.enableGrid = false;
+    controls.enablePan = false;
+    controls.target.set( group[0].position.x, 0, group[0].position.z);
+    controls.update();
+    controls.enabled = false
+
     renderer.setAnimationLoop( animate );
     // composer.render(scene, camera);
 };
@@ -1402,76 +1512,567 @@ function setCircle(arr) {
         let angleStep = THREE.MathUtils.degToRad(360) / arr.length;
         let angle = angleStep * idx;
         arr[idx].position.set( Math.sin(angle) * radius, 0, -Math.cos(angle) * radius );
-        
-        arr[idx].type == 'Group' ? arr[idx].children.forEach(mesh => mesh.lookAt(0, 0, 0)) : arr[idx].lookAt(0, 0, 0);
+        arr[idx].lookAt(0, 0, 0);
+        // if ( idx != 0 ) arr[idx].visible = false;
 
-        scene.add(gimbal, arr[idx]);
-        return arr[idx];
+        // let bbox = new THREE.Box3().setFromObject(arr[idx], true);
+        // const obb = new OBB();
+        // obb.fromBox3(bbox);
+        // obb.applyMatrix4(arr[idx].matrixWorld);
+        // let helper = new THREE.Box3Helper(bbox, new THREE.Color(0, 255, 0));
+        // scene.add(helper);
+
+        step.push(angle);
+        groupS.add(arr[idx]);
     });
+    step.push( step[1] * step.length );
+    step.unshift(-step[1]);
+    scene.add(groupS);
 };
 
 init();
 
 function onWindowResize() {
-    renderer.setPixelRatio(devicePixelRatio);
-    renderer.setSize( sectionAbout.clientWidth, sectionAbout.clientHeight );
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize( window.innerWidth, window.innerHeight );
 };
 
 function animate() {
-
-
-    // new TWEEN.Tween(material.userData.mixVal)
-    //     .to({value: 1}, 1000)
-    //     .onStart(() => {changingInProgress = true;})
-    //     .onComplete(() => {changingInProgress = false;})
-    //     .start();
-
+    // if (!drag) camera.rotation.y += ( targetRotation - camera.rotation.y ) * 0.05;
+    // if (!controls.enabled) camera.rotation.y += ( targetRotation - camera.rotation.y ) * 0.05;
+    // if (!controls.enabled) groupS.rotation.y += ( targetRotation - groupS.rotation.y ) * 0.05;
 
     TWEEN.update();
+    stats.update();
     renderer.render(scene, camera);
     // composer.render(scene, camera);
 };
 
-function wheelCarousel(event) {
-    models[changed].rotation.y += -event.deltaX / 2000;
-};
-sectionAbout.addEventListener('mousedown', (event) => {
-    isDragging = true;
-    previousMousePosition = {
-        x: event.clientX,
-        y: event.clientY
+function render() {
+    // stats.update();
+    renderer.render( scene, camera );
+}
+
+// EVENTS
+function onPointerDblClick( event ) {
+    if (event.type == 'touchstart') {
+        pointer.set((event.touches[0].clientX / renderer.domElement.clientWidth) * 2 - 1, -(event.touches[0].clientY / renderer.domElement.clientHeight) * 2 + 1);
+    } else {
+        pointer.set((event.clientX / renderer.domElement.clientWidth) * 2 - 1, -(event.clientY / renderer.domElement.clientHeight) * 2 + 1);
     };
-});
-sectionAbout.addEventListener('mousemove', (event) => {
-    if (isDragging) {
-        const deltaX = event.clientX - previousMousePosition.x;
-        const deltaY = event.clientY - previousMousePosition.y;
+    raycaster.setFromCamera(pointer, camera);
+    const intersects = raycaster.intersectObjects(group);
 
-        // Rotate around Y-axis for horizontal movement
-        models[changed].rotation.y += deltaX * 0.01;
-        // Rotate around X-axis for vertical movement
-        models[changed].rotation.x += deltaY * 0.01;
+    if (intersects.length > 0) {
+        if (controls.enabled) {
+            renderer.domElement.animate({
+                    opacity: [1, 0, 1],
+                },
+                {
+                    duration: 1000,
+                    easing: 'ease-in-out'
+                }
+            );
+            
+            // controls.camera.rotation.set(0, 0, 0);
+            // controls.camera.position.set(0, 0, 0);
+            // controls.enabled = false;
+            // group.forEach( gr => gr.visible = true);
+            // renderer.domElement.addEventListener( 'pointerdown', onDocumentMouseDown, false );
+            // renderer.domElement.animate(
+            //     [
+            //         { opacity: 0 },
+            //         { opacity: 1 }
+            //     ],
+            //     {
+            //         duration: 1000,
+            //         easing: 'ease-in-out'
+            //     }
+            // );
 
-        previousMousePosition = {
-            x: event.clientX,
-            y: event.clientY
-        };
 
-        renderer.render(scene, camera);
+
+            // let pos = {};
+            // new TWEEN.Tween(camera.rotation)
+            //     .to( {x: -0, y: 0, z: -0} , 1000)
+            //     .easing(TWEEN.Easing.Cubic.Out)
+            //     .start()
+            //     .onStart(() => {
+            //         pos.x = camera.rotation.x;
+            //         pos.y = camera.rotation.y;
+            //         pos.z = camera.rotation.z;
+            //     })
+            //     .onComplete(() => {
+            //         new TWEEN.Tween(camera.rotation)
+            //             .to( {x: pos.x, y: pos.y, z: pos.z} , 1000)
+            //             .easing(TWEEN.Easing.Cubic.Out)
+            //             .start()
+            //         }
+            //     );
+
+
+
+            // new TWEEN.Tween(fogFar)
+            //     .to( { value: 5 } , 1000)
+            //     .easing(TWEEN.Easing.Quadratic.InOut)
+            //     .onStart(() => controls.enabled = false)
+            //     .onUpdate(() => {
+            //         scene.fog = new THREE.Fog(0x000000, 4, fogFar);
+            //     })
+            //     .onComplete(() => {
+            //         group.forEach( gr => gr.visible = true);
+            //         controls.enabled = false;
+            //         renderer.domElement.addEventListener( 'pointerdown', onDocumentMouseDown, false );
+            //     })
+            //     .start();
+            // new TWEEN.Tween(controls.camera.rotation)
+            //     .to( {x: -0, y: 0, z: -0} , 1000)
+            //     .easing(TWEEN.Easing.Quadratic.InOut)
+            //     .onStart(() => controls.enabled = false)
+            //     .onComplete(() => {
+            //         group.forEach( gr => gr.visible = true);
+            //     })
+            //     .start();
+            // controls.enabled = false;
+            // renderer.domElement.addEventListener( 'pointerdown', onDocumentMouseDown, false );
+        } else {
+            group.forEach( gr => {
+                if (gr != intersects[0].object.parent) return gr.visible = false;
+                gr.visible = true;
+            });
+            controls.enabled = true;
+            renderer.domElement.removeEventListener('pointerdown', onPointerDown, false );
+            // renderer.domElement.removeEventListener( 'pointerdown', onDocumentMouseDown, false );
+        }
     }
-});
-sectionAbout.addEventListener('mouseup', () => {
-    isDragging = false;
-});
+};
 
-Array.from(phaseList).forEach((radio) => {
-    radio.addEventListener("input", (event) => {
-        changed = event.target.defaultValue;
-        new TWEEN.Tween(gimbal.rotation)
-            .to( { y: THREE.MathUtils.degToRad(-step * event.target.defaultValue) } , 1000)
-            .easing(TWEEN.Easing.Quadratic.InOut)
-            .start();
-            // .onStart(() => {changingInProgress = true;})
-            // .onComplete(() => {changingInProgress = false;})
-    });
-});
+// let targetRotation = 0;
+// let targetRotationOnMouseDown = 0;
+// let mouseX = 0;
+// let mouseXOnMouseDown = 0;
+// let windowHalfX = window.innerWidth;
+// // let mousePreviousPosition = 0;
+// // let drag = false;
+
+// function onDocumentMouseDown( event ) {
+//     // drag = true;
+//     // mousePreviousPosition = event.clientX;
+//     // targetRotation = camera.rotation.y;
+//     targetRotation = groupS.rotation.y;
+//     document.addEventListener( 'selectstart', () => {return false} );
+//     event.preventDefault();
+//     renderer.domElement.addEventListener( 'pointermove', onDocumentMouseMove, false );
+//     renderer.domElement.addEventListener( 'pointerup', onPointerLeave, false );
+//     renderer.domElement.addEventListener( 'pointerout', onPointerLeave, false );
+//     // mouseXOnMouseDown = event.clientX - windowHalfX;
+//     mouseXOnMouseDown = -event.clientX;
+//     targetRotationOnMouseDown = targetRotation;
+// };
+
+// function onDocumentMouseMove( event ) {
+//     // let deltaMove = event.clientX - mousePreviousPosition;
+//     // camera.rotation.y += deltaMove * 0.0008;
+//     // mousePreviousPosition = event.clientX;
+//     // mouseX = event.clientX - windowHalfX;
+//     mouseX = -event.clientX;
+//     targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.002;
+// };
+
+// function onPointerLeave(event) {
+//     // drag = false;
+//     // mouseX = event.clientX - windowHalfX;
+//     // targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.002;
+//     document.removeEventListener( 'selectstart', () => {return false} );
+//     renderer.domElement.removeEventListener( 'pointermove', onDocumentMouseMove, false );
+//     renderer.domElement.removeEventListener( 'pointerup', onPointerLeave, false );
+//     renderer.domElement.removeEventListener( 'pointerout', onPointerLeave, false );
+// };
+
+
+
+
+
+
+let previousMousePosition,
+    startMousePosition,
+    swipeStart;
+
+// renderer.domElement.addEventListener('pointerdown', onPointerDown, false );
+
+function onPointerDown(event) {
+    swipeStart = new Date().getTime();
+
+    startMousePosition = previousMousePosition = event.clientX * 3;
+    renderer.domElement.addEventListener( 'pointermove', onPointerMove, false );
+    renderer.domElement.addEventListener( 'pointerup', onPointerLeave, false );
+    renderer.domElement.addEventListener( 'pointerout', onPointerLeave, false );
+};
+
+function onPointerMove(event) {
+    let deltaMove = (event.clientX * 3) - previousMousePosition;
+    groupS.rotation.y += -deltaMove * 0.0008;
+    previousMousePosition = event.clientX * 3;
+    rotato();
+};
+
+function onPointerLeave(event) {
+    let setDeg = step.reduce( (prev, curr) => {return (Math.abs(curr - groupS.rotation.y) < Math.abs(prev - groupS.rotation.y) ? curr : prev)});
+    let swipeEnd = new Date().getTime();
+    let swipeDelay = swipeEnd - swipeStart;
+    if ( (swipeDelay < 130) && (swipeDelay > 0) ) {
+        if ( (event.clientX * 3) - startMousePosition < 0 ) {
+            setDeg = step.reduce( (prev, curr) => { return groupS.rotation.y > prev ? curr : prev });
+        } else {
+            setDeg = step.reduceRight( (prev, curr) => { return groupS.rotation.y < prev ? curr : prev });
+        }
+    };
+
+    new TWEEN.Tween(groupS.rotation)
+        .to( {y: setDeg} , 400)
+        .easing(TWEEN.Easing.Cubic.Out)
+        .start();
+
+    renderer.domElement.removeEventListener( 'pointermove', onPointerMove, false );
+    renderer.domElement.removeEventListener( 'pointerup', onPointerLeave, false );
+    renderer.domElement.removeEventListener( 'pointerout', onPointerLeave, false );
+};
+
+let lastTouch;
+renderer.domElement.addEventListener( "touchstart", (ev) => {
+    let now = new Date().getTime();
+    let touchDelay = now - lastTouch;
+    if ( (touchDelay < 180) && (touchDelay > 0) ) {
+        onPointerDblClick(ev);
+    }
+    lastTouch = new Date().getTime();
+}, false );
+
+
+
+
+
+
+
+
+function rotato() {
+    if ( groupS.rotation.y > step.at(-1) ) {
+        groupS.rotation.y = step.at(1);
+    } else if ( groupS.rotation.y <= step.at(0) ) {
+        groupS.rotation.y = step.at(-2);
+    }
+};
+
+
+
+
+
+
+
+// Array.from(phaseList).forEach((radio) => {
+//     radio.addEventListener("input", (event) => {
+//         changed = event.target.defaultValue;
+//         new TWEEN.Tween(controls.camera.position)
+//             .to( {x: 0, y: 0, z: 0} , 1000)
+//             .easing(TWEEN.Easing.Quadratic.InOut)
+//             .onStart(() => controls.enabled = false)
+//             .onComplete(() => controls.enabled = true)
+//             .start();
+//         new TWEEN.Tween(controls.camera.rotation)
+//             .to( {x: -0, y: 0, z: -0} , 1000)
+//             .easing(TWEEN.Easing.Quadratic.InOut)
+//             .onStart(() => controls.enabled = false)
+//             .onComplete(() => controls.enabled = true)
+//             .start();
+//         new TWEEN.Tween(groupS.rotation)
+//             // .to( { y: THREE.MathUtils.degToRad(-step * event.target.defaultValue) } , 1000)
+//             .to( { y: THREE.MathUtils.degToRad(step * event.target.defaultValue) } , 1000)
+//             .easing(TWEEN.Easing.Quadratic.InOut)
+//             .onStart(() => {
+//                 group.forEach( gr => gr.visible = true);
+//                 controls.enabled = false;
+//                 controls.reset();
+//             })
+//             .onComplete(() => {
+//                 group.forEach( gr => {
+//                     if (gr != group[changed]) {
+//                         return gr.visible = false;
+//                     }
+//                     gr.visible = true;
+//                     controls.enabled = true;
+//                     controls.update();
+//                 });
+//                 // controls = new DragControls( group, camera, renderer.domElement );
+//             })
+//             .delay(1000)
+//             .start();
+//     });
+// });
+
+
+
+// function onPointerMove( event ) {
+//     pointer.set((event.clientX / renderer.domElement.clientWidth) * 2 - 1, -(event.clientY / renderer.domElement.clientHeight) * 2 + 1);
+//     raycaster.setFromCamera(pointer, camera);
+//     // const intersects = raycaster.intersectObjects(rayMeshes, false);
+//     // const intersects = raycaster.intersectObjects(group);
+
+//     // if (intersects.length > 0) {
+//     //     // intersects[0].object.parent;
+//     //     new TWEEN.Tween(intersects[0].object.parent)
+//     //         .to( {x: 0, y: 0, z: 0} , 1000)
+//     //         .easing(TWEEN.Easing.Quadratic.InOut)
+//     //         .onStart(() => controls.enabled = false)
+//     //         .onComplete(() => controls.enabled = true)
+//     //         .start();
+//     // }
+// }
+
+// function onPointerClick( event ) {
+//     pointer.set((event.clientX / renderer.domElement.clientWidth) * 2 - 1, -(event.clientY / renderer.domElement.clientHeight) * 2 + 1);
+//     raycaster.setFromCamera(pointer, camera);
+//     // const intersects = raycaster.intersectObjects(rayMeshes, false);
+//     const intersects = raycaster.intersectObjects(group);
+
+//     if (intersects.length > 0) {
+//         new TWEEN.Tween(controls.camera.position)
+//             .to( {x: 0, y: 0, z: 0} , 1000)
+//             .easing(TWEEN.Easing.Quadratic.InOut)
+//             .onStart(() => controls.enabled = false)
+//             .onComplete(() => controls.enabled = true)
+//             .start();
+//         new TWEEN.Tween(controls.camera.rotation)
+//             .to( {x: 0, y: 0, z: 0} , 1000)
+//             .easing(TWEEN.Easing.Quadratic.InOut)
+//             .onStart(() => controls.enabled = false)
+//             .onComplete(() => controls.enabled = true)
+//             .start();
+//     }
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // //          :REFERENCE
+    // await new THREE.TextureLoader().loadAsync( '../img/texture/reference.webp').then((loadedTexture) => {
+    //     const aspectRatio = loadedTexture.image.width / loadedTexture.image.height;
+    //     let mesh = new THREE.Mesh(
+    //         new THREE.PlaneGeometry( 2.5, 2.5),
+    //         new THREE.MeshLambertMaterial({
+    //             map: loadedTexture,
+    //             side: THREE.DoubleSide
+    //         })
+    //     );
+    //     mesh.scale.set(aspectRatio, 1, 1);
+    //     let group = new THREE.Group().add(mesh);
+    //     models.push(group);
+    // });
+
+    // //          :SCULPT
+    // let groupSculpt = new THREE.Group();
+    // let sculpt = models[0];
+    // sculpt.material = new THREE.MeshMatcapMaterial({
+    //     color: new THREE.Color().setHex(0xb0b0b0),
+    //     matcap: textureMatcap,
+    //     normalMap: textureNormalHP,
+    //     side: THREE.DoubleSide
+    // });
+    // groupSculpt.add(sculpt);
+    // group.push(groupSculpt);
+    // // await new GLTFLoader().loadAsync( '../models/bust-sculpt.glb').then((gltf) => {
+    // //     const model = gltf.scene.children[0];
+    // //     let textureMatcap = new THREE.TextureLoader().load( '../img/texture/texture__matcap.webp' );
+    // //     textureMatcap.encoding = THREE.SRGBColorSpace;
+    // //     let textureNormal = new THREE.TextureLoader().load( '../img/texture/texture__norm-sculpt.webp' );
+    // //     textureNormal.flipY = false;
+    // //     model.material = new THREE.MeshMatcapMaterial({
+    // //         color: new THREE.Color().setHex(0xb0b0b0),
+    // //         matcap: textureMatcap,
+    // //         normalMap: textureNormal,
+    // //         side: THREE.DoubleSide
+    // //     });
+    // //     models.push(gltf.scene);
+    // // });
+
+    // //          :TOPOLOGY
+    // let groupTopo = new THREE.Group();
+    // let modelTopo = models[1];
+    // modelTopo.material = new THREE.MeshLambertMaterial({ normalMap: textureNormalLP, side: THREE.DoubleSide });
+    // groupTopo.add(modelTopo);
+
+    // let lineTopo = models[2];
+    // groupTopo.add(lineTopo);
+
+    // group.push(groupTopo);
+
+    // // await new GLTFLoader().loadAsync( '../models/bust-topo.glb').then((gltf) => {
+    // //     const model = gltf.scene.children[0];
+    // //     let textureNormal = new THREE.TextureLoader().load( '../img/texture/texture__norm.webp' );
+    // //     textureNormal.flipY = false;
+    // //     model.material = new THREE.MeshLambertMaterial({ normalMap: textureNormal, side: THREE.DoubleSide });
+
+    // //     let group = new THREE.Group();
+    // //     group.add(model);
+    // //     group.add(lineSegm[0]);
+
+    // //     models.push(group);
+    // // });
+
+    // //          :UNWRAP
+    // let groupUnwrap = new THREE.Group();
+    // let modelUnwrap = models[1];
+    // modelUnwrap.material = new THREE.MeshLambertMaterial({
+    //     map: textureUvGrid,
+    //     side: THREE.DoubleSide
+    // });
+    // groupUnwrap.add(modelUnwrap);
+
+    // let lineUnwrap = models[3];
+    // lineUnwrap.material = new THREE.LineBasicMaterial({
+    //     color: 0xffff00,
+    //     linewidth: 1,
+    // });
+    // groupUnwrap.add(lineUnwrap);
+
+    // group.push(groupUnwrap);
+
+    // // await new GLTFLoader().loadAsync( '../models/bust-uv.glb').then((gltf) => {
+    // //     const model = gltf.scene.children[0];
+    // //     let textureTopo = new THREE.TextureLoader().load( '../img/texture/texture__uv-grid.webp' );
+    // //     textureTopo.flipY = false;
+    // //     textureTopo.colorSpace = THREE.SRGBColorSpace;
+    // //     model.material = new THREE.MeshLambertMaterial({
+    // //         map: textureTopo,
+    // //         side: THREE.DoubleSide
+    // //     });
+
+    // //     const model2 = gltf.scene.children[1];
+    // //     model2.material = new THREE.LineBasicMaterial({
+    // //         color: 0xffff00,
+    // //         linewidth: 1,
+    // //     });
+
+    // //     models.push(gltf.scene);
+    // // });
+
+    // //          :BAKING
+    // let groupBake = new THREE.Group();
+    // let modelBake = models[1];
+    // modelBake.material = new THREE.MeshLambertMaterial({
+    //     map: textureNormalLP,
+    //     side: THREE.DoubleSide
+    // });
+    // groupBake.add(modelBake);
+
+    // let lineBake = models[2];
+    // groupBake.add(lineBake);
+
+    // group.push(groupBake);
+
+    // // await new GLTFLoader().loadAsync( '../models/bust-bake.glb').then((gltf) => {
+    // //     const model = gltf.scene.children[1];
+    // //     let textureNormal = new THREE.TextureLoader().load( '../img/texture/texture__norm.webp' );
+    // //     textureNormal.flipY = false;
+    // //     textureNormal.colorSpace = THREE.SRGBColorSpace;
+    // //     model.material = new THREE.MeshLambertMaterial({
+    // //         map: textureNormal,
+    // //         side: THREE.DoubleSide
+    // //     });
+
+    // //     const model2 = gltf.scene.children[0];
+    // //     model2.material.transparent = true;
+    // //     model2.material.opacity = 0.2;
+
+    // //     models.push(gltf.scene);
+    // // });
+
+    // //          :PAINT
+    // let groupPaint = new THREE.Group();
+    // let modelPaint = models[1];
+    // modelPaint.material = new THREE.MeshLambertMaterial({
+    //     // map: texturePaint,
+    //     normalMap: textureNormalLP,
+    //     normalMapType: THREE.ObjectSpaceNormalMap,
+    //     side: THREE.DoubleSide
+    // });
+    // groupPaint.add(modelPaint);
+
+    // group.push(groupPaint);
+
+    // // await new GLTFLoader().loadAsync( '../models/bust-paint.glb').then((gltf) => {
+    // //     const model = gltf.scene.children[0];
+    // //     let texturePaint = new THREE.TextureLoader().load( '../img/texture/texture__paint.webp' );
+    // //     texturePaint.flipY = false;
+    // //     let textureNormal = new THREE.TextureLoader().load( '../img/texture/texture__norm.webp' );
+    // //     textureNormal.flipY = false;
+    // //     model.material = new THREE.MeshLambertMaterial({
+    // //         // map: texturePaint,
+    // //         normalMap: textureNormal,
+    // //         normalMapType: THREE.ObjectSpaceNormalMap,
+    // //         side: THREE.DoubleSide
+    // //     });
+    // //     models.push(gltf.scene);
+    // // });
+
+    // //          :RIGGING & SKINNING
+    // let groupRS = new THREE.Group();
+    // let modelRS = models[1];
+    // modelRS.material = new THREE.MeshLambertMaterial({
+    //         map: textureWeight,
+    //         normalMap: textureNormalLP,
+    //         normalMapType: THREE.ObjectSpaceNormalMap,
+    //         side: THREE.DoubleSide
+    //     });
+    // groupRS.add(modelRS);
+
+    // let lineRS = models[4];
+    // groupRS.add(lineRS);
+
+    // group.push(groupRS);
+
+    // // await new GLTFLoader().loadAsync( '../models/bust-rig.glb').then((gltf) => {
+    // //     const model = gltf.scene.children[1];
+    // //     let textureNormal = new THREE.TextureLoader().load( '../img/texture/texture__norm.webp' );
+    // //     textureNormal.flipY = false;
+    // //     let textureWeight = new THREE.TextureLoader().load( '../img/texture/texture__weight.webp' );
+    // //     textureWeight.flipY = false;
+    // //     model.material = new THREE.MeshLambertMaterial({
+    // //         map: textureWeight,
+    // //         normalMap: textureNormal,
+    // //         normalMapType: THREE.ObjectSpaceNormalMap,
+    // //         side: THREE.DoubleSide
+    // //     });
+
+    // //     const model2 = gltf.scene.children[0];
+    // //     model2.material.transparent = true;
+    // //     model2.material.opacity = 0.4;
+
+    // //     models.push(gltf.scene);
+    // // });
