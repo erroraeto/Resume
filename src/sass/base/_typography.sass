@@ -8,8 +8,8 @@
 h1,
 h2,
 summary
-    font-family: "Cormorant Garamond", serif
-    font-weight: bold
+    // font-family: "Cormorant Garamond", serif
+    // font-weight: bold
 
 h1
     font-size: 7.2rem
@@ -21,6 +21,7 @@ h2
 h3,
 p,
 a,
+summary,
 .radio__item
     font-size: 1.7rem
 
@@ -54,15 +55,21 @@ a:link, a:visited
 
 // Description
 .description__title
-    font-weight: normal
+    // font-weight: normal
     &::after
         font-family: "Cormorant Garamond", serif
         letter-spacing: normal
         font-size: 1.6rem
 
-
 .description__paragraph
     line-height: 1.2em
+
+.description-details__summary
+    font-family: "Quicksand", sans-serif
+    font-size: 2.4rem
+    // font-size: 2.8rem
+    font-weight: lighter
+
 
 // Grid hexagon
 .grid-hexagon__item::before
@@ -78,10 +85,10 @@ a:link, a:visited
     //         // color: #d5d2d3
 
 // List details
-.list-details
+.list-phase
     &__summary
         font-size: 2.5rem
-        font-weight: normal
+        // font-weight: normal
         // font-size: 2.7rem
         // letter-spacing: .08em
         // font-weight: bolder

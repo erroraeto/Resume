@@ -5,16 +5,57 @@
     row-gap: .4rem
     height: max-content
     // filter: url(#filter__inkBleed) drop-shadow(0 0 4px black) drop-shadow(0 0 4px black) drop-shadow(0 0 4px black)
+    &__title
+        &::after
+            content: attr(data-title)
+            vertical-align: text-top
+    &__paragraph
+        display: flex
+        flex-direction: column
+        row-gap: .6rem
+        text-align: justify
+        span
+            display: block
 
-.description__title
-    &::after
-        content: attr(data-title)
-        vertical-align: text-top
-
-.description__paragraph
-    display: flex
-    flex-direction: column
-    row-gap: .6rem
-    text-align: justify
-    span
-        display: block
+.list-phase
+    position: relative
+    vertical-align: top
+    height: max-content
+    width: 100%
+    white-space: nowrap
+    overflow-x: scroll
+    overflow-y: hidden
+    // scroll-snap-type: x mandatory
+    // scroll-behavior: smooth
+    &::-webkit-scrollbar
+        display: none
+    &__details
+        position: relative
+        display: inline-flex
+        flex-direction: column
+        align-items: end
+        overflow: hidden
+        width: 100%
+        vertical-align: top
+        scroll-snap-align: start
+        *
+            text-align: right
+        @media (prefers-reduced-motion: no-preference)
+            interpolate-size: allow-keywords
+        &::details-content
+            opacity: 0
+            block-size: 0
+            width: var(--comp-width)
+            transition: content-visibility 1s allow-discrete, opacity 1s ease, block-size 1s ease
+        &[open]::details-content
+            opacity: 1
+            block-size: auto
+    &__summary
+        cursor: pointer
+        width: max-content
+        &::marker
+            content: ''
+    &__content
+        position: relative
+        white-space: normal
+        width: var(--comp-width)
