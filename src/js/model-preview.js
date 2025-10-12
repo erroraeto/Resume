@@ -1,35 +1,15 @@
 import * as THREE from 'three';
-import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
-import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
-import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
-import { RenderTransitionPass } from 'three/addons/postprocessing/RenderTransitionPass.js';
-import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { Pass } from 'three/addons/postprocessing/Pass.js';
-import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
-import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import * as TWEEN from 'three/addons/libs/tween.module.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
-import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
-import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
-import { TransformControls, TransformControlsGizmo } from 'three/addons/controls/TransformControls.js';
-import { DragControls } from 'three/addons/controls/DragControls.js';
 import Stats from 'three/addons/libs/stats.module.js';
 import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
-import { OBB } from 'three/addons/math/OBB';
-
-
 
 
 let sectionAbout = document.querySelector('.section__about');
 let phaseList = document.querySelector('.section__about .list-phase');
 let phaseListArr = Array.from(phaseList.children);
 
-let camera, scene, raycaster, renderer, control, controls, composer, gimbal, material, stats, groupS;
+let camera, scene, raycaster, renderer, controls, stats, groupS;
 
 const pointer = new THREE.Vector2();
 
@@ -188,11 +168,12 @@ async function init() {
     let modelBake = models[1].clone();
     modelBake.material = new THREE.MeshLambertMaterial({
         map: textureNormalLP,
+        normalMap: textureNormalLP,
         side: THREE.DoubleSide
     });
     groupBake.add(modelBake);
-    let lineBake = models[2].clone();
-    groupBake.add(lineBake);
+    // let lineBake = models[2].clone();
+    // groupBake.add(lineBake);
     group.push(groupBake);
 
 
@@ -200,7 +181,7 @@ async function init() {
     let groupPaint = new THREE.Group();
     let modelPaint = models[1].clone();
     modelPaint.material = new THREE.MeshLambertMaterial({
-        // map: texturePaint,
+        map: texturePaint,
         normalMap: textureNormalLP,
         side: THREE.DoubleSide
     });
@@ -214,7 +195,6 @@ async function init() {
     modelRS.material = new THREE.MeshLambertMaterial({
         map: textureWeight,
         normalMap: textureNormalLP,
-        normalMapType: THREE.ObjectSpaceNormalMap,
         side: THREE.DoubleSide
     });
     groupRS.add(modelRS);
@@ -416,9 +396,9 @@ const observer = new IntersectionObserver( (entries) => {
         if (entry.isIntersecting) {
             phaseList.classList.remove('scroll-snap-type__x-mandatory', 'scroll-behavior__smooth');
             if (entry.target == phaseList.children[0] && entry.isIntersecting) {
-                phaseList.children[phaseListArr.length - 2].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+                phaseList.children[phaseListArr.length - 2].scrollIntoView({ block: 'nearest', inline: 'nearest', container: 'nearest' });
             } else if (entry.target == phaseList.children[phaseListArr.length - 1] && entry.isIntersecting) {
-                phaseList.children[1].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+                phaseList.children[1].scrollIntoView({ block: 'nearest', inline: 'nearest', container: 'nearest' });
             }
             phaseList.classList.add('scroll-snap-type__x-mandatory', 'scroll-behavior__smooth');
         }

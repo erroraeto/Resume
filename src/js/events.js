@@ -4,9 +4,16 @@ function sleep(ms) {
 
 let phaseList = document.querySelector('.section__about .list-phase');
 
+// phaseList.onscroll = (e) => {
+[ 'scroll', 'mousewheel', 'touchmove' ].forEach( event => phaseList.addEventListener( event, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    })
+);
 document.addEventListener('load', () => {
     phaseList.classList.remove('scroll-snap-type__x-mandatory', 'scroll-behavior__smooth');
-    phaseList.children[1].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    phaseList.children[1].scrollIntoView({ block: 'nearest', inline: 'nearest', container: 'nearest' });
     phaseList.classList.add('scroll-snap-type__x-mandatory', 'scroll-behavior__smooth');
 }, true);
 
