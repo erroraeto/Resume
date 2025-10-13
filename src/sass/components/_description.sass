@@ -20,24 +20,22 @@
 .list-phase
     position: relative
     vertical-align: top
-    height: max-content
+    height: 100%
     width: 100%
-    white-space: nowrap
-    overflow-x: scroll
-    overflow-y: hidden
-    // scroll-snap-type: x mandatory
-    // scroll-behavior: smooth
+    overflow: hidden
     &::-webkit-scrollbar
         display: none
     &__details
-        position: relative
+        position: absolute
+        opacity: 0
         display: inline-flex
         flex-direction: column
         align-items: end
         overflow: hidden
         width: 100%
+        padding-inline: 1rem
         vertical-align: top
-        scroll-snap-align: start
+        transition: opacity .25s ease
         *
             text-align: right
         @media (prefers-reduced-motion: no-preference)

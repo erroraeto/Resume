@@ -6,8 +6,7 @@ import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
 
 
 let sectionAbout = document.querySelector('.section__about');
-let phaseList = document.querySelector('.section__about .list-phase');
-let phaseListArr = Array.from(phaseList.children);
+let phaseListArr = Array.from( document.querySelectorAll('.section__about .list-phase .list-phase__details') );
 
 let camera, scene, raycaster, renderer, controls, stats, groupS;
 
@@ -207,8 +206,8 @@ async function init() {
 
     onWindowResize();
     window.addEventListener( 'resize', onWindowResize );
-    renderer.domElement.addEventListener('dblclick', onPointerDblClick );
-    renderer.domElement.addEventListener('pointerdown', onPointerDown, false );
+    sectionAbout.addEventListener('dblclick', onPointerDblClick );
+    sectionAbout.addEventListener('pointerdown', onPointerDown, false );
 
     // CONTROLS
     controls = new ArcballControls( camera, renderer.domElement, scene );
@@ -281,33 +280,25 @@ function onPointerDblClick( event ) {
     if (intersects.length > 0) {
         if (controls.enabled) {
 
-            new TWEEN.Tween(controls.camera.rotation)
-                .to( {x: 0, y: 0, z: 0} , 500)
-                .easing(TWEEN.Easing.Quadratic.InOut)
-                .onStart(() => controls.enabled = false)
-                .onComplete(() => {
-                    group.forEach( gr => gr.visible = true);
-                })
-                .start();
-            new TWEEN.Tween(controls.camera.position)
-                .to( {x: 0, y: 0, z: 0} , 500)
-                .easing(TWEEN.Easing.Quadratic.InOut)
-                .onStart(() => controls.enabled = false)
-                .onComplete(() => {
-                    group.forEach( gr => gr.visible = true);
-                    new TWEEN.Tween(intersects[0].object.parent.scale)
-                        .to( {x: 1, y: 1, z: 1} , 250)
-                        .easing(TWEEN.Easing.Quadratic.InOut)
-                        .onStart(() => controls.enabled = false)
-                        .onComplete(() => {
-                            group.forEach( gr => gr.visible = true);
-                            phaseListArr.forEach( item => item.open = false );
-                        })
-                        .start();
-                })
-                .start();
+            let start = renderer.domElement.animate(
+                { opacity: [1, 0] },
+                { duration: 175, }
+            );
+            start.onfinish = (event) => {
+                controls.enabled = false;
+                controls.camera.rotation.set( 0, 0, 0 );
+                controls.camera.position.set( 0, 0, 0 );
+                intersects[0].object.parent.scale.set( 1, 1, 1 );
+                group.forEach( (gr) => gr.visible = true);
+                phaseListArr.forEach( item => item.open = false );
 
-            renderer.domElement.addEventListener( 'pointerdown', onPointerDown, false );
+                renderer.domElement.animate(
+                    { opacity: [0, 1] },
+                    { duration: 175, }
+                );
+            };
+
+            sectionAbout.addEventListener( 'pointerdown', onPointerDown, false );
         } else {
             new TWEEN.Tween(intersects[0].object.parent.scale)
                 .to( {x: 1.1, y: 1.1, z: 1.1} , 250)
@@ -321,7 +312,7 @@ function onPointerDblClick( event ) {
                 phaseListArr.slice(1, -1)[idx].open = true;
             });
             controls.enabled = true;
-            renderer.domElement.removeEventListener('pointerdown', onPointerDown, false );
+            sectionAbout.removeEventListener('pointerdown', onPointerDown, false );
         }
     }
 };
@@ -334,9 +325,9 @@ function onPointerDown(event) {
     swipeStart = new Date().getTime();
 
     startMousePosition = previousMousePosition = event.clientX * 3;
-    renderer.domElement.addEventListener( 'pointermove', onPointerMove, false );
-    renderer.domElement.addEventListener( 'pointerup', onPointerLeave, false );
-    renderer.domElement.addEventListener( 'pointerout', onPointerLeave, false );
+    sectionAbout.addEventListener( 'pointermove', onPointerMove, false );
+    sectionAbout.addEventListener( 'pointerup', onPointerLeave, false );
+    sectionAbout.addEventListener( 'pointerout', onPointerLeave, false );
 };
 
 function onPointerMove(event) {
@@ -350,39 +341,41 @@ function onPointerMove(event) {
         groupS.rotation.y = step.at(-2);
     };
 
-    phaseList.classList.remove('scroll-snap-type__x-mandatory', 'scroll-behavior__smooth');
-    phaseList.scrollLeft += -deltaMove / 3;
 };
 
 function onPointerLeave(event) {
-    phaseList.classList.add('scroll-snap-type__x-mandatory', 'scroll-behavior__smooth');
+    if (event.relatedTarget && event.relatedTarget.closest('.section__about') && event.pressure != 0) return;
     let setDeg = step.reduce( (prev, curr) => {return (Math.abs(curr - groupS.rotation.y) < Math.abs(prev - groupS.rotation.y) ? curr : prev)});
     let swipeEnd = new Date().getTime();
     let swipeDelay = swipeEnd - swipeStart;
 
     if ( (swipeDelay < 130) && (swipeDelay > 0) ) {
-        phaseList.classList.add('scroll-snap-type__x-mandatory', 'scroll-behavior__smooth');
         if ( (event.clientX * 3) - startMousePosition < -100 ) {
             setDeg = step.reduce( (prev, curr) => { return groupS.rotation.y > prev ? curr : prev });
-            phaseList.scrollLeft += phaseList.clientWidth;
         } else if ( (event.clientX * 3) - startMousePosition > 100 ) {
             setDeg = step.reduceRight( (prev, curr) => { return groupS.rotation.y < prev ? curr : prev });
-            phaseList.scrollLeft += -phaseList.clientWidth;
         }
     };
 
+    phaseListArr.forEach( (it, idx) => {
+        if ( idx == step.findIndex(number => number == setDeg) ) {
+            it.classList.add('visible');
+        } else {
+            it.classList.remove('visible');
+        }
+    });
     new TWEEN.Tween(groupS.rotation)
         .to( {y: setDeg} , 400)
         .easing(TWEEN.Easing.Cubic.Out)
         .start();
 
-    renderer.domElement.removeEventListener( 'pointermove', onPointerMove, false );
-    renderer.domElement.removeEventListener( 'pointerup', onPointerLeave, false );
-    renderer.domElement.removeEventListener( 'pointerout', onPointerLeave, false );
+    sectionAbout.removeEventListener( 'pointermove', onPointerMove, false );
+    sectionAbout.removeEventListener( 'pointerup', onPointerLeave, false );
+    sectionAbout.removeEventListener( 'pointerout', onPointerLeave, false );
 };
 
 let lastTouch;
-renderer.domElement.addEventListener( "touchstart", (ev) => {
+sectionAbout.addEventListener( "touchstart", (ev) => {
     let now = new Date().getTime();
     let touchDelay = now - lastTouch;
     if ( (touchDelay < 180) && (touchDelay > 0) ) {
@@ -391,26 +384,7 @@ renderer.domElement.addEventListener( "touchstart", (ev) => {
     lastTouch = new Date().getTime();
 }, false );
 
-const observer = new IntersectionObserver( (entries) => {
-    entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-            phaseList.classList.remove('scroll-snap-type__x-mandatory', 'scroll-behavior__smooth');
-            if (entry.target == phaseList.children[0] && entry.isIntersecting) {
-                phaseList.children[phaseListArr.length - 2].scrollIntoView({ block: 'nearest', inline: 'nearest', container: 'nearest' });
-            } else if (entry.target == phaseList.children[phaseListArr.length - 1] && entry.isIntersecting) {
-                phaseList.children[1].scrollIntoView({ block: 'nearest', inline: 'nearest', container: 'nearest' });
-            }
-            phaseList.classList.add('scroll-snap-type__x-mandatory', 'scroll-behavior__smooth');
-        }
-    })
-    }, {
-        root: phaseList,
-        threshold: 1.0,
-    }
-);
-
 phaseListArr.forEach((item) => {
-    observer.observe(item)
     item.addEventListener("toggle", (event) => {
         if (event.target.dataset.twin) {
             phaseListArr.filter( item => item.dataset.twin == event.target.dataset.twin).forEach( item => item.open = true);
