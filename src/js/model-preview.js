@@ -1,14 +1,13 @@
 import * as THREE from 'three';
 import * as TWEEN from 'three/addons/libs/tween.module.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import Stats from 'three/addons/libs/stats.module.js';
 import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
 
 
 let sectionAbout = document.querySelector('.section__about');
 let phaseListArr = Array.from( document.querySelectorAll('.section__about .list-phase .list-phase__details') );
 
-let camera, scene, raycaster, renderer, controls, stats, groupS;
+let camera, scene, raycaster, renderer, controls, groupS;
 
 const pointer = new THREE.Vector2();
 
@@ -39,14 +38,6 @@ async function init() {
     renderer.setPixelRatio(devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     sectionAbout.insertAdjacentElement('afterbegin' , renderer.domElement);
-
-    // STATS
-    stats = new Stats();
-    sectionAbout.appendChild(stats.dom);
-
-    // CONTROLS
-    // let controls = new OrbitControls(camera, renderer.domElement);
-    // scene.add(new THREE.GridHelper(10, 10));
 
     // MODEL
     //          :TEXTURES
@@ -238,6 +229,7 @@ function setCircle(arr) {
         // obb.applyMatrix4(arr[idx].matrixWorld);
         // let helper = new THREE.Box3Helper(bbox, new THREE.Color(0, 255, 0));
         // scene.add(helper);
+        arr[idx].scale.set( .9, .9, .9 );
 
         step.push(angle);
         groupS.add(arr[idx]);
@@ -258,12 +250,10 @@ function onWindowResize() {
 
 function animate() {
     TWEEN.update();
-    stats.update();
     renderer.render(scene, camera);
 };
 
 function render() {
-    // stats.update();
     renderer.render( scene, camera );
 }
 
@@ -282,26 +272,26 @@ function onPointerDblClick( event ) {
 
             let start = renderer.domElement.animate(
                 { opacity: [1, 0] },
-                { duration: 175, }
+                { duration: 300, }
             );
+            phaseListArr.forEach( item => item.open = false );
             start.onfinish = (event) => {
                 controls.enabled = false;
                 controls.camera.rotation.set( 0, 0, 0 );
                 controls.camera.position.set( 0, 0, 0 );
-                intersects[0].object.parent.scale.set( 1, 1, 1 );
+                intersects[0].object.parent.scale.set( .9, .9, .9 );
                 group.forEach( (gr) => gr.visible = true);
-                phaseListArr.forEach( item => item.open = false );
 
                 renderer.domElement.animate(
                     { opacity: [0, 1] },
-                    { duration: 175, }
+                    { duration: 300, }
                 );
             };
 
             sectionAbout.addEventListener( 'pointerdown', onPointerDown, false );
         } else {
             new TWEEN.Tween(intersects[0].object.parent.scale)
-                .to( {x: 1.1, y: 1.1, z: 1.1} , 250)
+                .to( {x: 1, y: 1, z: 1} , 250)
                 .easing(TWEEN.Easing.Quadratic.InOut)
                 .onStart(() => controls.enabled = false)
                 .onComplete(() => controls.enabled = true)
@@ -325,9 +315,9 @@ function onPointerDown(event) {
     swipeStart = new Date().getTime();
 
     startMousePosition = previousMousePosition = event.clientX * 3;
-    sectionAbout.addEventListener( 'pointermove', onPointerMove, false );
-    sectionAbout.addEventListener( 'pointerup', onPointerLeave, false );
-    sectionAbout.addEventListener( 'pointerout', onPointerLeave, false );
+    window.addEventListener( 'pointermove', onPointerMove, false );
+    window.addEventListener( 'pointerup', onPointerLeave, false );
+    window.addEventListener( 'pointerout', onPointerLeave, false );
 };
 
 function onPointerMove(event) {
@@ -369,9 +359,9 @@ function onPointerLeave(event) {
         .easing(TWEEN.Easing.Cubic.Out)
         .start();
 
-    sectionAbout.removeEventListener( 'pointermove', onPointerMove, false );
-    sectionAbout.removeEventListener( 'pointerup', onPointerLeave, false );
-    sectionAbout.removeEventListener( 'pointerout', onPointerLeave, false );
+    window.removeEventListener( 'pointermove', onPointerMove, false );
+    window.removeEventListener( 'pointerup', onPointerLeave, false );
+    window.removeEventListener( 'pointerout', onPointerLeave, false );
 };
 
 let lastTouch;
@@ -387,7 +377,7 @@ sectionAbout.addEventListener( "touchstart", (ev) => {
 phaseListArr.forEach((item) => {
     item.addEventListener("toggle", (event) => {
         if (event.target.dataset.twin) {
-            phaseListArr.filter( item => item.dataset.twin == event.target.dataset.twin).forEach( item => item.open = true);
+            phaseListArr.filter( item => item.dataset.twin == event.target.dataset.twin).forEach( item => item.open = event.target.open);
         }
     });
 });

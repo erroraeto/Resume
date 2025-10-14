@@ -1,41 +1,40 @@
 .grid-hexagon
-    place-self: center
+    position: absolute
     display: flex
-    flex-direction: column
-    justify-content: center
-    align-items: center
-    box-sizing: content-box
-    row-gap: 1rem
-    height: max-content
+    height: 100%
     width: 100%
+    overflow: hidden
+    scrollbar-width: none
+    &__wrapper
+        display: flex
+        flex-direction: column
+        justify-content: center
+        align-items: center
+        box-sizing: content-box
+        row-gap: 1rem
+        height: max-content
+        aspect-ratio: 1 / 1
+        margin: 36vh 50vw
+        border-radius: 100rem
+        user-select: none
+        cursor: grab
+        &:active
+            cursor: grabbing
     &__column
         display: flex
-        width: 100%
         justify-content: center
-        column-gap: 1rem
-        &::after,
-        &::before
-            content: ''
-            position: relative
-            width: 14rem
-            height: 8rem
-            padding: 1.4rem
-            border-radius: 1.2rem
-            border: 1px dashed gray
-            mask: linear-gradient(to left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1))
-        &::before
-            mask: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1))
+        column-gap: 2rem
     &__item
         display: flex
         flex-direction: column
         justify-content: center
         align-items: center
         position: relative
-        width: 14rem
+        width: 8rem
         height: 8rem
         padding: 1.4rem
-        border-radius: 1.2rem
-        border: 1px dashed gray
+        border-radius: 100rem
+        border: 2px solid rgba(255, 255, 255, 0.2)
         transition: all .15s ease
         &::before
             content: attr(data-name)
@@ -45,30 +44,23 @@
             opacity: 0
             filter: blur(8px)
             translate: 0 -76%
-            border-radius: 1rem
+            border-radius: 100rem
             box-shadow: rgba(255, 255, 255, .1) 0px 0px 8px inset, rgba(255, 255, 255, .1) 0px 0px 32px inset, rgba(0, 0, 0, 1) 0px 0px 6px
             text-shadow: 0 0 4px black
             background: linear-gradient(transparent, var(--grad-color))
             backdrop-filter: blur(2px)
             transition: all .25s ease-out
-        &:hover::before
-            opacity: 1
-            filter: blur(0px)
-            translate: 0 calc( -100% - 1rem)
-        &:hover img
-            filter: grayscale(0%) brightness(100%) drop-shadow(0 0 20px #000000b4)
-        &:hover &-bg
-            opacity: .7
         img
-            height: 100%
+            height: 75%
             flex-basis: 85%
             filter: grayscale(100%) brightness(1000%) drop-shadow(0 0 0px #000000b4)
+            pointer-events: none
             transition: all .15s ease
         &-bg
             position: absolute
             height: 100%
             width: 100%
-            border-radius: 1.2rem
+            border-radius: 100rem
             overflow: hidden
             opacity: 0
             transition: all .15s ease
@@ -83,3 +75,124 @@
                 background-size: 100% 100%
                 filter: blur(40px) saturate(50%) url(#filter__noise)
                 transition: all .15s ease
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// .grid-hexagon
+//     place-self: center
+//     display: flex
+//     flex-direction: column
+//     justify-content: center
+//     align-items: center
+//     box-sizing: content-box
+//     row-gap: 1rem
+//     height: max-content
+//     width: 100%
+//     &__column
+//         display: flex
+//         width: 100%
+//         justify-content: center
+//         column-gap: 1rem
+//         &::after,
+//         &::before
+//             content: ''
+//             position: relative
+//             width: 14rem
+//             height: 8rem
+//             padding: 1.4rem
+//             border-radius: 1.2rem
+//             border: 1px dashed gray
+//             mask: linear-gradient(to left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1))
+//         &::before
+//             mask: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1))
+//     &__item
+//         display: flex
+//         flex-direction: column
+//         justify-content: center
+//         align-items: center
+//         position: relative
+//         width: 14rem
+//         height: 8rem
+//         padding: 1.4rem
+//         border-radius: 1.2rem
+//         border: 1px dashed gray
+//         transition: all .15s ease
+//         &::before
+//             content: attr(data-name)
+//             position: absolute
+//             padding: .5rem 1rem
+//             top: 0
+//             opacity: 0
+//             filter: blur(8px)
+//             translate: 0 -76%
+//             border-radius: 1rem
+//             box-shadow: rgba(255, 255, 255, .1) 0px 0px 8px inset, rgba(255, 255, 255, .1) 0px 0px 32px inset, rgba(0, 0, 0, 1) 0px 0px 6px
+//             text-shadow: 0 0 4px black
+//             background: linear-gradient(transparent, var(--grad-color))
+//             backdrop-filter: blur(2px)
+//             transition: all .25s ease-out
+//         &:hover::before
+//             opacity: 1
+//             filter: blur(0px)
+//             translate: 0 calc( -100% - 1rem)
+//         &:hover img
+//             filter: grayscale(0%) brightness(100%) drop-shadow(0 0 20px #000000b4)
+//         &:hover &-bg
+//             opacity: .7
+//         img
+//             height: 100%
+//             flex-basis: 85%
+//             filter: grayscale(100%) brightness(1000%) drop-shadow(0 0 0px #000000b4)
+//             transition: all .15s ease
+//         &-bg
+//             position: absolute
+//             height: 100%
+//             width: 100%
+//             border-radius: 1.2rem
+//             overflow: hidden
+//             opacity: 0
+//             transition: all .15s ease
+//             z-index: -1
+//             &::before
+//                 content: ''
+//                 position: absolute
+//                 height: 100%
+//                 width: 100%
+//                 inset: 0
+//                 background-image: var(--src-img)
+//                 background-size: 100% 100%
+//                 filter: blur(40px) saturate(50%) url(#filter__noise)
+//                 transition: all .15s ease

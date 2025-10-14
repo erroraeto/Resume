@@ -1,0 +1,38 @@
+.list-phase
+    position: relative
+    vertical-align: top
+    height: 100%
+    width: 100%
+    &::-webkit-scrollbar
+        display: none
+    &__details
+        position: absolute
+        opacity: 0
+        display: inline-flex
+        flex-direction: column
+        align-items: end
+        width: 100%
+        padding-inline: 1rem
+        vertical-align: top
+        transition: opacity .25s ease
+        *
+            text-align: right
+        @media (prefers-reduced-motion: no-preference)
+            interpolate-size: allow-keywords
+        &::details-content
+            opacity: 0
+            block-size: 0
+            width: var(--comp-width)
+            transition: content-visibility .6s allow-discrete, opacity .6s ease, block-size .6s ease
+        &[open]::details-content
+            opacity: 1
+            block-size: auto
+    &__summary
+        cursor: pointer
+        width: max-content
+        &::marker
+            content: ''
+    &__content
+        position: relative
+        white-space: normal
+        width: var(--comp-width)

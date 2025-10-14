@@ -6,5 +6,10 @@
 html
     color-scheme: dark
     font-size: 62.5%
-    &::-webkit-scrollbar
-        display: none
+    scrollbar-width: none
+    @include respond(tab-land)
+        font-size: 50%
+    @include respond(tab-port)
+        font-size: 45%
+    @include respond(phone)
+        font-size: 42%

@@ -1,13 +1,27 @@
 .section__soft-skills
-    grid-area: 3 / 1 / 4 / 2
-    // display: none
+    display: flex
+    gap: 3rem
+    @include respond(tab-land)
+        flex-direction: column-reverse
     .description
-        grid-area: 2 / 7 / -2 / -2
         align-items: end
         align-self: start
         &,
         .description__paragraph
             text-align: right
+        @include respond(tab-land)
+            align-self: center
+            align-items: center
+            &,
+            .description__paragraph
+                text-align: center
     .list-details
-        grid-area: 2 / 2 / -2 / -4
         align-self: anchor-center
+        @include respond(phone)
+            flex-direction: column
+            details
+                flex-direction: column
+                writing-mode: unset
+                summary,
+                p
+                    writing-mode: unset
