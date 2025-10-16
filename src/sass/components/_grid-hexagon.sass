@@ -1,21 +1,27 @@
 .grid-hexagon
-    position: absolute
-    display: flex
+    position: relative
     height: 100%
-    width: 100%
+    aspect-ratio: 1 / 1
     overflow: hidden
-    scrollbar-width: none
+    // scrollbar-width: none
+    border: 1px solid white
+    border-radius: 100rem
     &__wrapper
+        position: relative
         display: flex
         flex-direction: column
         justify-content: center
         align-items: center
         box-sizing: content-box
-        row-gap: 1rem
+        // row-gap: 1rem
         height: max-content
+        width: max-content
+        // height: 50%
+        // width: 50%
+        row-gap: 1rem
         aspect-ratio: 1 / 1
-        margin: 36vh 50vw
         border-radius: 100rem
+        border: 1px solid white
         user-select: none
         cursor: grab
         &:active
@@ -35,7 +41,7 @@
         padding: 1.4rem
         border-radius: 100rem
         border: 2px solid rgba(255, 255, 255, 0.2)
-        transition: all .15s ease
+        transition: all .15s ease, scale .25s ease
         &::before
             content: attr(data-name)
             position: absolute
@@ -75,12 +81,37 @@
                 background-size: 100% 100%
                 filter: blur(40px) saturate(50%) url(#filter__noise)
                 transition: all .15s ease
+    &__detecter
+        position: fixed
+        display: flex
+        justify-content: center
+        align-items: center
+        height: max-content
+        aspect-ratio: 1 / 1
+        left: 50%
+        top: 50%
+        translate: -50% -50%
+        border: 1px solid white
+        border-radius: 100rem
+        &-target
+            height: 10%
+            aspect-ratio: 1 / 1
+            margin: 10rem
+            border: 1px solid white
+            border-radius: 100rem
 
 
 
 
-
-
+.hover
+    &::before
+        opacity: 1
+        filter: blur(0px)
+        translate: 0 calc( -100% - 1rem)
+    img
+        filter: grayscale(0%) brightness(100%) drop-shadow(0 0 20px #000000b4)
+    div
+        opacity: .7
 
 
 

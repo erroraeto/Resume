@@ -115,27 +115,46 @@ let gridHexWrapp = document.querySelector('.grid-hexagon__wrapper');
 let gridHexItem = document.querySelectorAll('.grid-hexagon__item');
 
 window.onload = () => {
-    gridHex.firstChild.scrollIntoView({ block: "center", inline: "center", container: "nearest" });
-    const relativePosition = getPositionRelativeToParent(gridHexWrapp);
-    console.log('Position relative to parent:', relativePosition);
+
+
+    // GRID HEXAGONE
+    circleRadius = gridHex.clientWidth / 2 - gridHexWrapp.clientWidth / 2;
+    circleCenter = {
+        x: circleRadius,
+        y: circleRadius,
+    };
+    gridHexWrapp.style.margin = circleRadius * 2 + 'px';
+    gridHexWrapp.scrollIntoView({ block: "center", inline: "center", container: "nearest" });
+
+
 };
 
+// GRID HEXAGONE DRAGG
 let isDown = false,
     startX,
-    scrollLeft,
     startY,
-    scrollTop;
+    circleRadius,
+    circleCenter = {};
+
+
+let initialMouseX, initialMouseY;
+let initialElementX, initialElementY;
 
 gridHexWrapp.addEventListener('mousedown', (e) => {
     document.body.style = 'user-select: none';
+    let dragBox = gridHexWrapp.getBoundingClientRect();
 
     isDown = true;
-    startX = e.pageX - gridHex.offsetLeft;
-    scrollLeft = gridHex.scrollLeft;
-    startY = e.pageY - gridHex.offsetTop;
-    scrollTop = gridHex.scrollTop;
+    // initialMouseX = e.pageX - gridHex.offsetLeft;
+    // initialMouseY = e.pageY - gridHex.offsetTop;
+    initialMouseX = e.layerX;
+    initialMouseY = e.layerY;
+    initialElementX = dragBox.left - gridHex.offsetLeft;
+    initialElementY = dragBox.top - gridHex.offsetTop;
+
     window.addEventListener('mousemove', onMoveGridHex);
     ['mouseup', 'mouseleave'].forEach( ev => window.addEventListener( ev , onLeaveGridHex) );
+
 });
 
 function onMoveGridHex(e) {
@@ -143,67 +162,60 @@ function onMoveGridHex(e) {
     e.preventDefault();
     document.body.style = '';
 
-    const x = e.pageX - gridHex.offsetLeft;
-    const walkX = (x - startX);
-    gridHex.scrollLeft = scrollLeft - walkX;
-    const y = e.pageY - gridHex.offsetTop;
-    const walkY = (y - startY);
-    gridHex.scrollTop = scrollTop - walkY;
+    // const x = e.pageX - gridHex.offsetLeft;
+    // const y = e.pageY - gridHex.offsetTop;
+    const x = e.layerX;
+    const y = e.layerY;
+    
+    const dx = x - initialMouseX;
+    const dy = y - initialMouseY;
 
-    getPositionRelativeToParent(gridHexWrapp);
+    let newX = initialElementX - dx;
+    let newY = initialElementY - dy;
+
+    const distanceFromCenter = Math.sqrt(
+        Math.pow(newX - circleCenter.x, 2) + Math.pow(newY - circleCenter.y, 2)
+    );
+
+    if (distanceFromCenter > circleRadius) {
+        const angle = Math.atan2(newY - circleCenter.y, newX - circleCenter.x);
+        newX = circleCenter.x + circleRadius * Math.cos(angle);
+        newY = circleCenter.y + circleRadius * Math.sin(angle);
+    }
+
+    gridHex.scrollTo( newX, newY );
+
 };
 
-function onLeaveGridHex(event) {
+function onLeaveGridHex(e) {
     isDown = false;
 
     window.removeEventListener('mousemove', onMoveGridHex);
     gridHex.firstChild.scrollIntoView({ behavior: "smooth", block: "center", inline: "center", container: "nearest" })
 
-    getPositionRelativeToParent(gridHexWrapp);
 };
 
+// GRID HEXAGONE SCALLABLE
+const observer = new IntersectionObserver( (entries) => {
+    entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+            if (entry.intersectionRatio > 0.95) {
+                entry.target.style.scale = `1`;
+                entry.target.classList.add('hover')
+            } else {
+                entry.target.style.scale = `0.5`;
+                entry.target.classList.remove('hover')
+            }
+        } else {
+            entry.target.style.scale = `0.1`;
+        }
+    })
+}, {
+    root: gridHex,
+    rootMargin: '-37%',
+    threshold: [0.0, 0.25, 0.5, 0.75, 1],
+});
 
-
-
-
-
-
-
-
-function getPositionRelativeToParent(element) {
-    const parent = element.parentElement;
-    const parentRect = parent.getBoundingClientRect();
-    const elementRect = element.getBoundingClientRect();
-
-    let left = ( elementRect.left + (elementRect.width / 2) ),
-        top = ( elementRect.top + (elementRect.height / 2) ),
-        pLeft = ( parentRect.width / 2 ),
-        pTop = ( parentRect.height / 2 );
-
-    let X = Math.abs( (pLeft - left) );
-    X = Math.abs( X * 1 / (pLeft - elementRect.width / 2) );
-
-    let Y = Math.abs( (pTop - top) );
-    Y = Math.abs( X * 1 / (pTop - elementRect.height / 2) );
-
-    let XYbigg = Math.abs(1 - Math.max( X, Y ));
-
-    element.style = `--scale: ${ XYbigg };`
-    // element.style = `--scaleX: ${ 1 - Math.abs(pLeft - left) }; --scaleY: ${ 1 - Math.abs(pTop - top) };`
-    // element.style = `scale: ${pLeft - left}px ${pTop - top}px`
-
-    console.log(X);
-    return {
-        // left: ( elementRect.left + (elementRect.width / 2) ),
-        // top: ( elementRect.top + (elementRect.height / 2) ),
-        // pLeft: ( parentRect.width / 2 ),
-        // pTop: ( parentRect.height / 2 ),
-        // onCenterX: ( pLeft - left ),
-        // onCenterY: ( pTop - top ),
-        X
-    };
-};
-
-// Usage with nested elements
-// const relativePosition = getPositionRelativeToParent(gridHexWrapp);
-// console.log('Position relative to parent:', relativePosition);
+gridHexItem.forEach((item) => {
+    observer.observe(item);
+});
