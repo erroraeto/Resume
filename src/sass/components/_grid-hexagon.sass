@@ -6,6 +6,19 @@
     // scrollbar-width: none
     border: 1px solid white
     border-radius: 100rem
+    // &::before
+    //     content: ''
+    //     // display: block
+    //     position: absolute
+    //     left: 50%
+    //     top: 50%
+    //     // height: 1rem
+    //     width: 12%
+    //     aspect-ratio: 1/1
+    //     translate: -50% -50%
+    //     border-radius: 100rem
+    //     border: 2px solid rgba(255, 255, 255, 0.2)
+    //     box-shadow: rgba(255, 255, 255, .1) 0px 0px 8px inset, rgba(255, 255, 255, .1) 0px 0px 32px inset, rgba(0, 0, 0, 1) 0px 0px 6px
     &__wrapper
         position: relative
         display: flex
@@ -81,24 +94,6 @@
                 background-size: 100% 100%
                 filter: blur(40px) saturate(50%) url(#filter__noise)
                 transition: all .15s ease
-    &__detecter
-        position: fixed
-        display: flex
-        justify-content: center
-        align-items: center
-        height: max-content
-        aspect-ratio: 1 / 1
-        left: 50%
-        top: 50%
-        translate: -50% -50%
-        border: 1px solid white
-        border-radius: 100rem
-        &-target
-            height: 10%
-            aspect-ratio: 1 / 1
-            margin: 10rem
-            border: 1px solid white
-            border-radius: 100rem
 
 
 

@@ -134,21 +134,22 @@ let isDown = false,
     startX,
     startY,
     circleRadius,
-    circleCenter = {};
-
-
-let initialMouseX, initialMouseY;
-let initialElementX, initialElementY;
+    circleCenter = {},
+    initialMouseX,
+    initialMouseY,
+    initialElementX,
+    initialElementY;
 
 gridHexWrapp.addEventListener('mousedown', (e) => {
     document.body.style = 'user-select: none';
-    let dragBox = gridHexWrapp.getBoundingClientRect();
+    let dragBox = {
+        left: gridHex.offsetLeft + gridHexWrapp.offsetLeft - gridHex.scrollLeft,
+        top: gridHex.offsetTop + gridHexWrapp.offsetTop - gridHex.scrollTop,
+    };
 
     isDown = true;
-    // initialMouseX = e.pageX - gridHex.offsetLeft;
-    // initialMouseY = e.pageY - gridHex.offsetTop;
-    initialMouseX = e.layerX;
-    initialMouseY = e.layerY;
+    initialMouseX = e.pageX - gridHex.offsetLeft;
+    initialMouseY = e.pageY - gridHex.offsetTop;
     initialElementX = dragBox.left - gridHex.offsetLeft;
     initialElementY = dragBox.top - gridHex.offsetTop;
 
@@ -162,10 +163,8 @@ function onMoveGridHex(e) {
     e.preventDefault();
     document.body.style = '';
 
-    // const x = e.pageX - gridHex.offsetLeft;
-    // const y = e.pageY - gridHex.offsetTop;
-    const x = e.layerX;
-    const y = e.layerY;
+    const x = e.pageX - gridHex.offsetLeft;
+    const y = e.pageY - gridHex.offsetTop;
     
     const dx = x - initialMouseX;
     const dy = y - initialMouseY;
@@ -191,7 +190,7 @@ function onLeaveGridHex(e) {
     isDown = false;
 
     window.removeEventListener('mousemove', onMoveGridHex);
-    gridHex.firstChild.scrollIntoView({ behavior: "smooth", block: "center", inline: "center", container: "nearest" })
+    gridHexWrapp.scrollIntoView({ behavior: "smooth", block: "center", inline: "center", container: "nearest" })
 
 };
 
