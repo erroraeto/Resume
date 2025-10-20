@@ -24,43 +24,63 @@
 
 
 
-#c
+#c,
+#content
+    grid-area: 1 / 1 / -1 / -1
+    place-self: center
     position: absolute
-    left: 0
     height: 100%
-    width: 100%
+    width: calc(100% + 14rem)
 
 #content
+    grid-area: 1 / 1 / -1 / -1
+    place-self: center
     position: absolute
     height: 100%
-    width: 100%
-    top: 0
+    width: calc(100% + 14rem)
+    padding-block: 3rem
     z-index: 1
     white-space: nowrap
-    // overflow-x: scroll
     overflow-x: scroll
-    // scroll-snap-type: x mandatory
+    overflow-y: hidden
     scrollbar-width: none
 
 .list-item
-    // position: relative
+    position: relative
     display: inline-block
     height: 100%
-    width: 50%
-    scroll-snap-align: center
+    // width: 50%
+    aspect-ratio: 1/1
+    margin-inline: 8rem
+    overflow: hidden
+    border-radius: 2rem
+    border: 1px solid white
+    // background: #75757588
+    // &::before
+    //     content: ''
+    //     position: absolute
+    //     left: 0
+    //     top: 0
+    //     height: 100%
+    //     width: 100%
+    //     background: #75757588
+    //     z-index: -2
 
 .list-item > div:nth-child(1)
     height: 100%
     width: 100%
+    z-index: 2
 
 .list-item > div:nth-child(2)
     position: absolute
-    // left: 0
+    left: 0
     top: 0
+    // height: 100%
+    // width: 100%
     color: #888
     font-size: 2rem
-    width: 200px
-    margin-top: 0.5em
+    // background: #75757588
+    // z-index: -2
 
 
 

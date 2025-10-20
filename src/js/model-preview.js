@@ -1043,7 +1043,6 @@ function animate() {
 
     renderer.setScissorTest( false );
     renderer.clear();
-
     renderer.setScissorTest( true );
 
     scenes.forEach( function ( scene ) {
@@ -1051,20 +1050,14 @@ function animate() {
         // get the element that is a place holder for where we want to
         // draw the scene
         const element = scene.userData.element;
+        const elementCont = element.offsetParent;
 
         // get its position relative to the page's viewport
-        // const rect = element.getBoundingClientRect();
-        // const rect = {
-        //     left: element.offsetLeft,
-        //     top: element.offsetTop,
-        //     right: element.offsetLeft + element.clientWidth,
-        //     bottom: element.offsetTop + element.clientHeight,
-        // };
         const rect = {
-            left: element.offsetLeft - element.offsetParent.scrollLeft,
-            top: element.offsetTop - element.offsetParent.scrollTop,
-            right: element.offsetLeft + element.clientWidth - element.offsetParent.scrollLeft,
-            bottom: element.offsetTop + element.clientHeight - element.offsetParent.scrollTop,
+            left: elementCont.offsetLeft - content.scrollLeft,
+            top: elementCont.offsetTop - content.scrollTop,
+            right: elementCont.offsetLeft + elementCont.clientWidth - content.scrollLeft,
+            bottom: elementCont.offsetTop + elementCont.clientHeight - content.scrollTop,
         };
 
         // check if it's offscreen. If so skip it
@@ -1118,6 +1111,7 @@ content.addEventListener('scroll', (e) => {
 
     scrollLast = e.target.scrollLeft;
 });
+
 
 
 
