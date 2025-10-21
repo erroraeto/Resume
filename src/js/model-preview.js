@@ -671,7 +671,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 
 let sectionAbout = document.querySelector('.section__about');
-let phaseListArr = Array.from( document.querySelectorAll('.section__about .list-phase .list-phase__details') );
+let progressiveBlur = document.querySelector('.progressive-blur');
 
 let canvas, renderer;
 
@@ -679,19 +679,30 @@ const scenes = [];
 const models = [];
 const texture = [];
 const group = [];
+const title = [
+    'CONCEPT DESIGN',
+    'SCULPTING',
+    'RETOPOLOGY',
+    'UNWRAP',
+    'BAKING',
+    'TEXTURING',
+    'RIGGING & SKINNING',
+];
+const description = [
+    "- is an early phase of the design process, in which the broad outlines of function and form of something are articulated.",
+    "- manipulate a digital object as if it were made of a real-life substance such as clay.",
+    "- is the process of creating a new, cleaner polygonal mesh for a 3D model while preserving its original shape.",
+    "- projecting a 3D model's surface to a 2D image for texture mapping.",
+    "- is the process of saving complex details, like lighting, shadows, and surface irregularities, from a high-polygon model or scene into a flat, 2D texture map.",
+    "- is the process of applying images or other data (textures) to a 3D model to give it a realistic appearance, color, and other surface properties.",
+    "- rigging is creating a virtual skeleton (a rig) for a 3D model, while skinning is the process of binding the 3D model's surface (the 'skin') to that skeleton.",
+];
 
 init();
 
 async function init() {
 
     canvas = document.getElementById( 'c' );
-
-    const geometries = [
-        new THREE.BoxGeometry( 1, 1, 1 ),
-        new THREE.SphereGeometry( 0.5, 12, 8 ),
-        new THREE.DodecahedronGeometry( 0.5 ),
-        new THREE.CylinderGeometry( 0.5, 0.5, 1, 12 )
-    ];
 
     const content = document.getElementById( 'content' );
 
@@ -768,19 +779,19 @@ async function init() {
 
     // GROUP
     //      :DUPLICATE!!! RIGGING & SKINNING
-    (function() {
-        let groupRS = new THREE.Group();
-        let modelRS = models[1].clone();
-        modelRS.material = new THREE.MeshLambertMaterial({
-            map: texture[6],
-            normalMap: texture[2],
-            side: THREE.DoubleSide
-        });
-        groupRS.add(modelRS);
-        let lineRS = models[4].clone();
-        groupRS.add(lineRS);
-        group.push(groupRS);
-    })();
+    // (function() {
+    //     let groupRS = new THREE.Group();
+    //     let modelRS = models[1].clone();
+    //     modelRS.material = new THREE.MeshLambertMaterial({
+    //         map: texture[6],
+    //         normalMap: texture[2],
+    //         side: THREE.DoubleSide
+    //     });
+    //     groupRS.add(modelRS);
+    //     let lineRS = models[4].clone();
+    //     groupRS.add(lineRS);
+    //     group.push(groupRS);
+    // })();
     //      :REFERENCE
     (function() {
         let groupRef = new THREE.Group();
@@ -875,91 +886,25 @@ async function init() {
         group.push(groupRS);
     })();
     //      :DUPLICATE!!! REFERENCE
-    (function() {
-        let groupRef = new THREE.Group();
-        const aspectRatio = texture[0].image.width / texture[0].image.height;
-        let mesh = new THREE.Mesh(
-        new THREE.PlaneGeometry( 2.5, 2.5),
-        new THREE.MeshLambertMaterial({
-            map: texture[0],
-            side: THREE.DoubleSide
-        })
-        );
-        mesh.scale.set(aspectRatio, 1, 1);
-        groupRef.add(mesh);
-        group.push(groupRef);
-    })();
+    // (function() {
+    //     let groupRef = new THREE.Group();
+    //     const aspectRatio = texture[0].image.width / texture[0].image.height;
+    //     let mesh = new THREE.Mesh(
+    //     new THREE.PlaneGeometry( 2.5, 2.5),
+    //     new THREE.MeshLambertMaterial({
+    //         map: texture[0],
+    //         side: THREE.DoubleSide
+    //     })
+    //     );
+    //     mesh.scale.set(aspectRatio, 1, 1);
+    //     groupRef.add(mesh);
+    //     group.push(groupRef);
+    // })();
 
-    // for ( let i = 0; i < 7; i ++ ) {
-
-    //     const scene = new THREE.Scene();
-
-    //     // make a list item
-    //     const element = document.createElement( 'div' );
-    //     element.className = 'list-item';
-
-    //     const sceneElement = document.createElement( 'div' );
-    //     element.appendChild( sceneElement );
-
-    //     const descriptionElement = document.createElement( 'div' );
-    //     descriptionElement.innerText = 'Scene ' + ( i + 1 );
-    //     element.appendChild( descriptionElement );
-
-    //     // the element that represents the area we want to render the scene
-    //     scene.userData.element = sceneElement;
-    //     content.appendChild( element );
-
-    //     const camera = new THREE.PerspectiveCamera( 50, 1, 1, 10 );
-    //     camera.position.z = 2;
-    //     scene.userData.camera = camera;
-
-    //     // CONTROLS
-    //     const controls = new OrbitControls( scene.userData.camera, scene.userData.element );
-    //     controls.minDistance = 2;
-    //     controls.maxDistance = 5;
-    //     controls.enablePan = false;
-    //     controls.enableZoom = false;
-    //     scene.userData.controls = controls;
-
-    //     // controls = new ArcballControls( scene.userData.camera, renderer.domElement, scene.userData.element );
-    //     // controls.addEventListener( 'change', render );
-    //     // controls.setGizmosVisible(false);
-    //     // controls.enableFocus = false;
-    //     // controls.enableZoom = false;
-    //     // controls.enableGrid = false;
-    //     // controls.enablePan = false;
-    //     // controls.enabled = false
-    //     // controls.update();
-        
-
-
-    //     // add one random mesh to each scene
-    //     const geometry = geometries[ geometries.length * Math.random() | 0 ];
-
-    //     const material = new THREE.MeshStandardMaterial( {
-
-    //         color: new THREE.Color().setHSL( Math.random(), 1, 0.75, THREE.SRGBColorSpace ),
-    //         roughness: 0.5,
-    //         metalness: 0,
-    //         flatShading: true
-
-    //     } );
-
-    //     scene.add( new THREE.Mesh( geometry, material ) );
-
-    //     scene.add( new THREE.HemisphereLight( 0xaaaaaa, 0x444444, 3 ) );
-
-    //     const light = new THREE.DirectionalLight( 0xffffff, 1.5 );
-    //     light.position.set( 1, 1, 1 );
-    //     scene.add( light );
-
-    //     scenes.push( scene );
-
-    // }
-    
     for ( let i = 0; i < group.length; i ++ ) {
 
         const scene = new THREE.Scene();
+        // scene.background = new THREE.Color(0x7b7b7b3c);
 
         // make a list item
         const element = document.createElement( 'div' );
@@ -967,11 +912,33 @@ async function init() {
         observerCanvasContainer.observe(element);
 
         const sceneElement = document.createElement( 'div' );
+        sceneElement.className = 'preview';
         element.appendChild( sceneElement );
 
-        const descriptionElement = document.createElement( 'div' );
-        descriptionElement.innerText = 'Scene ' + ( i + 1 );
-        element.appendChild( descriptionElement );
+
+        const attentElement = document.createElement( 'div' );
+        attentElement.className = 'attention';
+        element.appendChild( attentElement );
+
+        const attentElementBlur = progressiveBlur.cloneNode(true);
+        attentElement.appendChild( attentElementBlur );
+
+        const titleElement = document.createElement( 'h2' );
+        titleElement.innerText = title[i];
+        // element.appendChild( titleElement );
+        // sceneElement.appendChild( titleElement );
+        attentElement.appendChild( titleElement );
+
+        const descElement = document.createElement( 'p' );
+        descElement.innerText = description[i];
+        // element.appendChild( descElement );
+        attentElement.appendChild( descElement );
+
+
+        const showElement = document.createElement( 'h3' );
+        showElement.innerText = '⛶';
+        element.appendChild( showElement );
+        // sceneElement.appendChild( showElement );
 
         // the element that represents the area we want to render the scene
         scene.userData.element = sceneElement;
@@ -982,12 +949,13 @@ async function init() {
         scene.userData.camera = camera;
 
         // CONTROLS
-        const controls = new OrbitControls( scene.userData.camera, scene.userData.element );
-        controls.minDistance = 2;
-        controls.maxDistance = 5;
-        controls.enablePan = false;
-        controls.enableZoom = false;
-        scene.userData.controls = controls;
+        // const controls = new OrbitControls( scene.userData.camera, scene.userData.element );
+        // controls.minDistance = 2;
+        // controls.maxDistance = 5;
+        // controls.enablePan = false;
+        // controls.enableZoom = false;
+        // scene.userData.controls = controls;
+        // controls.enabled = false;
 
         // controls = new ArcballControls( scene.userData.camera, renderer.domElement, scene.userData.element );
         // controls.addEventListener( 'change', render );
@@ -1003,6 +971,7 @@ async function init() {
 
         // add one random mesh to each scene
         group[i].scale.set(0.5, 0.5, 0.5);
+        group[i].rotation.y = -0.2;
         scene.add(group[i]);
 
         scene.add( new THREE.HemisphereLight( 0xaaaaaa, 0x444444, 3 ) );
@@ -1015,12 +984,13 @@ async function init() {
 
     }
 
-    content.children[1].scrollIntoView({ block: "center", inline: "center", container: "nearest" });
-    scrollLast = content.scrollLeft;
+    // content.children[1].scrollIntoView({ block: "center", inline: "center", container: "nearest" });
+    // scrollLast = content.scrollLeft;
     renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true, alpha: true } );
-    // renderer.setClearColor( 0xffffff, 1 );
+    // renderer.setClearColor( 0x7b7b7b3c );
     // renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setAnimationLoop( animate );
+    updateSize();
 
 }
 
@@ -1032,7 +1002,9 @@ function updateSize() {
     if ( canvas.width !== width || canvas.height !== height ) {
 
         renderer.setSize( width, height, false );
-
+        // renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        // renderer.setSize( window.innerWidth, window.innerHeight );
     }
 
 }
@@ -1040,6 +1012,8 @@ function updateSize() {
 function animate() {
 
     updateSize();
+
+    canvas.style.transform = `translateX(${content.scrollLeft}px)`;
 
     renderer.setScissorTest( false );
     renderer.clear();
@@ -1054,10 +1028,10 @@ function animate() {
 
         // get its position relative to the page's viewport
         const rect = {
-            left: elementCont.offsetLeft - content.scrollLeft,
-            top: elementCont.offsetTop - content.scrollTop,
-            right: elementCont.offsetLeft + elementCont.clientWidth - content.scrollLeft,
-            bottom: elementCont.offsetTop + elementCont.clientHeight - content.scrollTop,
+            left: elementCont.offsetLeft + element.offsetLeft - content.scrollLeft,
+            top: elementCont.offsetTop + element.offsetTop - content.scrollTop,
+            right: elementCont.offsetLeft + element.offsetLeft + element.clientWidth - content.scrollLeft,
+            bottom: elementCont.offsetTop + element.offsetTop + element.clientHeight - content.scrollTop,
         };
 
         // check if it's offscreen. If so skip it
@@ -1078,6 +1052,8 @@ function animate() {
         renderer.setScissor( left, bottom, width, height );
 
         const camera = scene.userData.camera;
+        camera.aspect = element.clientWidth / element.clientHeight;
+        camera.updateProjectionMatrix();
 
         renderer.render( scene, camera );
 
@@ -1085,10 +1061,22 @@ function animate() {
 
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
 const observerCanvasContainer = new IntersectionObserver( (entries) => {
     entries.forEach((entry) => {
         if (entry.isIntersecting && entry.intersectionRatio == 1) {
-            entry.target.style.scale = '';
+            // entry.target.style.scale = '';
         } else {
             // entry.target.style.scale = '0.8';
         }
@@ -1101,17 +1089,20 @@ const observerCanvasContainer = new IntersectionObserver( (entries) => {
     // rootMargin: '0% -5%',
 });
 
-let scrollLast = 0;
-content.addEventListener('scroll', (e) => {
-    if (e.target.scrollLeft === e.target.scrollWidth - e.target.clientWidth && scrollLast < e.target.scrollLeft) {
-        e.target.scrollLeft += -e.target.scrollWidth;
-    } else if (e.target.scrollLeft === 0 && scrollLast > e.target.scrollLeft) {
-        e.target.scrollLeft += e.target.scrollWidth;
-    }
+// let scrollLast = 0;
+// content.addEventListener('scroll', (e) => {
+//     if (e.target.scrollLeft >= e.target.scrollWidth - e.target.clientWidth && scrollLast < e.target.scrollLeft) {
+//         e.target.scrollLeft += -e.target.scrollWidth;
+//         // e.target.scrollLeft += -e.target.scrollWidth + e.target.clientWidth * 2;
+//         // e.target.scrollTo(e.target.clientWidth, 0);
+//     } else if (e.target.scrollLeft <= 0 && scrollLast > e.target.scrollLeft) {
+//         e.target.scrollLeft += e.target.scrollWidth;
+//         // e.target.scrollLeft += e.target.scrollWidth - e.target.clientWidth * 2;
+//         // e.target.scrollTo(e.target.scrollWidth - e.target.clientWidth * 2, 0);
+//     }
 
-    scrollLast = e.target.scrollLeft;
-});
-
+//     scrollLast = e.target.scrollLeft;
+// });
 
 
 

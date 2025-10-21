@@ -1,101 +1,106 @@
 .section__about
-    display: grid
-    grid: repeat(2, 1fr) / repeat(2, 1fr)
-    column-gap: 1rem
-    // canvas
-    //     grid-area: 1 / 1 / -1 / -1
-    //     position: absolute
-    //     left: -7rem
-    //     top: -7rem
+    display: flex
+    align-items: center
+    justify-content: center
+    flex-direction: column
+    row-gap: 2rem
     .description
-        grid-area: 1 / 1 / -1 / 2
+        width: 100%
         align-self: start
-        width: 70%
-        @include respond(phone)
-            grid-area: 1 / 1 / -2 / -1
-    .list-phase
-        grid-area: 2 / 2 / -1 / -1
-        @include respond(phone)
-            grid-area: 2 / 1 / -1 / -1
-            vertical-align: bottom
-            &__details
-                bottom: 0
 
 
 
-
-#c,
-#content
-    grid-area: 1 / 1 / -1 / -1
-    place-self: center
+#c
     position: absolute
-    height: 100%
-    width: calc(100% + 14rem)
-
-#content
-    grid-area: 1 / 1 / -1 / -1
-    place-self: center
-    position: absolute
-    height: 100%
-    width: calc(100% + 14rem)
-    padding-block: 3rem
-    z-index: 1
-    white-space: nowrap
-    overflow-x: scroll
-    overflow-y: hidden
-    scrollbar-width: none
-
-.list-item
-    position: relative
-    display: inline-block
-    height: 100%
-    // width: 50%
-    aspect-ratio: 1/1
-    margin-inline: 8rem
-    overflow: hidden
-    border-radius: 2rem
-    border: 1px solid white
-    // background: #75757588
-    // &::before
-    //     content: ''
-    //     position: absolute
-    //     left: 0
-    //     top: 0
-    //     height: 100%
-    //     width: 100%
-    //     background: #75757588
-    //     z-index: -2
-
-.list-item > div:nth-child(1)
     height: 100%
     width: 100%
-    z-index: 2
-
-.list-item > div:nth-child(2)
-    position: absolute
     left: 0
     top: 0
-    // height: 100%
-    // width: 100%
-    color: #888
-    font-size: 2rem
-    // background: #75757588
-    // z-index: -2
+
+#content
+    height: 100%
+    width: calc(100% + 14rem)
+    place-self: center
+    position: relative
+    display: inline-flex
+    column-gap: 3rem
+    align-items: center
+    white-space: nowrap
+    overflow-x: scroll
+    overflow-y: visible
+    scrollbar-width: none
+    scroll-snap-type: x proximity
+    &::after,
+    &::before
+        content: ''
+        flex: 0 0 auto
+        position: relative
+        display: inline-flex
+        height: 100%
+        width: 5%
 
 
-
-
-
-    
-// .canvas-phase
-//     // grid-area: 1 / 1 / -1 / -1
-//     position: absolute
-//     display: flex
-//     overflow-x: scroll
-//     scroll-snap-type: x mandatory
-//     height: 100%
-//     width: 100%
-//     canvas
-//         scroll-snap-align: center
-//         transition: all .25s ease
-
+.list-item
+    flex: 0 0 auto
+    scroll-snap-align: center
+    position: relative
+    display: inline-flex
+    justify-content: center
+    height: 95%
+    // width: 25%
+    width: max-content
+    // aspect-ratio: 1 / 1
+    overflow: hidden
+    border-radius: 2rem
+    // border: 1px solid white
+    // box-shadow: 1px 2px 4px 0px #000
+    box-shadow: rgba(0, 0, 0, 1) 2px 4px 12px, rgba(255, 255, 255, .1) 0px 0px 16px inset
+    transition: all .25s ease
+    &:hover
+        box-shadow: rgba(0, 0, 0, 1) 2px 4px 16px, rgba(255, 255, 255, .1) 0px 0px 16px inset
+        transform: scale3d(1.01, 1.01, 1.01)
+        .attention
+            p
+                opacity: 1
+            .progressive-blur
+                scale: 1 1
+    .preview
+        position: relative
+        height: 100%
+        width: 25vw
+        // width: 60vw
+        align-self: center
+    h3
+        position: absolute
+        margin: 2rem
+        bottom: 0
+        right: 0
+        font-size: 3rem !important
+        font-weight: normal
+    .attention
+        position: absolute
+        display: flex
+        flex-direction: column
+        align-items: flex-end
+        row-gap: 1rem
+        height: 100%
+        width: 100%
+        padding: 2rem
+        h2,
+        p
+            z-index: 1
+        h2
+            align-self: flex-start
+            font-size: 2rem !important
+            font-weight: normal
+        p
+            opacity: 0
+            white-space: normal
+            transition: all .25s ease
+        .progressive-blur
+            left: 0
+            top: 0
+            z-index: 0
+            transform-origin: top
+            scale: 1 0
+            transition: all .3s ease
