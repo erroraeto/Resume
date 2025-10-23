@@ -670,15 +670,26 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 
 
-let sectionAbout = document.querySelector('.section__about');
+let buttonListMod = document.querySelectorAll('.list-model__button');
 let progressiveBlur = document.querySelector('.progressive-blur');
+let canvas = document.querySelector( '.list-model__canvas' );
+const content = document.querySelector( '.list-model__content' );
 
-let canvas, renderer;
+let renderer;
 
 const scenes = [];
 const models = [];
 const texture = [];
 const group = [];
+const iconSrc = [
+    '../icons/draw.svg',
+    '../icons/sculpt.svg',
+    '../icons/retopo.svg',
+    '../icons/uv.svg',
+    '../icons/bake.svg',
+    '../icons/t-paint.svg',
+    '../icons/w-paint.svg',
+];
 const title = [
     'CONCEPT DESIGN',
     'SCULPTING',
@@ -698,13 +709,28 @@ const description = [
     "- rigging is creating a virtual skeleton (a rig) for a 3D model, while skinning is the process of binding the 3D model's surface (the 'skin') to that skeleton.",
 ];
 
+
+
+
+const observerCanvasContainer = new IntersectionObserver( (entries) => {
+    entries.forEach((entry) => {
+        if ( entry.isIntersecting ) {
+            entry.target;
+        };
+        // if (entry.isIntersecting && entry.intersectionRatio == 1) {
+        //     // entry.target.style.scale = '';
+        // } else {
+        //     // entry.target.style.scale = '0.8';
+        // }
+    })
+}, {
+    root: content,
+    threshold: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+});
+
 init();
 
 async function init() {
-
-    canvas = document.getElementById( 'c' );
-
-    const content = document.getElementById( 'content' );
 
     // MODEL
     //          :TEXTURES
@@ -916,27 +942,39 @@ async function init() {
         element.appendChild( sceneElement );
 
 
-        const attentElement = document.createElement( 'div' );
-        attentElement.className = 'attention';
-        element.appendChild( attentElement );
+        const specificationEl = document.createElement( 'div' );
+        specificationEl.className = 'specification';
+        element.appendChild( specificationEl );
 
-        const attentElementBlur = progressiveBlur.cloneNode(true);
-        attentElement.appendChild( attentElementBlur );
+            const progressiveBlurEl = progressiveBlur.cloneNode(true);
+            specificationEl.appendChild( progressiveBlurEl );
 
-        const titleElement = document.createElement( 'h2' );
-        titleElement.innerText = title[i];
-        // element.appendChild( titleElement );
-        // sceneElement.appendChild( titleElement );
-        attentElement.appendChild( titleElement );
+            const specificationTitleEl = document.createElement( 'div' );
+            specificationTitleEl.className = 'specification__title';
+            specificationEl.appendChild( specificationTitleEl );
 
-        const descElement = document.createElement( 'p' );
-        descElement.innerText = description[i];
-        // element.appendChild( descElement );
-        attentElement.appendChild( descElement );
+                const iconEl = document.createElement( 'img' );
+                iconEl.src = iconSrc[i];
+                specificationTitleEl.appendChild( iconEl );
+
+                const titleEl = document.createElement( 'h2' );
+                titleEl.innerText = title[i];
+                specificationTitleEl.appendChild( titleEl );
+
+            const specificationDescEl = document.createElement( 'p' );
+            specificationDescEl.className = 'specification__content';
+            specificationDescEl.innerText = description[i];
+            specificationEl.appendChild( specificationDescEl );
 
 
-        const showElement = document.createElement( 'h3' );
-        showElement.innerText = '⛶';
+        // const showElement = document.createElement( 'h3' );
+        const showElement = iconEl.cloneNode(true);
+        showElement.addEventListener('click', listControl);
+        showElement.className = 'list-item__gimbal';
+        showElement.src = '../icons/gimbal.svg';
+        showElement.dataset.current = i;
+        // showElement.innerText = '⛶';
+        // showElement.addEventListener('click', fullSize);
         element.appendChild( showElement );
         // sceneElement.appendChild( showElement );
 
@@ -949,13 +987,13 @@ async function init() {
         scene.userData.camera = camera;
 
         // CONTROLS
-        // const controls = new OrbitControls( scene.userData.camera, scene.userData.element );
-        // controls.minDistance = 2;
-        // controls.maxDistance = 5;
-        // controls.enablePan = false;
-        // controls.enableZoom = false;
-        // scene.userData.controls = controls;
-        // controls.enabled = false;
+        const controls = new OrbitControls( scene.userData.camera, scene.userData.element );
+        controls.minDistance = 2;
+        controls.maxDistance = 5;
+        controls.enablePan = false;
+        controls.enableZoom = false;
+        scene.userData.controls = controls;
+        controls.enabled = false;
 
         // controls = new ArcballControls( scene.userData.camera, renderer.domElement, scene.userData.element );
         // controls.addEventListener( 'change', render );
@@ -986,9 +1024,9 @@ async function init() {
 
     // content.children[1].scrollIntoView({ block: "center", inline: "center", container: "nearest" });
     // scrollLast = content.scrollLeft;
-    renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true, alpha: true } );
     // renderer.setClearColor( 0x7b7b7b3c );
     // renderer.setPixelRatio( window.devicePixelRatio );
+    renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true, alpha: true } );
     renderer.setAnimationLoop( animate );
     updateSize();
 
@@ -1012,8 +1050,6 @@ function updateSize() {
 function animate() {
 
     updateSize();
-
-    canvas.style.transform = `translateX(${content.scrollLeft}px)`;
 
     renderer.setScissorTest( false );
     renderer.clear();
@@ -1067,42 +1103,217 @@ function animate() {
 
 
 
+// let modalCanvas = document.querySelector('.dialog__preview');
+// let rendererModal, cameraModal, sceneModal;
+
+// initModal();
+// function initModal() {
+//     rendererModal = new THREE.WebGLRenderer( { canvas: modalCanvas, antialias: true, alpha: true } );
+//     // rendererModal.setAnimationLoop( animateModal );
+//     // window.addEventListener( 'load', updateSizeModal );
+//     // updateSizeModal();
+// };
+
+// function updateSizeModal() {
+//     cameraModal.aspect = modalCanvas.clientWidth / modalCanvas.clientHeight;
+//     cameraModal.updateProjectionMatrix();
+//     rendererModal.setPixelRatio(window.devicePixelRatio);
+//     rendererModal.setSize( modalCanvas.clientWidth, modalCanvas.clientHeight );
+// };
+
+// function animateModal() {
+//     rendererModal.render(sceneModal, cameraModal);
+// };
 
 
 
 
 
 
-const observerCanvasContainer = new IntersectionObserver( (entries) => {
-    entries.forEach((entry) => {
-        if (entry.isIntersecting && entry.intersectionRatio == 1) {
-            // entry.target.style.scale = '';
-        } else {
-            // entry.target.style.scale = '0.8';
-        }
-    })
-}, {
-    root: content,
-    // threshold: [0.95, 1],
-    // threshold: 1,
-    threshold: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
-    // rootMargin: '0% -5%',
+
+
+
+// EVENTS
+
+buttonListMod.forEach((btn) => {
+    btn.addEventListener('click', listMove);
 });
 
-// let scrollLast = 0;
-// content.addEventListener('scroll', (e) => {
-//     if (e.target.scrollLeft >= e.target.scrollWidth - e.target.clientWidth && scrollLast < e.target.scrollLeft) {
-//         e.target.scrollLeft += -e.target.scrollWidth;
-//         // e.target.scrollLeft += -e.target.scrollWidth + e.target.clientWidth * 2;
-//         // e.target.scrollTo(e.target.clientWidth, 0);
-//     } else if (e.target.scrollLeft <= 0 && scrollLast > e.target.scrollLeft) {
-//         e.target.scrollLeft += e.target.scrollWidth;
-//         // e.target.scrollLeft += e.target.scrollWidth - e.target.clientWidth * 2;
-//         // e.target.scrollTo(e.target.scrollWidth - e.target.clientWidth * 2, 0);
-//     }
+function listMove(e) {
+    if (e.target.closest('button').name == 'prev') {
+        content.scrollTo({ left: content.scrollLeft - content.children[0].clientWidth, behavior: "smooth"});
+    } else if (e.target.closest('button').name == 'next') {
+        content.scrollTo({ left: content.scrollLeft + content.children[0].clientWidth, behavior: "smooth"});
+    };
+};
 
-//     scrollLast = e.target.scrollLeft;
-// });
+content.addEventListener('scroll', (e) => {
+    if (content.scrollLeft - content.children[0].clientWidth <= 0) {
+        buttonListMod[0].style.opacity = 0;
+    } else {
+        buttonListMod[0].style.opacity = '';
+    }
+
+    if (content.scrollLeft + content.clientWidth + content.children[0].clientWidth >= content.scrollWidth) {
+        buttonListMod[1].style.opacity = 0;
+    } else {
+        buttonListMod[1].style.opacity = '';
+    }
+});
+
+
+function listControl(e) {
+    let i = e.target.dataset.current;
+    let element = scenes[i].userData.element.offsetParent;
+    element.classList.toggle('open');
+    let control = scenes[i].userData.controls;
+    control.enabled = control.enabled == true ? false : true;
+};
+
+// let isDown,
+//     startX,
+//     scrollLeft;
+// content.addEventListener('mousedown', onClickGridHex);
+
+// function onClickGridHex(e) {
+//     isDown = true;
+//     document.body.style = 'user-select: none';
+//     content.style.scrollSnapType = "none";
+
+//     startX = e.pageX - content.offsetLeft;
+//     scrollLeft = content.scrollLeft;
+
+//     window.addEventListener('mousemove', onMoveGridHex);
+//     window.addEventListener('pointermove', onMoveGridHex);
+//     ['mouseup', 'mouseleave'].forEach( ev => window.addEventListener( ev , onLeaveGridHex) );
+
+// };
+
+// function onMoveGridHex(e) {
+//     if (!isDown) return;
+//     e.preventDefault();
+//     document.body.style = '';
+//     const x = e.pageX - content.offsetLeft;
+//     const walk = (x - startX) * 2;
+//     content.scrollLeft = scrollLeft - walk;
+
+// };
+
+// function onLeaveGridHex(e) {
+//     isDown = false;
+//     window.removeEventListener('mousemove', onMoveGridHex);
+//     document.children[0].style = '';
+//     content.style.scrollSnapType = "";
+// };
+
+
+
+
+
+// let modal = document.querySelector('.dialog');
+// // let modalCanvas = document.querySelector('.dialog__preview');
+// let prevElement;
+// let i;
+
+// // ["cancel", "close" ].forEach((ev) => {
+// //     modal.addEventListener(ev, () => {
+// //         scenes[i].userData.element = prevElement;
+// //     });
+// // });
+
+// function fullSize(e) {
+//     modal.showModal();
+//     i = e.target.dataset.current;
+
+//     setTimeout( () => {
+//         sceneModal = scenes[i].clone();
+//         // cameraModal = sceneModal.userData.camera;
+//         cameraModal = scenes[i].userData.camera.clone();
+
+//         const controls = new OrbitControls( cameraModal, modalCanvas );
+//         controls.minDistance = 2;
+//         controls.maxDistance = 5;
+//         controls.enablePan = false;
+//         controls.enableZoom = false;
+//         // scene.userData.controls = controls;
+//         // const controls = new ArcballControls( cameraModal, renderer.domElement, modalCanvas );
+//         // controls.setGizmosVisible(false);
+//         // controls.enableFocus = false;
+//         // controls.enableZoom = false;
+//         // controls.enableGrid = false;
+//         // controls.enablePan = false;
+//         // controls.enabled = false
+//         // controls.update();
+
+//         // camera.aspect = modalCanvas.clientWidth / modalCanvas.clientHeight;
+//         // camera.updateProjectionMatrix();
+
+//         // renderer.setPixelRatio(window.devicePixelRatio);
+//         // renderer.setSize( modalCanvas.clientWidth, modalCanvas.clientHeight );
+//         // renderer.render(sceneModal, camera);
+//         rendererModal.setAnimationLoop( animateModal );
+//         updateSizeModal();
+
+
+
+
+
+
+
+//     //     prevElement = scenes[i].userData.element;
+//     //     scenes[i].userData.element = modalCanvas;
+
+//     //     // const element = modalCanvas;
+//     //     // const elementCont = modal;
+
+//     //     // const rect = {
+//     //     //     left: elementCont.offsetLeft + element.offsetLeft,
+//     //     //     top: elementCont.offsetTop + element.offsetTop,
+//     //     //     right: elementCont.offsetLeft + element.offsetLeft + element.clientWidth,
+//     //     //     bottom: elementCont.offsetTop + element.offsetTop + element.clientHeight,
+//     //     // };
+
+//     //     // const width = rect.right - rect.left;
+//     //     // const height = rect.bottom - rect.top;
+//     //     // const left = rect.left;
+//     //     // const bottom = renderer.domElement.clientHeight - rect.bottom;
+
+//     //     // renderer.setViewport( left, bottom, width, height );
+//     //     // renderer.setScissor( left, bottom, width, height );
+
+//     //     // const camera = scenes[i].userData.camera;
+//     //     // camera.aspect = element.clientWidth / element.clientHeight;
+//     //     // camera.updateProjectionMatrix();
+
+//     //     // renderer.render( scenes[i], camera );
+//     }, 2);
+// };
+
+
+// // function animate() {
+// //     renderer.render(scene, camera);
+// // };
+
+
+
+
+
+
+
+// // let scrollLast = 0;
+// // content.addEventListener('scroll', (e) => {
+// //     if (e.target.scrollLeft >= e.target.scrollWidth - e.target.clientWidth && scrollLast < e.target.scrollLeft) {
+// //         e.target.scrollLeft += -e.target.scrollWidth;
+// //         // e.target.scrollLeft += -e.target.scrollWidth + e.target.clientWidth * 2;
+// //         // e.target.scrollTo(e.target.clientWidth, 0);
+// //     } else if (e.target.scrollLeft <= 0 && scrollLast > e.target.scrollLeft) {
+// //         e.target.scrollLeft += e.target.scrollWidth;
+// //         // e.target.scrollLeft += e.target.scrollWidth - e.target.clientWidth * 2;
+// //         // e.target.scrollTo(e.target.scrollWidth - e.target.clientWidth * 2, 0);
+// //     }
+
+// //     scrollLast = e.target.scrollLeft;
+// // });
 
 
 

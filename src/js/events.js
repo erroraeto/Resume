@@ -25,8 +25,6 @@ Array.from(listItems).forEach((item) => {
 });
 
 // GRID HEXAGON
-let gridItem = document.querySelectorAll('.grid-hexagon__item');
-
 let gridHex = document.querySelector('.grid-hexagon');
 let gridHexWrapp = document.querySelector('.grid-hexagon__wrapper');
 let gridHexItem = document.querySelectorAll('.grid-hexagon__item');
@@ -156,3 +154,52 @@ const observer = new IntersectionObserver( (entries) => {
 gridHexItem.forEach((item) => {
     observer.observe(item);
 });
+
+
+
+
+function clamp(min, value, max) {
+    return Math.max(min, Math.min(value, max));
+};
+
+gridHex.addEventListener('scroll', () => {
+    gridHexItem.forEach((item) => {
+        let newX = gridHex.scrollLeft - (gridHexWrapp.offsetLeft / 2);
+        let newY = gridHex.scrollTop - (gridHexWrapp.offsetTop / 2);
+
+        const containerMinX = -item.offsetWidth / 2;
+        const containerMinY = -item.offsetHeight / 2;
+        const containerMaxX = item.offsetWidth / 2;
+        const containerMaxY = item.offsetHeight / 2;
+
+        item.style.transform = `translateX(${clamp(containerMinX, newX, containerMaxX)}px) translateY(${clamp(containerMinY, newY, containerMaxY)}px)`;
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//  let newX = e.pageX - dragOffsetX;
+// let newY = e.pageY - dragOffsetY;
+
+// if (newX < 0) newX = 0;
+// if (newY < 0) newY = 0;
+// if (newX + draggableWidth > containerWidth) newX = containerWidth - draggableWidth;
+// if (newY + draggableHeight > containerHeight) newY = containerHeight - draggableHeight;
+
+// draggableElement.style.left = newX + 'px';
+// draggableElement.style.top = newY + 'px';

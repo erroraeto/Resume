@@ -10,17 +10,44 @@
 
 
 
-#c
-    position: absolute
-    height: 100%
-    width: 100%
-    left: 0
-    top: 0
 
-#content
+.list-model
     height: 100%
     width: calc(100% + 14rem)
     place-self: center
+    position: relative
+    &__canvas
+        position: absolute
+        height: 100%
+        width: 100%
+        left: 0
+        top: 0
+    &__button
+        position: absolute
+        left: 2%
+        top: 50%
+        height: 10%
+        aspect-ratio: 1
+        transform: translateY(-50%)
+        border-radius: 100rem
+        border: none
+        background: #fff
+        cursor: pointer
+        opacity: .5
+        z-index: 1
+        transition: all .25s ease
+        &:last-of-type
+            left: unset
+            right: 2%
+        &:hover
+            opacity: .9
+        img
+            height: 100%
+            aspect-ratio: 1
+
+.list-model__content
+    height: 100%
+    width: 100%
     position: relative
     display: inline-flex
     column-gap: 3rem
@@ -37,7 +64,7 @@
         position: relative
         display: inline-flex
         height: 100%
-        width: 5%
+        width: 10%
 
 
 .list-item
@@ -47,20 +74,32 @@
     display: inline-flex
     justify-content: center
     height: 95%
-    // width: 25%
     width: max-content
-    // aspect-ratio: 1 / 1
     overflow: hidden
     border-radius: 2rem
-    // border: 1px solid white
-    // box-shadow: 1px 2px 4px 0px #000
     box-shadow: rgba(0, 0, 0, 1) 2px 4px 12px, rgba(255, 255, 255, .1) 0px 0px 16px inset
+    cursor: grab
     transition: all .25s ease
+    &::after
+        content: ''
+        position: relative
+        display: inline-block
+        height: 100%
+        width: 0%
+        z-index: -1
+        transition: all .25s ease
+    &:active
+        cursor: grabbing
+    &:first-of-type,
+    &:last-of-type
+        scroll-snap-align: none
     &:hover
         box-shadow: rgba(0, 0, 0, 1) 2px 4px 16px, rgba(255, 255, 255, .1) 0px 0px 16px inset
         transform: scale3d(1.01, 1.01, 1.01)
-        .attention
-            p
+        .preview
+            height: 101%
+        .specification
+            &__content
                 opacity: 1
             .progressive-blur
                 scale: 1 1
@@ -70,6 +109,7 @@
         width: 25vw
         // width: 60vw
         align-self: center
+        transition: all .25s ease
     h3
         position: absolute
         margin: 2rem
@@ -77,23 +117,26 @@
         right: 0
         font-size: 3rem !important
         font-weight: normal
-    .attention
+    .specification
         position: absolute
+        right: 0
         display: flex
         flex-direction: column
-        align-items: flex-end
+        align-items: flex-start
         row-gap: 1rem
         height: 100%
         width: 100%
         padding: 2rem
-        h2,
-        p
-            z-index: 1
-        h2
-            align-self: flex-start
-            font-size: 2rem !important
-            font-weight: normal
-        p
+        &__title
+            display: flex
+            align-items: center
+            column-gap: 1rem
+            img
+                height: 2.5rem
+            h2
+                font-size: 2rem !important
+                font-weight: normal
+        &__content
             opacity: 0
             white-space: normal
             transition: all .25s ease
@@ -103,4 +146,35 @@
             z-index: 0
             transform-origin: top
             scale: 1 0
+            z-index: -1
             transition: all .3s ease
+    &__gimbal
+        position: absolute
+        height: 3rem
+        margin: 2rem
+        bottom: 0
+        right: 0
+        cursor: pointer
+        // font-size: 3rem !important
+        // font-weight: normal
+
+
+
+.open
+    .preview
+        width: 43vw
+    .specification
+        height: max-content
+    // .progressive-blur
+    //     height: 50%
+        // height: 110% !important
+        // width: 100%
+    // &::after
+    //     width: 60%
+    // .specification
+    //     // position: relative
+    //     width: 50%
+    //     .progressive-blur
+    //         display: none
+    //     &__content
+    //         opacity: 1
