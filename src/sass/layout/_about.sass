@@ -16,10 +16,10 @@
     width: calc(100% + 14rem)
     place-self: center
     position: relative
+    @include respond(phone)
+        width: calc(100% + 10rem)
     &__canvas
         position: absolute
-        height: 100%
-        width: 100%
         left: 0
         top: 0
     &__button
@@ -36,6 +36,7 @@
         opacity: .5
         z-index: 1
         transition: all .25s ease
+        // mask: url()
         &:last-of-type
             left: unset
             right: 2%

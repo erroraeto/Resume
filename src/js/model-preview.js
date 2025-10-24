@@ -1022,13 +1022,13 @@ async function init() {
 
     }
 
-    // content.children[1].scrollIntoView({ block: "center", inline: "center", container: "nearest" });
-    // scrollLast = content.scrollLeft;
-    // renderer.setClearColor( 0x7b7b7b3c );
-    // renderer.setPixelRatio( window.devicePixelRatio );
     renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true, alpha: true } );
-    renderer.setAnimationLoop( animate );
+    renderer.setPixelRatio(window.devicePixelRatio);
     updateSize();
+    renderer.setAnimationLoop( animate );
+    setTimeout(() => {
+        renderer.setAnimationLoop( null );
+    }, 600)
 
 }
 
@@ -1037,13 +1037,12 @@ function updateSize() {
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
 
-    if ( canvas.width !== width || canvas.height !== height ) {
-
-        renderer.setSize( width, height, false );
-        // renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        // renderer.setSize( window.innerWidth, window.innerHeight );
-    }
+    renderer.setSize( content.scrollWidth, content.scrollHeight );
+    renderer.setPixelRatio(window.devicePixelRatio);
+    // if ( canvas.width !== width || canvas.height !== height ) {
+    //     renderer.setSize( width, height, false );
+    //     // renderer.setSize( window.innerWidth, window.innerHeight );
+    // }
 
 }
 
@@ -1051,23 +1050,29 @@ function animate() {
 
     updateSize();
 
+    // canvas.style.transform = `translateX(${content.scrollLeft}px)`;
+
     renderer.setScissorTest( false );
     renderer.clear();
     renderer.setScissorTest( true );
 
     scenes.forEach( function ( scene ) {
 
-        // get the element that is a place holder for where we want to
-        // draw the scene
         const element = scene.userData.element;
         const elementCont = element.offsetParent;
 
-        // get its position relative to the page's viewport
+        // const rect = {
+        //     left: elementCont.offsetLeft + element.offsetLeft - content.scrollLeft,
+        //     top: elementCont.offsetTop + element.offsetTop - content.scrollTop,
+        //     right: elementCont.offsetLeft + element.offsetLeft + element.clientWidth - content.scrollLeft,
+        //     bottom: elementCont.offsetTop + element.offsetTop + element.clientHeight - content.scrollTop,
+        // };
+
         const rect = {
-            left: elementCont.offsetLeft + element.offsetLeft - content.scrollLeft,
-            top: elementCont.offsetTop + element.offsetTop - content.scrollTop,
-            right: elementCont.offsetLeft + element.offsetLeft + element.clientWidth - content.scrollLeft,
-            bottom: elementCont.offsetTop + element.offsetTop + element.clientHeight - content.scrollTop,
+            left: elementCont.offsetLeft + element.offsetLeft,
+            top: elementCont.offsetTop + element.offsetTop,
+            right: elementCont.offsetLeft + element.offsetLeft + element.clientWidth,
+            bottom: elementCont.offsetTop + element.offsetTop + element.clientHeight,
         };
 
         // check if it's offscreen. If so skip it
@@ -1159,6 +1164,7 @@ content.addEventListener('scroll', (e) => {
     } else {
         buttonListMod[1].style.opacity = '';
     }
+
 });
 
 
@@ -1167,7 +1173,15 @@ function listControl(e) {
     let element = scenes[i].userData.element.offsetParent;
     element.classList.toggle('open');
     let control = scenes[i].userData.controls;
-    control.enabled = control.enabled == true ? false : true;
+    if (control.enabled != true) {
+        control.enabled = true;
+        renderer.setAnimationLoop( animate );
+    } else {
+        control.enabled = false;
+        setTimeout(() => {
+            renderer.setAnimationLoop( null );
+        }, 600)
+    }
 };
 
 // let isDown,

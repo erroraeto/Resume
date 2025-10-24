@@ -39,7 +39,8 @@ window.onload = () => {
         y: circleRadius,
     };
     gridHexWrapp.style.margin = circleRadius * 2 + 'px';
-    gridHexWrapp.scrollIntoView({ block: "center", inline: "center", container: "nearest" });
+    // gridHexWrapp.scrollIntoView({ block: "center", inline: "center", container: "nearest" });
+    gridHex.scrollTo({ left: circleRadius, top: circleRadius, behavior: "smooth"});
 
 
 };
@@ -87,7 +88,8 @@ function onClickGridHex(e) {
     initialElementY = dragBox.top - gridHex.offsetTop;
 
     window.addEventListener('mousemove', onMoveGridHex);
-    window.addEventListener('pointermove', onMoveGridHex);
+    window.addEventListener('touchmove', (e) => onMoveGridHex(e));
+    // window.addEventListener('pointermove', onMoveGridHex);
     ['mouseup', 'mouseleave'].forEach( ev => window.addEventListener( ev , onLeaveGridHex) );
     ['touchend', 'touchcancel'].forEach( ev => window.addEventListener( ev , onLeaveGridHex) );
 
@@ -98,8 +100,18 @@ function onMoveGridHex(e) {
     e.preventDefault();
     document.body.style = '';
 
-    const x = e.pageX - gridHex.offsetLeft;
-    const y = e.pageY - gridHex.offsetTop;
+    let x,
+        y;
+    if (e.type == 'touchmove') {
+        x = e.touches[0].pageX - gridHex.offsetLeft;
+        y = e.touches[0].pageY - gridHex.offsetTop;
+    } else {
+        x = e.pageX - gridHex.offsetLeft;
+        y = e.pageY - gridHex.offsetTop;
+    }
+
+    // const x = e.pageX - gridHex.offsetLeft;
+    // const y = e.pageY - gridHex.offsetTop;
     
     const dx = x - initialMouseX;
     const dy = y - initialMouseY;
@@ -125,8 +137,9 @@ function onLeaveGridHex(e) {
     isDown = false;
 
     window.removeEventListener('mousemove', onMoveGridHex);
-    gridHexWrapp.scrollIntoView({ behavior: "smooth", block: "center", inline: "center", container: "nearest" })
-    
+    // gridHexWrapp.scrollIntoView({ behavior: "smooth", block: "center", inline: "center", container: "nearest" })
+    gridHex.scrollTo({ left: circleRadius, top: circleRadius, behavior: "smooth"});
+
     document.children[0].style = '';
 };
 
