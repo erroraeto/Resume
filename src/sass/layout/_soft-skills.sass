@@ -1,0 +1,27 @@
+.section__soft-skills
+    display: flex
+    gap: 3rem
+    @include respond(tab-land)
+        flex-direction: column-reverse
+    .description
+        align-items: end
+        align-self: start
+        &,
+        .description__paragraph
+            text-align: right
+        @include respond(tab-land)
+            align-self: center
+            align-items: center
+            &,
+            .description__paragraph
+                text-align: center
+    .list-details
+        align-self: anchor-center
+        @include respond(phone)
+            flex-direction: column
+            details
+                flex-direction: column
+                writing-mode: unset
+                summary,
+                p
+                    writing-mode: unset

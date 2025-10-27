@@ -1,0 +1,87 @@
+.grid-hexagon
+    position: relative
+    overflow: hidden
+    &__wrapper
+        position: relative
+        display: flex
+        flex-direction: column
+        justify-content: center
+        align-items: center
+        row-gap: 2%
+        box-sizing: content-box
+        user-select: none
+        cursor: grab
+        &:active
+            cursor: grabbing
+    &__column
+        position: relative
+        flex: 1 1 auto
+        height: 100%
+        width: 100%
+        display: flex
+        justify-content: center
+        column-gap: 4%
+    &__item
+        position: relative
+        display: flex
+        justify-content: center
+        align-items: center
+        aspect-ratio: 1 / 1
+        border-radius: 100rem
+        border: 2px solid rgba(255, 255, 255, 0.2)
+        transition: all .15s ease, scale .25s ease
+        &::before
+            content: attr(data-name)
+            position: absolute
+            width: max-content
+            padding: .5rem 1rem
+            left: 50%
+            top: 0
+            opacity: 0
+            filter: blur(8px)
+            translate: -50% -76%
+            border-radius: 100rem
+            box-shadow: rgba(255, 255, 255, .1) 0px 0px 8px inset, rgba(255, 255, 255, .1) 0px 0px 32px inset, rgba(0, 0, 0, 1) 0px 0px 6px
+            text-shadow: 0 0 4px black
+            background: linear-gradient(transparent, var(--grad-color))
+            backdrop-filter: blur(2px)
+            transition: all .25s ease-out
+        img
+            position: absolute
+            height: 55%
+            filter: grayscale(100%) brightness(1000%) drop-shadow(0 0 0px #000000b4)
+            pointer-events: none
+            transition: all .15s ease
+        &-bg
+            position: absolute
+            height: 100%
+            width: 100%
+            border-radius: 100rem
+            overflow: hidden
+            opacity: 0
+            transition: all .15s ease
+            z-index: -1
+            &::before
+                content: ''
+                position: relative
+                display: block
+                height: 100%
+                width: 100%
+                inset: 0
+                background-image: var(--src-img)
+                background-size: 100% 100%
+                filter: blur(2.5rem) saturate(50%)
+                transition: all .15s ease
+
+
+
+
+.hover
+    &::before
+        opacity: 1
+        filter: blur(0px)
+        translate: -50% calc( -100% - 1rem)
+    img
+        filter: grayscale(0%) brightness(100%) drop-shadow(0 0 20px #000000b4)
+    div
+        opacity: .7

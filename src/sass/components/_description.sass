@@ -1,0 +1,21 @@
+.description
+    position: relative
+    display: flex
+    flex-direction: column
+    row-gap: .4rem
+    height: max-content
+    filter: drop-shadow( 0 0 5px black ) drop-shadow( 0 0 2.5px black ) drop-shadow( 0 0 1px black )
+    // filter: url(#filter__inkBleed) drop-shadow(0 0 4px black) drop-shadow(0 0 4px black) drop-shadow(0 0 4px black)
+    &__title
+        &::after
+            content: attr(data-title)
+            position: absolute
+            margin-inline: .6rem
+            vertical-align: text-top
+    &__paragraph
+        display: flex
+        flex-direction: column
+        row-gap: .6rem
+        text-align: justify
+        span
+            display: block

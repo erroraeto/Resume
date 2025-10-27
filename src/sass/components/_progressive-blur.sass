@@ -1,0 +1,96 @@
+.progressive-blur
+    position: absolute
+    z-index: -1
+    // inset: 0 0 auto
+    height: 100%
+    width: 100%
+    pointer-events: none
+    &::after,
+    &::before
+        content: ""
+        position: absolute
+        inset: 0
+        z-index: 1
+        backdrop-filter: blur(.5px)
+        mask: linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgb(0, 0, 0) 12.5%, rgb(0, 0, 0) 25%, rgba(0, 0, 0, 0) 37.5%)
+    &::after
+        z-index: 8
+        backdrop-filter: blur(64px)
+        mask: linear-gradient(to top, rgba(0, 0, 0, 0) 87.5%, rgb(0, 0, 0) 100%)
+    &__layer
+        position: absolute
+        inset: 0
+        &:nth-of-type(1)
+            z-index: 2
+            backdrop-filter: blur(1px)
+            mask: linear-gradient(to top, rgba(0, 0, 0, 0) 12.5%, rgb(0, 0, 0) 25%, rgb(0, 0, 0) 37.5%, rgba(0, 0, 0, 0) 50%)
+        &:nth-of-type(2)
+            z-index: 3
+            backdrop-filter: blur(2px)
+            mask: linear-gradient(to top, rgba(0, 0, 0, 0) 25%, rgb(0, 0, 0) 37.5%, rgb(0, 0, 0) 50%, rgba(0, 0, 0, 0) 62.5%)
+        &:nth-of-type(3)
+            z-index: 4
+            backdrop-filter: blur(4px)
+            mask: linear-gradient(to top, rgba(0, 0, 0, 0) 37.5%, rgb(0, 0, 0) 50%, rgb(0, 0, 0) 62.5%, rgba(0, 0, 0, 0) 75%)
+        &:nth-of-type(4)
+            z-index: 4
+            backdrop-filter: blur(8px)
+            mask: linear-gradient(to top, rgba(0, 0, 0, 0) 50%, rgb(0, 0, 0) 62.5%, rgb(0, 0, 0) 75%, rgba(0, 0, 0, 0) 87.5%)
+        &:nth-of-type(5)
+            z-index: 5
+            backdrop-filter: blur(16px)
+            mask: linear-gradient(to top,rgba(0,0,0,0) 62.5%,rgb(0,0,0) 75%,rgb(0,0,0) 87.5%,rgba(0,0,0,0) 100%)
+        &:nth-of-type(6)
+            z-index: 5
+            backdrop-filter: blur(32px)
+            mask: linear-gradient(to top,rgba(0,0,0,0) 75%,rgb(0,0,0) 87.5%,rgb(0,0,0) 100%)
+    &__bottom-side
+        bottom: 0
+        scale: 1 -1
+
+.progressive-blur__left-side,
+.progressive-blur__right-side
+        z-index: 0
+        &::after,
+        &::before
+            content: ""
+            position: absolute
+            inset: 0
+            z-index: 1
+            backdrop-filter: blur(.5px)
+            // mask: linear-gradient(to left, rgba(0, 0, 0, 0) 0%, rgb(0, 0, 0) 12.5%, rgb(0, 0, 0) 25%, rgba(0, 0, 0, 0) 37.5%)
+        &::after
+            z-index: 8
+            backdrop-filter: blur(64px)
+            mask: linear-gradient(to left, rgba(0, 0, 0, 0) 87.5%, rgb(0, 0, 0) 100%)
+        .progressive-blur__layer
+            position: absolute
+            inset: 0
+            &:nth-of-type(1)
+                z-index: 2
+                backdrop-filter: blur(1px)
+                mask: linear-gradient(to left, rgba(0, 0, 0, 0) 12.5%, rgb(0, 0, 0) 25%, rgb(0, 0, 0) 37.5%, rgba(0, 0, 0, 0) 50%)
+            &:nth-of-type(2)
+                z-index: 3
+                backdrop-filter: blur(2px)
+                mask: linear-gradient(to left, rgba(0, 0, 0, 0) 25%, rgb(0, 0, 0) 37.5%, rgb(0, 0, 0) 50%, rgba(0, 0, 0, 0) 62.5%)
+            &:nth-of-type(3)
+                z-index: 4
+                backdrop-filter: blur(4px)
+                mask: linear-gradient(to left, rgba(0, 0, 0, 0) 37.5%, rgb(0, 0, 0) 50%, rgb(0, 0, 0) 62.5%, rgba(0, 0, 0, 0) 75%)
+            &:nth-of-type(4)
+                z-index: 4
+                backdrop-filter: blur(8px)
+                mask: linear-gradient(to left, rgba(0, 0, 0, 0) 50%, rgb(0, 0, 0) 62.5%, rgb(0, 0, 0) 75%, rgba(0, 0, 0, 0) 87.5%)
+            &:nth-of-type(5)
+                z-index: 5
+                backdrop-filter: blur(16px)
+                mask: linear-gradient(to left,rgba(0,0,0,0) 62.5%,rgb(0,0,0) 75%,rgb(0,0,0) 87.5%,rgba(0,0,0,0) 100%)
+            &:nth-of-type(6)
+                z-index: 5
+                backdrop-filter: blur(32px)
+                mask: linear-gradient(to left,rgba(0,0,0,0) 75%,rgb(0,0,0) 87.5%,rgb(0,0,0) 100%)
+
+.progressive-blur__right-side
+    right: 0
+    scale: -1 1

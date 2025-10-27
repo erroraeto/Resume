@@ -1,0 +1,16 @@
+.section__about
+    display: flex
+    align-items: center
+    justify-content: center
+    flex-direction: column
+    row-gap: 2rem
+    .description
+        width: 100%
+        align-self: start
+    .list-model
+        .preview
+            width: 25vw
+            @include respond(tab-port)
+                width: 35vw
+            @include respond(phone)
+                width: 60vw

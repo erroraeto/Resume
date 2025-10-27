@@ -1,0 +1,103 @@
+*, ::after, ::before
+    color: var(--color-white)
+    font-family: "Quicksand", sans-serif
+    letter-spacing: .04em
+    font-weight: lighter
+    font-style: normal
+
+h1,
+h2,
+summary
+    // font-family: "Quicksand", sans-serif
+
+
+h1
+    font-size: 7.2rem
+    line-height: .8em
+
+h2
+    font-size: 4.4rem
+
+h3,
+p,
+a,
+summary,
+.radio__item
+    font-size: 1.7rem
+
+a:link, a:visited
+    text-decoration: none
+    color: var(--color-white)
+
+.nav__titul
+    color: #d5d2d3 !important
+    font-family: "Cormorant Garamond", serif
+    font-weight: 600
+    font-size: 2rem
+    letter-spacing: -.08em
+    @include respond(phone)
+        font-size: 3rem
+
+
+// Cover
+.cover__title
+    h1,
+    h2,
+    &::after
+        font-family: "Cormorant Garamond", serif
+        font-weight: 600
+    h1
+        font-size: 20rem
+        margin-right: -.08em
+        line-height: .6em
+    h2,
+    &::after
+        font-size: 14rem
+        line-height: .8em
+        letter-spacing: -.08em
+    p,
+    span
+        letter-spacing: .42em
+
+// Description
+.description__title
+    &::after
+        letter-spacing: .1em
+        font-size: 1.4rem
+
+.description__paragraph
+    line-height: 1.2em
+
+.description-details__summary
+    font-family: "Quicksand", sans-serif
+    font-size: 2.4rem
+    font-weight: lighter
+
+// List details
+.list-details
+    summary
+        font-size: 2.2rem
+
+// Grid hexagon
+.grid-hexagon__item::before
+    font-size: 1.6rem
+
+// Visit card
+.visit-card
+    text
+        font-weight: bold
+
+// List details
+.list-phase
+    &__summary
+        font-size: 2.5rem
+
+// Scrollbar
+.scrollbar__list
+    font-size: 1.2rem
+
+.footer
+    a,
+    p
+        @include respond(phone)
+            font-size: 2rem
